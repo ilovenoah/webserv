@@ -46,7 +46,10 @@ IncludeBlocks: Preserve
 IndentCaseLabels: true
 
 # インデントは4スペース
+BasedOnStyle: LLVM
 IndentWidth: 4
+TabWidth: 4
+UseTab: Always
 
 # ポインターの * & は変数宣言の左に記述する
 PointerAlignment: Right
