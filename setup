@@ -1,0 +1,5 @@
+# ベースとなるDockerイメージを指定
+FROM ubuntu:latest
+
+# 必要なパッケージをインストール
+RUN apt-get update && apt-get install -y git
