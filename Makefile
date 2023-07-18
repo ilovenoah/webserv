@@ -11,8 +11,8 @@ OBJ_DIR		=	objs/
 
 BUILT_NAME	=	main.cpp
 
-OBJ_NAME	=	$(addprefix $(BUILT_DIR), $(BUILT_NAME:.c=.o))
-OBJ_NAME	+=	$(addprefix $(EXEC_DIR), $(EXEC_NAME:.c=.o))
+OBJ_NAME	=	$(addprefix $(BUILT_DIR), $(BUILT_NAME:.cpp=.o))
+OBJ_NAME	+=	$(addprefix $(EXEC_DIR), $(EXEC_NAME:.cpp=.o))
 OBJ			=	$(addprefix $(OBJ_DIR), $(OBJ_NAME))
 
 all: mkdir $(NAME)
@@ -21,7 +21,7 @@ $(NAME): $(OBJ)
 	@$(CXX) -o $@ $^
 	@echo "##### $@ compiling finished! #####"
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c
+$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 	@$(CXX) $(CXXFLAGS) $(INC) -o $@ -c $^
 	@echo "##### Creating" [ $@ ] " #####"
 
