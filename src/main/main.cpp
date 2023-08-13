@@ -12,7 +12,14 @@ int error_log(std::string string)
 
 int main(int argc, char const *argv[])
 {
+	std::map <std::string, Value> config;
+
 	if (argc > 2)
 		return(error_log("Too many arguments"));
+	(void)argv;
 
+	config["server_name"].type = STRING;
+	config["server_name"].value.strVal = new std::string("server_name");
+	
+	return (0);
 }

@@ -8,4 +8,6 @@
 #include <sstream>
 #include <iterator>
 
+#include "conf.hpp"
+
 #endif
