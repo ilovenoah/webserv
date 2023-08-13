@@ -13,6 +13,7 @@ OBJ_DIR		=	objs/
 MAIN_NAME	=	main.cpp
 
 OBJ_NAME	+=	$(addprefix $(MAIN_DIR), $(MAIN_NAME:.cpp=.o))
+
 OBJ			=	$(addprefix $(OBJ_DIR), $(OBJ_NAME))
 
 all: mkdir $(NAME)
