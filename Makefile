@@ -7,12 +7,17 @@ NAME		=	webserv
 INC			=	-I inc/
 
 SRC_DIR		=	src/
-MAIN_DIR	=	main/
+ARGS_DIR	=	args/
+UTILS_DIR	=	utils/
 OBJ_DIR		=	objs/
 
 MAIN_NAME	=	main.cpp
+ARGS_NAME	=	read_conf.cpp
+UTILS_NAME	=	Error.cpp
 
-OBJ_NAME	+=	$(addprefix $(MAIN_DIR), $(MAIN_NAME:.cpp=.o))
+OBJ_NAME	=	$(MAIN_NAME:.cpp=.o)
+OBJ_NAME	+=	$(addprefix $(ARGS_DIR), $(ARGS_NAME:.cpp=.o))
+OBJ_NAME	+=	$(addprefix $(UTILS_DIR), $(UTILS_NAME:.cpp=.o))
 
 OBJ			=	$(addprefix $(OBJ_DIR), $(OBJ_NAME))
 
@@ -27,7 +32,8 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 	@echo "##### Creating" [ $@ ] " #####"
 
 mkdir:
-	@mkdir -p $(OBJ_DIR)$(MAIN_DIR)
+	@mkdir -p $(OBJ_DIR)$(ARGS_DIR)
+	@mkdir -p $(OBJ_DIR)$(UTILS_DIR)
 	@echo "##### Creating obj directory #####"
 
 clean:
