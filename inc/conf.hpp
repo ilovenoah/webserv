@@ -4,6 +4,9 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <iostream>
+#include <cstdlib>
 
 enum ValueType
 {
@@ -23,5 +26,7 @@ struct Value
 		std::vector<Value> *vctVal;
 	} value;
 };
+
+std::map <std::string, Value> *parseConfig(int argc, const char *argv[]);
 
 #endif
