@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iterator>
 
-#include "conf.hpp"
+#include "Config.hpp"
 #include "Error.hpp"
 
 #endif

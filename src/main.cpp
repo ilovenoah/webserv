@@ -2,9 +2,9 @@
 
 int main(int argc, const char *argv[])
 {
-	std::map <std::string, Value> *config;
+	Config config;
 
-	config = parseConfig(argc, argv);
+	config.parseConfig(argc, argv);
 
 	// config読み込み
 	// config["server_name"].type = STRING;

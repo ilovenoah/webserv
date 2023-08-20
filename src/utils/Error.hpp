@@ -4,11 +4,11 @@
 
 class GenericException : public std::exception
 {
-  private:
+private:
 	int errorCode;
 	std::string errorMessage;
 
-  public:
+public:
 	GenericException(int code, const std::string &message);
 	virtual ~GenericException() throw() {}
 	int code() const;
