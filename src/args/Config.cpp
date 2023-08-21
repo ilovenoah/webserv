@@ -2,6 +2,21 @@
 #include "Error.hpp"
 #include "parse.hpp"
 
+Config::Config()
+{
+	std::map<std::string, std::function<void()>> setterMap;
+
+	setterMap["server_name"] = &Server::setServerName;
+	setterMap["listen"] = &Server::setListen;
+	setterMap["root"] = &Server::setRoot;
+	setterMap["error_page"] = &Server::setErrorPage;
+	setterMap["allow_methods"] = &Server::setAllowMethods;
+	setterMap["index"] = &Server::setIndex;
+	setterMap["client_body_limit"] = &Server::setClientBodyLimit;
+	setterMap["location"] = &Server::setLocation;
+	setterMap["error_page"] = &Server::setErrorPage;
+}
+
 static bool isComment(std::string& line)
 {
 	if (line[0] == '#')
@@ -27,17 +42,11 @@ static void parseLine(Config config, std::string &line)
 	{
 		config.add_back(Server());
 	}
-	else if ((pos = line.find("location")) != std::string::npos)
-	{
-	}
-	else if ((pos = line.find("error_page")) != std::string::npos)
-	{
-	}
 	else
 	{
 		key = line.substr(0, line.find(' '));
 		value = line.substr(line.find(' ') + 1);
-		config._servers.back().setServerName(value);
+		config._servers.back().setterMap[key](value);
 	}
 }
 
