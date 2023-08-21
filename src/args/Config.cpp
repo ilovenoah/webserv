@@ -17,7 +17,31 @@ static void deleteTab(std::string& line)
 		line.erase(pos, 1);
 }
 
-static void parseFile(Config config, std::ifstream& file)
+void parseServer(Config config, std::string &line)
+
+static void parseLine(Config config, std::string &line)
+{
+	size_t pos;
+
+	if ((pos = line.find("server")) != std::string::npos)
+	{
+		config.add_back(Server());
+	}
+	else if ((pos = line.find("location")) != std::string::npos)
+	{
+	}
+	else if ((pos = line.find("error_page")) != std::string::npos)
+	{
+	}
+	else
+	{
+		key = line.substr(0, line.find(' '));
+		value = line.substr(line.find(' ') + 1);
+		config._servers.back().setServerName(value);
+	}
+}
+
+static void parseFile(Config config, std::ifstream &file)
 {
 	std::string line;
 
@@ -26,16 +50,7 @@ static void parseFile(Config config, std::ifstream& file)
 		deleteTab(line);
 		if (isComment(line))
 			continue ;
-		// 一番右が"{"ならば左側がキー、"}"までvalue
-		if (line.find('{') != std::string::npos)
-		{
-			// "}"までがvalue
-		}
-		// "{"がなければ始めのスペースまでがキー
-		else
-		{
-			// 最初のスペースまでがキー
-			// その後がvalue
+		parseLine(config, line);
 		}
 	}
 }
