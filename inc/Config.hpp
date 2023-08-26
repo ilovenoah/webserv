@@ -1,8 +1,6 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <map>
-#include <string>
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -13,6 +11,7 @@ class Config
 {
 private:
 	std::vector<Server> _servers;
+	std::map<std::string, std::function<void(Server&)>> _srvSetterMap;
 
 public:
 	Config();

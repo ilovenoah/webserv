@@ -1,9 +1,8 @@
-#ifndef SEVER_HPP
-#define SEVER_HPP
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
-#include "Location.hpp"
 #include <map>
-#include <string>
+#include "Location.hpp"
 
 class Server
 {
@@ -16,6 +15,7 @@ private:
 	std::string _client_body_limit;
 	Location _location;
 	std::map<std::string, std::string> _error_page;
+	std::map<std::string, void()> _locSetterMap;
 
 public:
 	Server();
@@ -29,8 +29,8 @@ public:
 	void setAllowMethods(const std::string &allowMethods);
 	void setIndex(const std::string &index);
 	void setClientBodyLimit(const std::string &clientBodyLimit);
-	void setLocation(const Location &location);
-	void setErrorPage(const std::map<std::string, std::string> &errorPage);
+	void setLocation(const std::string &location);
+	void setErrorPage(const std::string &errorPage);
 
 	const std::string &getServerName() const;
 	const std::string &getListen() const;

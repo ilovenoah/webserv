@@ -15,6 +15,20 @@ private:
 public:
 	Location();
 	~Location();
+	Location(const Location &copy);
+	Location &operator=(const Location &copy);
+
+	void setLocation(const std::string &location);
+	void setAllowMethods(const std::string &allowMethods);
+	void setRoot(const std::string &root);
+	void setIndex(const std::string &index);
+	void setCgiInfo(const std::string &cgiInfo);
+
+	const std::string &getLocation() const;
+	const std::string &getAllowMethods() const;
+	const std::string &getRoot() const;
+	const std::string &getIndex() const;
+	const std::string &getCgiInfo() const;
 };
 
 #endif
