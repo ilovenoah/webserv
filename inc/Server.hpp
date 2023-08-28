@@ -16,6 +16,7 @@ class Server
 	Location _location;
 	std::map<std::string, std::string> _error_page;
 
+  protected:
 	std::map<std::string, void (Server::*)(const std::string &)> _srvSetterMap;
 
   public:
@@ -33,14 +34,16 @@ class Server
 	void setLocation(const std::string &location);
 	void setErrorPage(const std::string &errorPage);
 
-	const std::string &getServerName() const;
-	const std::string &getListen() const;
-	const std::string &getRoot() const;
-	const std::string &getAllowMethods() const;
-	const std::string &getIndex() const;
-	const std::string &getClientBodyLimit() const;
-	const Location &getLocation() const;
-	const std::map<std::string, std::string> &getErrorPage() const;
+	std::string &getServerName() const;
+	std::string &getListen() const;
+	std::string &getRoot() const;
+	std::string &getAllowMethods() const;
+	std::string &getIndex() const;
+	std::string &getClientBodyLimit() const;
+	Location &getLocation() const;
+	std::map<std::string, std::string> &getErrorPage() const;
+
+	void execSetterMap(std::string keys, std::string value);
 };
 
 #endif

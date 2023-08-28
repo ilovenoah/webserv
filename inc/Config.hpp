@@ -19,7 +19,7 @@ class Config
 	Config &operator=(const Config &copy);
 
 	void setServers();
-	const std::vector<Server> &getServers() const;
+	std::vector<Server> &getServers() const;
 	Config parseConfig(int argc, const char *argv[]);
 };
 

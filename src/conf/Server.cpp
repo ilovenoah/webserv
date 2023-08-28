@@ -13,7 +13,9 @@ Server::Server()
 	_srvSetterMap["error_page"] = &Server::setErrorPage;
 }
 
-Server::~Server() {}
+Server::~Server()
+{
+}
 
 Server::Server(const Server &copy)
 {
@@ -76,9 +78,6 @@ void Server::setLocation(const std::string &location)
 	pos = location.find_last_of(' ');
 	key = location.substr(0, pos);
 	value = location.substr(pos + 1);
-
-	
-
 }
 
 void Server::setErrorPage(const std::string &errorPage)
@@ -137,4 +136,9 @@ const Location &Server::getLocation() const
 const std::map<std::string, std::string> &Server::getErrorPage() const
 {
 	return _error_page;
+}
+
+void execSetterMap(std::string keys, std::string value)
+{
+	_srvSetterMap[keys](value);
 }

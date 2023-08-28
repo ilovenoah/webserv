@@ -27,11 +27,11 @@ class Location
 	void setIndex(const std::string &index);
 	void setCgiInfo(const std::string &cgiInfo);
 
-	const std::string &getLocation() const;
-	const std::string &getAllowMethods() const;
-	const std::string &getRoot() const;
-	const std::string &getIndex() const;
-	const std::string &getCgiInfo() const;
+	std::string &getLocation() const;
+	std::string &getAllowMethods() const;
+	std::string &getRoot() const;
+	std::string &getIndex() const;
+	std::string &getCgiInfo() const;
 };
 
 #endif

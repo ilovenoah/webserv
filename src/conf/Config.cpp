@@ -51,7 +51,7 @@ void parseLine(Config config, std::string &line)
 	{
 		key = line.substr(0, line.find(' '));
 		value = line.substr(line.find(' ') + 1, line.find(';') - 1);
-		config.getServers().back()._srvSetterMap[key](value);
+		config.getServers().back().execSetterMap(key, value);
 	}
 }
 
