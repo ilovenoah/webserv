@@ -1,28 +1,26 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <vector>
+#include "Server.hpp"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <cstdlib>
-#include "Server.hpp"
+#include <vector>
 
 class Config
 {
-private:
+  private:
 	std::vector<Server> _servers;
-	std::map<std::string, std::function<void(Server&)>> _srvSetterMap;
 
-public:
+  public:
 	Config();
 	~Config();
 	Config(const Config &copy);
 	Config &operator=(const Config &copy);
 
-	void setServers(const std::vector<Server> &servers);
+	void setServers();
 	const std::vector<Server> &getServers() const;
 	Config parseConfig(int argc, const char *argv[]);
-
 };
 
 #endif

@@ -1,6 +1,8 @@
 #include "Error.hpp"
 
-GenericException::GenericException(int code, const std::string &message) : errorCode(code), errorMessage(message) {}
+GenericException::GenericException(int code, const std::string &message) : errorCode(code), errorMessage(message)
+{
+}
 
 int GenericException::code() const
 {

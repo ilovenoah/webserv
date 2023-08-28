@@ -1,7 +1,14 @@
 #include "Location.hpp"
 #include <map>
 
-Location::Location() {}
+Location::Location()
+{
+	_locSetterMap["location"] = &Location::setLocation;
+	_locSetterMap["allow_methods"] = &Location::setAllowMethods;
+	_locSetterMap["root"] = &Location::setRoot;
+	_locSetterMap["index"] = &Location::setIndex;
+	_locSetterMap["cgi_info"] = &Location::setCgiInfo;
+}
 
 Location::~Location() {}
 

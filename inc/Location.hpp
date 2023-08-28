@@ -2,17 +2,20 @@
 #define LOCATION_HPP
 
 #include <string>
+#include <map>
 
 class Location
 {
-private:
+  private:
 	std::string _location;
 	std::string _allowMethods;
 	std::string _root;
 	std::string _index;
 	std::string _cgiInfo;
 
-public:
+	std::map<std::string, void (Location::*)(const std::string &)> _locSetterMap;
+
+  public:
 	Location();
 	~Location();
 	Location(const Location &copy);

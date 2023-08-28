@@ -3,11 +3,14 @@
 
 Server::Server()
 {
-	_locSetterMap["location"] = &Location::setLocation;
-	_locSetterMap["allow_methods"] = &Location::setAllowMethods;
-	_locSetterMap["root"] = &Location::setRoot;
-	_locSetterMap["index"] = &Location::setIndex;
-	_locSetterMap["cgi_info"] = &Location::setCgiInfo;
+	_srvSetterMap["server_name"] = &Server::setServerName;
+	_srvSetterMap["listen"] = &Server::setListen;
+	_srvSetterMap["root"] = &Server::setRoot;
+	_srvSetterMap["allow_methods"] = &Server::setAllowMethods;
+	_srvSetterMap["index"] = &Server::setIndex;
+	_srvSetterMap["client_body_limit"] = &Server::setClientBodyLimit;
+	_srvSetterMap["location"] = &Server::setLocation;
+	_srvSetterMap["error_page"] = &Server::setErrorPage;
 }
 
 Server::~Server() {}
@@ -66,8 +69,16 @@ void Server::setClientBodyLimit(const std::string &clientBodyLimit)
 void Server::setLocation(const std::string &location)
 {
 	Location loc;
+	std::string key;
+	std::string value;
+	std::size_t pos;
 
-	loc._
+	pos = location.find_last_of(' ');
+	key = location.substr(0, pos);
+	value = location.substr(pos + 1);
+
+	
+
 }
 
 void Server::setErrorPage(const std::string &errorPage)

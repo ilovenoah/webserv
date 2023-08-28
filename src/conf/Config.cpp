@@ -1,16 +1,7 @@
 #include "Config.hpp"
+#include "Error.hpp"
 
-Config::Config()
-{
-	_srvSetterMap["server_name"] = &Server::setServerName;
-	_srvSetterMap["listen"] = &Server::setListen;
-	_srvSetterMap["root"] = &Server::setRoot;
-	_srvSetterMap["allow_methods"] = &Server::setAllowMethods;
-	_srvSetterMap["index"] = &Server::setIndex;
-	_srvSetterMap["client_body_limit"] = &Server::setClientBodyLimit;
-	_srvSetterMap["location"] = &Server::setLocation;
-	_srvSetterMap["error_page"] = &Server::setErrorPage;
-}
+Config::Config() {}
 
 Config::~Config() {}
 
@@ -22,11 +13,18 @@ Config::Config(const Config &copy)
 Config &Config::operator=(const Config &copy)
 {
 	if (this != &copy)
-	{
 		_servers = copy._servers;
-		_srvSetterMap = copy._srvSetterMap;
-	}
 	return *this;
+}
+
+void Config::setServers()
+{
+	_servers.push_back(Server());
+}
+
+const std::vector<Server> &Config::getServers() const
+{
+	return _servers;
 }
 
 void removeUnwanted(std::string &line)
@@ -48,12 +46,12 @@ void parseLine(Config config, std::string &line)
 	std::string value;
 
 	if ((pos = line.find("server ")) != std::string::npos)
-		config._servers.add_back(Server());
+		config.setServers();
 	else
 	{
 		key = line.substr(0, line.find(' '));
 		value = line.substr(line.find(' ') + 1, line.find(';') - 1);
-		config._servers.back()._srvSetterMap[key](value);
+		config.getServers().back()._srvSetterMap[key](value);
 	}
 }
 
