@@ -3,14 +3,16 @@
 
 Location::Location()
 {
-	_locSetterMap["location"] = &Location::setLocation;
-	_locSetterMap["allow_methods"] = &Location::setAllowMethods;
-	_locSetterMap["root"] = &Location::setRoot;
-	_locSetterMap["index"] = &Location::setIndex;
-	_locSetterMap["cgi_info"] = &Location::setCgiInfo;
+	Location::_locSetterMap["location"] = &Location::setLocation;
+	Location::_locSetterMap["allow_methods"] = &Location::setAllowMethods;
+	Location::_locSetterMap["root"] = &Location::setRoot;
+	Location::_locSetterMap["index"] = &Location::setIndex;
+	Location::_locSetterMap["cgi_info"] = &Location::setCgiInfo;
 }
 
-Location::~Location() {}
+Location::~Location()
+{
+}
 
 Location::Location(const Location &copy)
 {

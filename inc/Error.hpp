@@ -1,3 +1,6 @@
+#ifndef ERROR_HPP
+#define ERROR_HPP
+
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -16,3 +19,5 @@ class GenericException : public std::exception
 	int code() const;
 	const char *what() const throw();
 };
+
+#endif

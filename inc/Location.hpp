@@ -1,8 +1,8 @@
 #ifndef LOCATION_HPP
 #define LOCATION_HPP
 
-#include <string>
 #include <map>
+#include <string>
 
 class Location
 {
@@ -12,7 +12,6 @@ class Location
 	std::string _root;
 	std::string _index;
 	std::string _cgiInfo;
-
 	std::map<std::string, void (Location::*)(const std::string &)> _locSetterMap;
 
   public:
@@ -27,11 +26,11 @@ class Location
 	void setIndex(const std::string &index);
 	void setCgiInfo(const std::string &cgiInfo);
 
-	std::string &getLocation() const;
-	std::string &getAllowMethods() const;
-	std::string &getRoot() const;
-	std::string &getIndex() const;
-	std::string &getCgiInfo() const;
+	const std::string &getLocation() const;
+	const std::string &getAllowMethods() const;
+	const std::string &getRoot() const;
+	const std::string &getIndex() const;
+	const std::string &getCgiInfo() const;
 };
 
 #endif

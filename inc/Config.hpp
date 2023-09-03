@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 
+#define DEFAULT_CONF "conf/sample.conf"
+
 class Config
 {
   private:
@@ -19,7 +21,7 @@ class Config
 	Config &operator=(const Config &copy);
 
 	void setServers();
-	std::vector<Server> &getServers() const;
+	std::vector<Server> &getServers();
 	Config parseConfig(int argc, const char *argv[]);
 };
 

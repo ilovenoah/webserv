@@ -12,11 +12,11 @@ UTILS_DIR	=	utils/
 OBJ_DIR		=	objs/
 
 MAIN_NAME	=	main.cpp
-ARGS_NAME	=	Config.cpp Location.cpp Server.cpp
+CONF_NAME	=	Config.cpp Location.cpp Server.cpp
 UTILS_NAME	=	Error.cpp
 
 OBJ_NAME	=	$(MAIN_NAME:.cpp=.o)
-OBJ_NAME	+=	$(addprefix $(CONF_DIR), $(ARGS_NAME:.cpp=.o))
+OBJ_NAME	+=	$(addprefix $(CONF_DIR), $(CONF_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(UTILS_DIR), $(UTILS_NAME:.cpp=.o))
 
 OBJ			=	$(addprefix $(OBJ_DIR), $(OBJ_NAME))

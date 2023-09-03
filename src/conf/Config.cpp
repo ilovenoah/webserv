@@ -1,9 +1,13 @@
 #include "Config.hpp"
 #include "Error.hpp"
 
-Config::Config() {}
+Config::Config()
+{
+}
 
-Config::~Config() {}
+Config::~Config()
+{
+}
 
 Config::Config(const Config &copy)
 {
@@ -22,7 +26,7 @@ void Config::setServers()
 	_servers.push_back(Server());
 }
 
-const std::vector<Server> &Config::getServers() const
+std::vector<Server> &Config::getServers()
 {
 	return _servers;
 }
@@ -86,7 +90,7 @@ void read_file(Config config, std::string path)
 	}
 }
 
-Config parseConfig(int argc, const char *argv[])
+Config Config::parseConfig(int argc, const char *argv[])
 {
 	Config config;
 
@@ -95,6 +99,9 @@ Config parseConfig(int argc, const char *argv[])
 		std::cout << "Usage: ./webserv [config_file]" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	read_file(config, argv[1]);
+	if (!argv[1])
+		read_file(config, DEFAULT_CONF);
+	else
+		read_file(config, argv[1]);
 	return (config);
 }
