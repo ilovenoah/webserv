@@ -4,6 +4,6 @@ int main(int argc, const char *argv[])
 {
 	Config config;
 
-	config.parseConfig(argc, argv);
+	config.setServers(argc, argv);
 	return (0);
 }

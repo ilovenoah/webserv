@@ -12,7 +12,8 @@ class Location
 	std::string _root;
 	std::string _index;
 	std::string _cgiInfo;
-	std::map<std::string, void (Location::*)(const std::string &)> _locSetterMap;
+
+	static std::map<std::string, void (Location::*)(const std::string &)> _locSetterMap;
 
   public:
 	Location();
@@ -31,6 +32,8 @@ class Location
 	const std::string &getRoot() const;
 	const std::string &getIndex() const;
 	const std::string &getCgiInfo() const;
+
+	void execSetterMap(std::string &keys, std::string &value);
 };
 
 #endif

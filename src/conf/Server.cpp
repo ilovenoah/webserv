@@ -1,16 +1,18 @@
 #include "Server.hpp"
 #include <vector>
 
+std::map<std::string, void (Server::*)(const std::string &)> Server::_srvSetterMap;
+
 Server::Server()
 {
-	Server::_srvSetterMap["server_name"] = &Server::setServerName;
-	Server::_srvSetterMap["listen"] = &Server::setListen;
-	Server::_srvSetterMap["root"] = &Server::setRoot;
-	Server::_srvSetterMap["allow_methods"] = &Server::setAllowMethods;
-	Server::_srvSetterMap["index"] = &Server::setIndex;
-	Server::_srvSetterMap["client_body_limit"] = &Server::setClientBodyLimit;
-	Server::_srvSetterMap["location"] = &Server::setLocation;
-	Server::_srvSetterMap["error_page"] = &Server::setErrorPage;
+	_srvSetterMap["server_name"] = &Server::setServerName;
+	_srvSetterMap["listen"] = &Server::setListen;
+	_srvSetterMap["root"] = &Server::setRoot;
+	_srvSetterMap["allow_methods"] = &Server::setAllowMethods;
+	_srvSetterMap["index"] = &Server::setIndex;
+	_srvSetterMap["client_body_limit"] = &Server::setClientBodyLimit;
+	_srvSetterMap["location"] = &Server::setLocation;
+	_srvSetterMap["error_page"] = &Server::setErrorPage;
 }
 
 Server::~Server()
@@ -138,7 +140,7 @@ const std::map<std::string, std::string> &Server::getErrorPage() const
 	return _error_page;
 }
 
-void Server::execSetterMap(std::string keys, std::string value)
+void Server::execSetterMap(std::string &keys, std::string &value)
 {
 	(this->*_srvSetterMap[keys])(value);
 }

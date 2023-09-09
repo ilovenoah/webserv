@@ -1,5 +1,6 @@
 #include "Config.hpp"
 #include "Error.hpp"
+#include <iostream>
 
 Config::Config()
 {
@@ -21,17 +22,22 @@ Config &Config::operator=(const Config &copy)
 	return *this;
 }
 
-void Config::setServers()
+void Config::setServers(int argc, const char *argv[])
 {
-	_servers.push_back(Server());
+	parseConfig(argc, argv);
 }
 
-std::vector<Server> &Config::getServers()
+void Config::setFilePath(std::string file_path)
+{
+	_filePath = file_path;
+}
+
+const std::vector<Server> &Config::getServers() const
 {
 	return _servers;
 }
 
-void removeUnwanted(std::string &line)
+void Config::removeUnwanted(std::string &line)
 {
 	size_t pos;
 
@@ -41,67 +47,71 @@ void removeUnwanted(std::string &line)
 		line.erase(pos);
 	if ((pos = line.find('}')) != std::string::npos)
 		line.erase(pos);
+	if ((pos = line.find('\n')) != std::string::npos)
+		line.erase(pos);
 }
 
-void parseLine(Config config, std::string &line)
+void Config::parseLine(std::string &line)
 {
 	size_t pos;
 	std::string key;
 	std::string value;
 
 	if ((pos = line.find("server ")) != std::string::npos)
-		config.setServers();
+		_servers.push_back(Server());
 	else
 	{
 		key = line.substr(0, line.find(' '));
-		value = line.substr(line.find(' ') + 1, line.find(';') - 1);
-		config.getServers().back().execSetterMap(key, value);
+		value = line.substr(line.find(' ') + 1, line.find(';') - line.find(' ') - 1);
+		_servers.back().execSetterMap(key, value);
 	}
 }
 
-void parseFile(Config config, std::ifstream &file)
+void Config::parseFile(std::ifstream &file)
 {
 	std::string line;
 
 	while (getline(file, line))
 	{
 		removeUnwanted(line);
+		std::cout << line;
 		if (line.empty())
 			continue;
-		parseLine(config, line);
+		std::cout << line.length() << std::endl;
+		parseLine(line);
 	}
 }
 
-void read_file(Config config, std::string path)
+void Config::readFile()
 {
-	std::ifstream file(path.c_str());
+	std::ifstream file(_filePath.c_str());
 	std::string line;
 
 	try
 	{
 		if (file.fail())
 			throw GenericException(0, "Failed to open file.");
-		parseFile(config, file);
+		parseFile(file);
 	}
 	catch (GenericException &e)
 	{
-		std::cout << e.code() << ":" << e.what() << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << e.code() << ": " << e.what() << std::endl;
+		std::exit(EXIT_FAILURE);
 	}
 }
 
-Config Config::parseConfig(int argc, const char *argv[])
+void Config::parseConfig(int argc, const char *argv[])
 {
-	Config config;
+	std::string file_path = DEFAULT_CONF;
 
 	if (argc > 2)
 	{
-		std::cout << "Usage: ./webserv [config_file]" << std::endl;
-		exit(EXIT_FAILURE);
+		std::cout << "Error: Too many arguments provided." << std::endl;
+		std::cout << "Usage: ./webserv [config_file] or ./webserv" << std::endl;
+		std::exit(EXIT_FAILURE);
 	}
-	if (!argv[1])
-		read_file(config, DEFAULT_CONF);
-	else
-		read_file(config, argv[1]);
-	return (config);
+	if (argv[1])
+		file_path = std::string(argv[1]);
+	setFilePath(file_path);
+	readFile();
 }

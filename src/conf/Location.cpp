@@ -1,13 +1,15 @@
 #include "Location.hpp"
 #include <map>
 
+std::map<std::string, void (Location::*)(const std::string &)> Location::_locSetterMap;
+
 Location::Location()
 {
-	Location::_locSetterMap["location"] = &Location::setLocation;
-	Location::_locSetterMap["allow_methods"] = &Location::setAllowMethods;
-	Location::_locSetterMap["root"] = &Location::setRoot;
-	Location::_locSetterMap["index"] = &Location::setIndex;
-	Location::_locSetterMap["cgi_info"] = &Location::setCgiInfo;
+	_locSetterMap["location"] = &Location::setLocation;
+	_locSetterMap["allow_methods"] = &Location::setAllowMethods;
+	_locSetterMap["root"] = &Location::setRoot;
+	_locSetterMap["index"] = &Location::setIndex;
+	_locSetterMap["cgi_info"] = &Location::setCgiInfo;
 }
 
 Location::~Location()
@@ -80,4 +82,9 @@ const std::string &Location::getIndex() const
 const std::string &Location::getCgiInfo() const
 {
 	return _cgiInfo;
+}
+
+void Location::execSetterMap(std::string &keys, std::string &value)
+{
+	(this->*_locSetterMap[keys])(value);
 }

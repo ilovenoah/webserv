@@ -15,7 +15,8 @@ class Server
 	std::string _client_body_limit;
 	Location _location;
 	std::map<std::string, std::string> _error_page;
-	std::map<std::string, void (Server::*)(const std::string &)> _srvSetterMap;
+
+	static std::map<std::string, void (Server::*)(const std::string &)> _srvSetterMap;
 
   public:
 	Server();
@@ -41,7 +42,7 @@ class Server
 	const Location &getLocation() const;
 	const std::map<std::string, std::string> &getErrorPage() const;
 
-	void execSetterMap(std::string keys, std::string value);
+	void execSetterMap(std::string &keys, std::string &value);
 };
 
 #endif
