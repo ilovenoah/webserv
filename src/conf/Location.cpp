@@ -34,29 +34,29 @@ Location &Location::operator=(const Location &copy)
 	return *this;
 }
 
-void Location::setLocation(const std::string &location)
+void Location::setLocation(const std::string &values)
 {
-	_location = location;
+	_location = values;
 }
 
-void Location::setAllowMethods(const std::string &allowMethods)
+void Location::setAllowMethods(const std::string &values)
 {
-	_allowMethods = allowMethods;
+	_allowMethods = values;
 }
 
-void Location::setRoot(const std::string &root)
+void Location::setRoot(const std::string &values)
 {
-	_root = root;
+	_root = values;
 }
 
-void Location::setIndex(const std::string &index)
+void Location::setIndex(const std::string &values)
 {
-	_index = index;
+	_index = values;
 }
 
-void Location::setCgiInfo(const std::string &cgiInfo)
+void Location::setCgiInfo(const std::string &values)
 {
-	_cgiInfo = cgiInfo;
+	_cgiInfo = values;
 }
 
 const std::string &Location::getLocation() const

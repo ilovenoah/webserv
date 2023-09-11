@@ -5,18 +5,18 @@
 #include <stdexcept>
 #include <string>
 
+#define ARGS_ERROR = "Too many arguments provided.\nUsage: ./webserv [config_file] or ./webserv";
+#define FAIL_OPEN  = "Failed to open file.";
+#define FAIL_KEY   = "Unknown key: ";
+
 class GenericException : public std::exception
 {
   private:
-	int errorCode;
 	std::string errorMessage;
 
   public:
-	GenericException(int code, const std::string &message);
-	virtual ~GenericException() throw()
-	{
-	}
-	int code() const;
+	GenericException(const std::string &message);
+	~GenericException() throw();
 	const char *what() const throw();
 };
 

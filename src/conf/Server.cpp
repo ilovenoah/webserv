@@ -9,8 +9,11 @@ Server::Server()
 	_srvSetterMap["listen"] = &Server::setListen;
 	_srvSetterMap["root"] = &Server::setRoot;
 	_srvSetterMap["allow_methods"] = &Server::setAllowMethods;
+	_srvSetterMap["autoindex"] = &Server::setAutoIndex;
 	_srvSetterMap["index"] = &Server::setIndex;
 	_srvSetterMap["client_body_limit"] = &Server::setClientBodyLimit;
+	_srvSetterMap["cgi_info"] = &Server::setCgiInfo;
+	_srvSetterMap["return"] = &Server::setReturn;
 	_srvSetterMap["location"] = &Server::setLocation;
 	_srvSetterMap["error_page"] = &Server::setErrorPage;
 }
@@ -40,57 +43,71 @@ Server &Server::operator=(const Server &copy)
 	return *this;
 }
 
-void Server::setServerName(const std::string &serverName)
+void Server::setServerName(const std::string &values)
 {
-	_server_name = serverName;
+	_server_name = values;
 }
 
-void Server::setListen(const std::string &listen)
+void Server::setListen(const std::string &values)
 {
-	_listen = listen;
+	_listen = values;
 }
 
-void Server::setRoot(const std::string &root)
+void Server::setRoot(const std::string &values)
 {
-	_root = root;
+	_root = values;
 }
 
-void Server::setAllowMethods(const std::string &allowMethods)
+void Server::setAllowMethods(const std::string &values)
 {
-	_allow_methods = allowMethods;
+	_allow_methods = values;
 }
 
-void Server::setIndex(const std::string &index)
+void Server::setAutoIndex(const std::string &values)
 {
-	_index = index;
+	_autoindex = values;
 }
 
-void Server::setClientBodyLimit(const std::string &clientBodyLimit)
+void Server::setIndex(const std::string &values)
 {
-	_client_body_limit = clientBodyLimit;
+	_index = values;
 }
 
-void Server::setLocation(const std::string &location)
+void Server::setClientBodyLimit(const std::string &values)
 {
-	Location loc;
+	_client_body_limit = values;
+}
+
+void Server::setReturn(const std::string &values)
+{
+	_return = values;
+}
+
+void Server::setCgiInfo(const std::string &values)
+{
+	_cgi_info = values;
+}
+
+void Server::setLocation(const std::string &values)
+{
 	std::string key;
 	std::string value;
 	std::size_t pos;
 
-	pos = location.find_last_of(' ');
-	key = location.substr(0, pos);
-	value = location.substr(pos + 1);
+	pos = values.find_last_of(' ');
+	key = values.substr(0, pos);
+	value = values.substr(pos + 1);
 }
 
-void Server::setErrorPage(const std::string &errorPage)
+void Server::setErrorPage(const std::string &values)
 {
 	std::string keys;
 	std::string value;
 	std::size_t pos;
 
-	pos = errorPage.find_last_of(' ');
-	keys = errorPage.substr(0, pos);
-	value = errorPage.substr(pos + 1);
+	pos = values.find_last_of(' ');
+	keys = values.substr(0, pos);
+	value = values.substr(pos + 1);
 
 	while ((pos = keys.find(' ')) != std::string::npos)
 	{
@@ -120,6 +137,11 @@ const std::string &Server::getAllowMethods() const
 	return _allow_methods;
 }
 
+const std::string &Server::getAutoIndex() const
+{
+	return _autoindex;
+}
+
 const std::string &Server::getIndex() const
 {
 	return _index;
@@ -140,7 +162,20 @@ const std::map<std::string, std::string> &Server::getErrorPage() const
 	return _error_page;
 }
 
+const std::string &Server::getReturn() const
+{
+	return _return;
+}
+
+const std::string &Server::getCgiInfo() const
+{
+	return _cgi_info;
+}
+
 void Server::execSetterMap(std::string &keys, std::string &value)
 {
-	(this->*_srvSetterMap[keys])(value);
+	if (_srvSetterMap.find(keys) == _srvSetterMap.end())
+		throw GenericException(std::string(FAIL_KEY) + keys);
+	else
+		(this->*_srvSetterMap[keys])(value);
 }

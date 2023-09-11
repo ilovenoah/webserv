@@ -1,12 +1,11 @@
 #include "Error.hpp"
 
-GenericException::GenericException(int code, const std::string &message) : errorCode(code), errorMessage(message)
+GenericException::GenericException(const std::string &message) :errorMessage(message)
 {
 }
 
-int GenericException::code() const
+GenericException::~GenericException() throw()
 {
-	return (errorCode);
 }
 
 const char *GenericException::what() const throw()

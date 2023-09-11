@@ -1,6 +1,7 @@
 #ifndef LOCATION_HPP
 #define LOCATION_HPP
 
+#include "Error.hpp"
 #include <map>
 #include <string>
 
@@ -21,11 +22,11 @@ class Location
 	Location(const Location &copy);
 	Location &operator=(const Location &copy);
 
-	void setLocation(const std::string &location);
-	void setAllowMethods(const std::string &allowMethods);
-	void setRoot(const std::string &root);
-	void setIndex(const std::string &index);
-	void setCgiInfo(const std::string &cgiInfo);
+	void setLocation(const std::string &values);
+	void setAllowMethods(const std::string &values);
+	void setRoot(const std::string &values);
+	void setIndex(const std::string &values);
+	void setCgiInfo(const std::string &values);
 
 	const std::string &getLocation() const;
 	const std::string &getAllowMethods() const;

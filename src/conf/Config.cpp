@@ -1,5 +1,4 @@
 #include "Config.hpp"
-#include "Error.hpp"
 #include <iostream>
 
 Config::Config()
@@ -40,14 +39,20 @@ const std::vector<Server> &Config::getServers() const
 void Config::removeUnwanted(std::string &line)
 {
 	size_t pos;
+	std::string toRemove = "\r\t{};";
 
-	while ((pos = line.find('\t')) != std::string::npos)
-		line.erase(pos, 1);
+	for (size_t i = 0; i < toRemove.length(); i++)
+	{
+		while ((pos = line.find(toRemove[i])) != std::string::npos)
+			line.erase(pos, 1);
+	}
+}
+
+void Config::removeComments(std::string &line)
+{
+	size_t pos;
+
 	if ((pos = line.find('#')) != std::string::npos)
-		line.erase(pos);
-	if ((pos = line.find('}')) != std::string::npos)
-		line.erase(pos);
-	if ((pos = line.find('\n')) != std::string::npos)
 		line.erase(pos);
 }
 
@@ -62,7 +67,7 @@ void Config::parseLine(std::string &line)
 	else
 	{
 		key = line.substr(0, line.find(' '));
-		value = line.substr(line.find(' ') + 1, line.find(';') - line.find(' ') - 1);
+		value = line.substr(line.find(' ') + 1);
 		_servers.back().execSetterMap(key, value);
 	}
 }
@@ -74,10 +79,9 @@ void Config::parseFile(std::ifstream &file)
 	while (getline(file, line))
 	{
 		removeUnwanted(line);
-		std::cout << line;
+		removeComments(line);
 		if (line.empty())
 			continue;
-		std::cout << line.length() << std::endl;
 		parseLine(line);
 	}
 }
@@ -90,12 +94,12 @@ void Config::readFile()
 	try
 	{
 		if (file.fail())
-			throw GenericException(0, "Failed to open file.");
+			throw GenericException(FAIL_OPEN);
 		parseFile(file);
 	}
 	catch (GenericException &e)
 	{
-		std::cout << e.code() << ": " << e.what() << std::endl;
+		std::cout << e.what() << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
 }
@@ -105,13 +109,11 @@ void Config::parseConfig(int argc, const char *argv[])
 	std::string file_path = DEFAULT_CONF;
 
 	if (argc > 2)
-	{
-		std::cout << "Error: Too many arguments provided." << std::endl;
-		std::cout << "Usage: ./webserv [config_file] or ./webserv" << std::endl;
-		std::exit(EXIT_FAILURE);
-	}
+		throw GenericException(ARGS_ERROR);
 	if (argv[1])
+	{
 		file_path = std::string(argv[1]);
-	setFilePath(file_path);
-	readFile();
+		setFilePath(file_path);
+		readFile();
+	}
 }

@@ -32,6 +32,7 @@ class Config
 	void parseFile(std::ifstream &file);
 	void parseLine(std::string &line);
 	void removeUnwanted(std::string &line);
+	void removeComments(std::string &line);
 };
 
 #endif
