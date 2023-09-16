@@ -1,12 +1,12 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "Location.hpp"
 #include <map>
 
-class Server
-{
-  private:
+#include "Location.hpp"
+
+class Server {
+   private:
 	std::string _server_name;
 	std::string _listen;
 	std::string _root;
@@ -19,9 +19,10 @@ class Server
 	Location _location;
 	std::map<std::string, std::string> _error_page;
 
-	static std::map<std::string, void (Server::*)(const std::string &)> _srvSetterMap;
+	static std::map<std::string, void (Server::*)(const std::string &)>
+		_srvSetterMap;
 
-  public:
+   public:
 	Server();
 	~Server();
 	Server(const Server &copy);

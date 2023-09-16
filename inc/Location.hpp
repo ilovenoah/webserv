@@ -1,22 +1,23 @@
 #ifndef LOCATION_HPP
 #define LOCATION_HPP
 
-#include "Error.hpp"
 #include <map>
 #include <string>
 
-class Location
-{
-  private:
+#include "Error.hpp"
+
+class Location {
+   private:
 	std::string _location;
 	std::string _allowMethods;
 	std::string _root;
 	std::string _index;
 	std::string _cgiInfo;
 
-	static std::map<std::string, void (Location::*)(const std::string &)> _locSetterMap;
+	static std::map<std::string, void (Location::*)(const std::string &)>
+		_locSetterMap;
 
-  public:
+   public:
 	Location();
 	~Location();
 	Location(const Location &copy);

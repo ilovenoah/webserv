@@ -1,21 +1,21 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Server.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
+#include "Server.hpp"
+
 #define DEFAULT_CONF "conf/sample.conf"
 
-class Config
-{
-  private:
+class Config {
+   private:
 	std::vector<Server> _servers;
 	std::string _filePath;
 
-  public:
+   public:
 	Config();
 	~Config();
 	Config(const Config &copy);
