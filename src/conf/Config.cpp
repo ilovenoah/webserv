@@ -62,10 +62,10 @@ void Config::parseLine(std::string &line) {
 	}
 }
 
-void Config::parseFile(std::ifstream &file) {
+void Config::parseFile() {
 	std::string line;
 
-	while (getline(file, line)) {
+	while (getline(_fileStream, line)) {
 		removeUnwanted(line);
 		removeComments(line);
 		if (line.empty()) {
@@ -76,14 +76,13 @@ void Config::parseFile(std::ifstream &file) {
 }
 
 void Config::readFile() {
-	std::ifstream file(_filePath.c_str());
-	std::string line;
+	_fileStream(_filePath.c_str());
 
 	try {
-		if (file.fail()) {
+		if (_fileStream.fail()) {
 			throw GenericException(FAIL_OPEN);
 		}
-		parseFile(file);
+		parseFile();
 	} catch (GenericException &e) {
 		std::cerr << e.what() << std::endl;
 	}
@@ -98,10 +97,9 @@ void Config::parseConfig(int argc, const char *argv[]) {
 		}
 		if (argv[1]) {
 			file_path = std::string(argv[1]);
-			setFilePath(file_path);
-			std::cout << "now" << std::endl;
-			readFile();
 		}
+		setFilePath(file_path);
+		readFile();
 	} catch (const std::exception &e) {
 		std::cerr << e.what() << '\n';
 	}

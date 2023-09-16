@@ -83,6 +83,15 @@ void Server::setLocation(const std::string &values) {
 	pos = values.find_last_of(' ');
 	key = values.substr(0, pos);
 	value = values.substr(pos + 1);
+
+	std::cout << "key: " << key << std::endl;
+	std::cout << "value: " << value << std::endl;
+	_location.setLocation(key);
+	while ((pos = value.find('}')) == std::string::npos) {
+		
+		std::cout << value << std::endl;
+	}
+	_location.execSetterMap(key, value);
 }
 
 void Server::setErrorPage(const std::string &values) {
@@ -148,7 +157,7 @@ const std::string &Server::getCgiInfo() const {
 void Server::execSetterMap(std::string &keys, std::string &value) {
 	try {
 		if (_srvSetterMap.find(keys) == _srvSetterMap.end()) {
-			throw GenericException(FAIL_KEY);
+			throw GenericException(FAIL_KEY + keys);
 		} else {
 			(this->*_srvSetterMap[keys])(value);
 		}

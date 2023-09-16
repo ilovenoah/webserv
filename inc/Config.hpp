@@ -14,6 +14,8 @@ class Config {
    private:
 	std::vector<Server> _servers;
 	std::string _filePath;
+	// TODO: どうにかする
+	std::ifstream _fileStream;
 
    public:
 	Config();
