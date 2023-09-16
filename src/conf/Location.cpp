@@ -2,8 +2,7 @@
 
 #include <map>
 
-std::map<std::string, void (Location::*)(const std::string &)>
-	Location::_locSetterMap;
+std::map<std::string, void (Location::*)(const std::string &)> Location::_locSetterMap;
 
 Location::Location() {
 	_locSetterMap["location"] = &Location::setLocation;
@@ -13,9 +12,12 @@ Location::Location() {
 	_locSetterMap["cgi_info"] = &Location::setCgiInfo;
 }
 
-Location::~Location() {}
+Location::~Location() {
+}
 
-Location::Location(const Location &copy) { *this = copy; }
+Location::Location(const Location &copy) {
+	*this = copy;
+}
 
 Location &Location::operator=(const Location &copy) {
 	if (this != &copy) {
@@ -28,27 +30,45 @@ Location &Location::operator=(const Location &copy) {
 	return *this;
 }
 
-void Location::setLocation(const std::string &values) { _location = values; }
+void Location::setLocation(const std::string &values) {
+	_location = values;
+}
 
 void Location::setAllowMethods(const std::string &values) {
 	_allowMethods = values;
 }
 
-void Location::setRoot(const std::string &values) { _root = values; }
+void Location::setRoot(const std::string &values) {
+	_root = values;
+}
 
-void Location::setIndex(const std::string &values) { _index = values; }
+void Location::setIndex(const std::string &values) {
+	_index = values;
+}
 
-void Location::setCgiInfo(const std::string &values) { _cgiInfo = values; }
+void Location::setCgiInfo(const std::string &values) {
+	_cgiInfo = values;
+}
 
-const std::string &Location::getLocation() const { return _location; }
+const std::string &Location::getLocation() const {
+	return _location;
+}
 
-const std::string &Location::getAllowMethods() const { return _allowMethods; }
+const std::string &Location::getAllowMethods() const {
+	return _allowMethods;
+}
 
-const std::string &Location::getRoot() const { return _root; }
+const std::string &Location::getRoot() const {
+	return _root;
+}
 
-const std::string &Location::getIndex() const { return _index; }
+const std::string &Location::getIndex() const {
+	return _index;
+}
 
-const std::string &Location::getCgiInfo() const { return _cgiInfo; }
+const std::string &Location::getCgiInfo() const {
+	return _cgiInfo;
+}
 
 void Location::execSetterMap(std::string &keys, std::string &value) {
 	(this->*_locSetterMap[keys])(value);
