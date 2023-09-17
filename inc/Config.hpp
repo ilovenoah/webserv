@@ -14,14 +14,14 @@ class Config {
    private:
 	std::vector<Server> _servers;
 	std::string _filePath;
-	// TODO: どうにかする
-	std::ifstream _fileStream;
 
    public:
 	Config();
 	~Config();
 	Config(const Config &copy);
 	Config &operator=(const Config &copy);
+
+	std::ifstream _fileStream;
 
 	void setServers(int argc, const char *argv[]);
 	void setFilePath(std::string file_path);
@@ -31,7 +31,7 @@ class Config {
 
 	void parseConfig(int argc, const char *argv[]);
 	void readFile();
-	void parseFile(std::ifstream &file);
+	void parseFile();
 	void parseLine(std::string &line);
 	void removeUnwanted(std::string &line);
 	void removeComments(std::string &line);

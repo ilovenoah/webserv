@@ -67,10 +67,6 @@ void Server::setClientBodyLimit(const std::string &values) {
 	_client_body_limit = values;
 }
 
-void Server::setReturn(const std::string &values) {
-	_return = values;
-}
-
 void Server::setCgiInfo(const std::string &values) {
 	_cgi_info = values;
 }
@@ -78,20 +74,18 @@ void Server::setCgiInfo(const std::string &values) {
 void Server::setLocation(const std::string &values) {
 	std::string key;
 	std::string value;
+	std::string line;
 	std::size_t pos;
 
 	pos = values.find_last_of(' ');
 	key = values.substr(0, pos);
 	value = values.substr(pos + 1);
 
-	std::cout << "key: " << key << std::endl;
-	std::cout << "value: " << value << std::endl;
-	_location.setLocation(key);
-	while ((pos = value.find('}')) == std::string::npos) {
-		
-		std::cout << value << std::endl;
+	_location.push_back(Location());
+	_location.back().setLocation(key);
+	while (getline(, line)) {
+		_location.back().execSetterMap(key, value);
 	}
-	_location.execSetterMap(key, value);
 }
 
 void Server::setErrorPage(const std::string &values) {
@@ -108,6 +102,22 @@ void Server::setErrorPage(const std::string &values) {
 		keys.erase(0, pos + 1);
 	}
 	_error_page[keys] = value;
+}
+
+void Server::setReturn(const std::string &values) {
+	std::string key;
+	std::string value;
+	std::size_t pos;
+
+	pos = values.find_last_of(' ');
+	key = values.substr(0, pos);
+	value = values.substr(pos + 1);
+
+	while ((pos = key.find(' ')) != std::string::npos) {
+		_return[key.substr(0, pos)] = value;
+		key.erase(0, pos + 1);
+	}
+	_return[key] = value;
 }
 
 const std::string &Server::getServerName() const {
@@ -138,7 +148,11 @@ const std::string &Server::getClientBodyLimit() const {
 	return _client_body_limit;
 }
 
-const Location &Server::getLocation() const {
+const std::string &Server::getCgiInfo() const {
+	return _cgi_info;
+}
+
+const std::vector<Location> &Server::getLocation() const {
 	return _location;
 }
 
@@ -146,15 +160,13 @@ const std::map<std::string, std::string> &Server::getErrorPage() const {
 	return _error_page;
 }
 
-const std::string &Server::getReturn() const {
+const std::map<std::string, std::string> &Server::getReturn() const {
 	return _return;
 }
 
-const std::string &Server::getCgiInfo() const {
-	return _cgi_info;
-}
+void Server::execSetterMap(std::string &keys, std::string &value, std::ifstream &fileStream) {
+	_fileStream = fileStream;
 
-void Server::execSetterMap(std::string &keys, std::string &value) {
 	try {
 		if (_srvSetterMap.find(keys) == _srvSetterMap.end()) {
 			throw GenericException(FAIL_KEY + keys);

@@ -1,7 +1,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <map>
+#include <fstream>
+#include <iostream>
+#include <vector>
 
 #include "Location.hpp"
 
@@ -14,19 +16,20 @@ class Server {
 	std::string _autoindex;
 	std::string _index;
 	std::string _client_body_limit;
-	std::string _return;
 	std::string _cgi_info;
-	Location _location;
+	std::vector<Location> _location;
 	std::map<std::string, std::string> _error_page;
+	std::map<std::string, std::string> _return;
 
-	static std::map<std::string, void (Server::*)(const std::string &)>
-		_srvSetterMap;
+	static std::map<std::string, void (Server::*)(const std::string &)> _srvSetterMap;
 
    public:
 	Server();
 	~Server();
 	Server(const Server &copy);
 	Server &operator=(const Server &copy);
+
+	std::ifstream &_fileStream;
 
 	void setServerName(const std::string &values);
 	void setListen(const std::string &values);
@@ -35,10 +38,10 @@ class Server {
 	void setAutoIndex(const std::string &values);
 	void setIndex(const std::string &values);
 	void setClientBodyLimit(const std::string &values);
-	void setReturn(const std::string &values);
 	void setCgiInfo(const std::string &values);
 	void setLocation(const std::string &values);
 	void setErrorPage(const std::string &values);
+	void setReturn(const std::string &values);
 
 	const std::string &getServerName() const;
 	const std::string &getListen() const;
@@ -47,12 +50,12 @@ class Server {
 	const std::string &getAutoIndex() const;
 	const std::string &getIndex() const;
 	const std::string &getClientBodyLimit() const;
-	const std::string &getReturn() const;
 	const std::string &getCgiInfo() const;
-	const Location &getLocation() const;
+	const std::vector<Location> &getLocation() const;
 	const std::map<std::string, std::string> &getErrorPage() const;
+	const std::map<std::string, std::string> &getReturn() const;
 
-	void execSetterMap(std::string &keys, std::string &value);
+	void execSetterMap(std::string &keys, std::string &value, std::ifstream &fileStream);
 };
 
 #endif

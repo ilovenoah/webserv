@@ -31,6 +31,10 @@ const std::vector<Server> &Config::getServers() const {
 	return _servers;
 }
 
+const std::string &Config::getFilePath() const {
+	return _filePath;
+}
+
 void Config::removeUnwanted(std::string &line) {
 	size_t pos;
 	std::string toRemove = "\r\t{};";
@@ -58,7 +62,7 @@ void Config::parseLine(std::string &line) {
 	} else {
 		key = line.substr(0, line.find(' '));
 		value = line.substr(line.find(' ') + 1);
-		_servers.back().execSetterMap(key, value);
+		_servers.back().execSetterMap(key, value, _fileStream);
 	}
 }
 
@@ -76,7 +80,7 @@ void Config::parseFile() {
 }
 
 void Config::readFile() {
-	_fileStream(_filePath.c_str());
+	_fileStream.open(_filePath.c_str());
 
 	try {
 		if (_fileStream.fail()) {
@@ -101,6 +105,6 @@ void Config::parseConfig(int argc, const char *argv[]) {
 		setFilePath(file_path);
 		readFile();
 	} catch (const std::exception &e) {
-		std::cerr << e.what() << '\n';
+		std::cerr << e.what() << std::endl;
 	}
 }
