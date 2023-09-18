@@ -49,7 +49,9 @@ void Config::removeUnwanted(std::string &line) {
 void Config::removeComments(std::string &line) {
 	size_t pos;
 
-	if ((pos = line.find('#')) != std::string::npos) line.erase(pos);
+	if ((pos = line.find('#')) != std::string::npos) {
+		line.erase(pos);
+	}
 }
 
 void Config::parseLine(std::string &line) {
