@@ -1,5 +1,7 @@
-BasedOnStyle: Microsoft
+BasedOnStyle: google
 
 IndentWidth: 4
 TabWidth: 4
 UseTab: Always
+ColumnLimit: 0
+AllowShortFunctionsOnASingleLine: None
