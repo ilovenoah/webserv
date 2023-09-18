@@ -1,8 +1,9 @@
 #include "Server.hpp"
+#include "Config.hpp"
 
 #include <vector>
 
-std::map<std::string, void (Server::*)(const std::string &)> Server::_srvSetterMap;
+std::map<std::string, void (Server::*)(const std::string &, std::ifstream &)> Server::_srvSetterMap;
 
 Server::Server() {
 	_srvSetterMap["server_name"] = &Server::setServerName;
@@ -39,43 +40,52 @@ Server &Server::operator=(const Server &copy) {
 	return *this;
 }
 
-void Server::setServerName(const std::string &values) {
+void Server::setServerName(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	_server_name = values;
 }
 
-void Server::setListen(const std::string &values) {
+void Server::setListen(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	_listen = values;
 }
 
-void Server::setRoot(const std::string &values) {
+void Server::setRoot(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	_root = values;
 }
 
-void Server::setAllowMethods(const std::string &values) {
+void Server::setAllowMethods(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	_allow_methods = values;
 }
 
-void Server::setAutoIndex(const std::string &values) {
+void Server::setAutoIndex(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	_autoindex = values;
 }
 
-void Server::setIndex(const std::string &values) {
+void Server::setIndex(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	_index = values;
 }
 
-void Server::setClientBodyLimit(const std::string &values) {
+void Server::setClientBodyLimit(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	_client_body_limit = values;
 }
 
-void Server::setCgiInfo(const std::string &values) {
+void Server::setCgiInfo(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	_cgi_info = values;
 }
 
-void Server::setLocation(const std::string &values) {
+void Server::setLocation(const std::string &values, std::ifstream &fileStream) {
 	std::string key;
 	std::string value;
 	std::string line;
 	std::size_t pos;
+	Config config;
 
 	pos = values.find_last_of(' ');
 	key = values.substr(0, pos);
@@ -83,12 +93,23 @@ void Server::setLocation(const std::string &values) {
 
 	_location.push_back(Location());
 	_location.back().setLocation(key);
-	while (getline(, line)) {
+	while (std::getline(fileStream, line)) {
+		if (line.find('}') != std::string::npos) {
+			break;
+		}
+		config.removeUnwanted(line);
+		config.removeComments(line);
+		if (line.empty()) {
+			continue;
+		}
+		key = line.substr(0, line.find(' '));
+		value = line.substr(line.find(' ') + 1);
 		_location.back().execSetterMap(key, value);
 	}
 }
 
-void Server::setErrorPage(const std::string &values) {
+void Server::setErrorPage(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	std::string keys;
 	std::string value;
 	std::size_t pos;
@@ -104,7 +125,8 @@ void Server::setErrorPage(const std::string &values) {
 	_error_page[keys] = value;
 }
 
-void Server::setReturn(const std::string &values) {
+void Server::setReturn(const std::string &values, std::ifstream &fileStream) {
+	(void)fileStream;
 	std::string key;
 	std::string value;
 	std::size_t pos;
@@ -165,13 +187,11 @@ const std::map<std::string, std::string> &Server::getReturn() const {
 }
 
 void Server::execSetterMap(std::string &keys, std::string &value, std::ifstream &fileStream) {
-	_fileStream = fileStream;
-
 	try {
 		if (_srvSetterMap.find(keys) == _srvSetterMap.end()) {
 			throw GenericException(FAIL_KEY + keys);
 		} else {
-			(this->*_srvSetterMap[keys])(value);
+			(this->*_srvSetterMap[keys])(value, fileStream);
 		}
 	} catch (GenericException &e) {
 		std::cerr << e.what() << std::endl;

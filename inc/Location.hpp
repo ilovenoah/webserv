@@ -14,8 +14,7 @@ class Location {
 	std::string _index;
 	std::string _cgiInfo;
 
-	static std::map<std::string, void (Location::*)(const std::string &)>
-		_locSetterMap;
+	static std::map<std::string, void (Location::*)(const std::string &)> _locSetterMap;
 
    public:
 	Location();

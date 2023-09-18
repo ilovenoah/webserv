@@ -21,7 +21,7 @@ class Server {
 	std::map<std::string, std::string> _error_page;
 	std::map<std::string, std::string> _return;
 
-	static std::map<std::string, void (Server::*)(const std::string &)> _srvSetterMap;
+	static std::map<std::string, void (Server::*)(const std::string &, std::ifstream &)> _srvSetterMap;
 
    public:
 	Server();
@@ -29,19 +29,17 @@ class Server {
 	Server(const Server &copy);
 	Server &operator=(const Server &copy);
 
-	std::ifstream &_fileStream;
-
-	void setServerName(const std::string &values);
-	void setListen(const std::string &values);
-	void setRoot(const std::string &values);
-	void setAllowMethods(const std::string &values);
-	void setAutoIndex(const std::string &values);
-	void setIndex(const std::string &values);
-	void setClientBodyLimit(const std::string &values);
-	void setCgiInfo(const std::string &values);
-	void setLocation(const std::string &values);
-	void setErrorPage(const std::string &values);
-	void setReturn(const std::string &values);
+	void setServerName(const std::string &values, std::ifstream &fileStream);
+	void setListen(const std::string &values, std::ifstream &fileStream);
+	void setRoot(const std::string &values, std::ifstream &fileStream);
+	void setAllowMethods(const std::string &values, std::ifstream &fileStream);
+	void setAutoIndex(const std::string &values, std::ifstream &fileStream);
+	void setIndex(const std::string &values, std::ifstream &fileStream);
+	void setClientBodyLimit(const std::string &values, std::ifstream &fileStream);
+	void setCgiInfo(const std::string &values, std::ifstream &fileStream);
+	void setLocation(const std::string &values, std::ifstream &fileStream);
+	void setErrorPage(const std::string &values, std::ifstream &fileStream);
+	void setReturn(const std::string &values, std::ifstream &fileStream);
 
 	const std::string &getServerName() const;
 	const std::string &getListen() const;

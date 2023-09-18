@@ -69,7 +69,7 @@ void Config::parseLine(std::string &line) {
 void Config::parseFile() {
 	std::string line;
 
-	while (getline(_fileStream, line)) {
+	while (std::getline(_fileStream, line)) {
 		removeUnwanted(line);
 		removeComments(line);
 		if (line.empty()) {

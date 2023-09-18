@@ -2,8 +2,6 @@
 #define CONFIG_HPP
 
 #include <cstdlib>
-#include <fstream>
-#include <iostream>
 #include <vector>
 
 #include "Server.hpp"
