@@ -10,7 +10,8 @@
 class Server {
    private:
 	std::string _server_name;
-	std::string _listen;
+	std::string _ip_address;
+	std::string _port;
 	std::string _root;
 	std::string _allow_methods;
 	std::string _autoindex;
@@ -42,7 +43,8 @@ class Server {
 	void setReturn(const std::string &values, std::ifstream &fileStream);
 
 	const std::string &getServerName() const;
-	const std::string &getListen() const;
+	const std::string &getIpAddress() const;
+	const std::string &getPort() const;
 	const std::string &getRoot() const;
 	const std::string &getAllowMethods() const;
 	const std::string &getAutoIndex() const;

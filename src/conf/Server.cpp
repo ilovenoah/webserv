@@ -1,7 +1,8 @@
 #include "Server.hpp"
-#include "Config.hpp"
 
 #include <vector>
+
+#include "Config.hpp"
 
 std::map<std::string, void (Server::*)(const std::string &, std::ifstream &)> Server::_srvSetterMap;
 
@@ -29,13 +30,17 @@ Server::Server(const Server &copy) {
 Server &Server::operator=(const Server &copy) {
 	if (this != &copy) {
 		_server_name = copy._server_name;
-		_listen = copy._listen;
+		_ip_address = copy._ip_address;
+		_port = copy._port;
 		_root = copy._root;
 		_allow_methods = copy._allow_methods;
+		_autoindex = copy._autoindex;
 		_index = copy._index;
 		_client_body_limit = copy._client_body_limit;
+		_cgi_info = copy._cgi_info;
 		_location = copy._location;
 		_error_page = copy._error_page;
+		_return = copy._return;
 	}
 	return *this;
 }
@@ -47,7 +52,14 @@ void Server::setServerName(const std::string &values, std::ifstream &fileStream)
 
 void Server::setListen(const std::string &values, std::ifstream &fileStream) {
 	(void)fileStream;
-	_listen = values;
+	std::size_t pos;
+
+	_port = values;
+	pos = values.find(':');
+	if (pos != std::string::npos) {
+		_ip_address = values.substr(0, pos);
+		_port = values.substr(pos + 1);
+	}
 }
 
 void Server::setRoot(const std::string &values, std::ifstream &fileStream) {
@@ -146,8 +158,12 @@ const std::string &Server::getServerName() const {
 	return _server_name;
 }
 
-const std::string &Server::getListen() const {
-	return _listen;
+const std::string &Server::getIpAddress() const {
+	return _ip_address;
+}
+
+const std::string &Server::getPort() const {
+	return _port;
 }
 
 const std::string &Server::getRoot() const {
