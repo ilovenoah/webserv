@@ -1,0 +1,28 @@
+GET / HTTP/1.1
+Host: localhost:4243
+Connection: keep-alive
+sec-ch-ua: "Edge";v="107", "Chromium";v="107", "Not=A?Brand";v="24"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "macOS"
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.23
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: none
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br
+Accept-Language: ja,en-US;q=0.9,en;q=0.8
+Cookie: _ga=GA1.1.1728055280.1695457724; _ga_KZEMFP46NG=GS1.1.1695700269.8.0.1695700269.0.0.0
+
+SERVER_SOFTWARE: サーバーが使用しているソフトウェアの名前とバージョンを示します。
+SERVER_NAME: サーバーの名前。ドメイン名またはIPアドレスとして示されることが多い。
+GATEWAY_INTERFACE: CGIのバージョンを示す。例："CGI/1.1"。
+SERVER_PROTOCOL: サーバーがサポートしているプロトコルの名前とバージョン。例："HTTP/1.1"。
+SERVER_PORT: サーバーがリクエストを受け取ったポート番号を示す。
+REQUEST_METHOD: リクエストのHTTPメソッド（例：GET、POST）。
+PATH_INFO: スクリプトのURIの後の追加のパス情報。
+PATH_TRANSLATED: PATH_INFOに対応するサーバーのファイルシステム上の実際のパス。
+SCRIPT_NAME: CGIスクリプトのURI。
+QUERY_STRING: リクエストURIにおいて"?"の後に続くクエリ情報。
+REMOTE_ADDR: リクエストを行ったクライアントのIPアドレス。
