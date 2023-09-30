@@ -8,5 +8,7 @@
 #include "Error.hpp"
 #include "Location.hpp"
 #include "Server.hpp"
+#include "CreateSocket.hpp"
+#include "ServerLoop.hpp"
 
 #endif

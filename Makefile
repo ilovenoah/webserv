@@ -31,7 +31,7 @@ $(NAME): $(OBJ)
 	@echo "##### $@ compiling finished! #####"
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
-	@$(CXX)  $(INC) -o $@ -c $^
+	@$(CXX) $(CXXFLAGS) $(INC) -o $@ -c $^
 	@echo "##### Creating" [ $@ ] " #####"
 
 mkdir:

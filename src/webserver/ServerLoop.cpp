@@ -28,7 +28,6 @@ int startServerLoop(Config &conf_info) {
 	std::vector<int> sockets = getSockets(conf_info.getServers());
 	int epollfd = initilizeEpollfd(sockets);
 	struct epoll_event events[MAXEVENTS];  // 一度に処理する最大のイベント数
-	// std::map<int, Config> buffered_data;
 	while (1) {
 		int n = epoll_wait(epollfd, events, MAXEVENTS, -1);
 		for (int i = 0; i < n; i++) {
