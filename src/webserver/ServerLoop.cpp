@@ -1,19 +1,23 @@
 #include "ServerLoop.hpp"
 
 int initilizeEpollfd(std::vector<int> sockets) {
-	int epollfd = epoll_create1(0);
-	if (epollfd == -1) {
-		std::cerr << "epoll_create1 failed." << std::endl;
-		std::exit(EXIT_FAILURE);
-	}
-	for (size_t i = 0; i < sockets.size(); i++) {
-		struct epoll_event event;
-		event.data.fd = sockets[i];
-		event.events = EPOLLIN;
-		if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockets[i], &event) == -1) {
-			std::cerr << "epoll_ctl failed for sockfd: " << sockets[i] << std::endl;
-			std::exit(EXIT_FAILURE);
+	int epollfd = 0;
+	try {
+		epollfd = epoll_create1(0);
+		if (epollfd == -1) {
+			throw GenericException(EPOLL_CREATE_ERROR);
 		}
+		for (size_t i = 0; i < sockets.size(); i++) {
+			struct epoll_event event;
+			event.data.fd = sockets[i];
+			event.events = EPOLLIN;
+			if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockets[i], &event) == -1) {
+				throw GenericException(EPOLL_CTL_ERROR);
+			}
+		}
+	} catch (GenericException &e) {
+		std::cerr << e.what() << std::endl;
+		std::exit(EXIT_FAILURE);
 	}
 	return epollfd;
 }

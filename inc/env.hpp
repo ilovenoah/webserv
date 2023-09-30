@@ -29,5 +29,7 @@
 #define FAIL_GET_ADDR "getaddrinfo failed"
 #define BIND_ERROR "Bind failed for"
 #define FAIL_LISTEN "listen failed"
+#define EPOLL_CREATE_ERROR "epoll_create1 failed."
+#define EPOLL_CTL_ERROR "epoll_ctl failed"
 
 #endif
