@@ -42,7 +42,7 @@ class Server {
 	const std::string &getServerName() const;
 	const std::string &getIpAddress() const;
 	const std::string &getPort() const;
-	const std::string getListen();
+	std::string getListen() const;
 	const std::string &getRoot() const;
 	const std::string &getAllowMethods() const;
 	const std::string &getAutoIndex() const;
