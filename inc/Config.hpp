@@ -1,10 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <cstdlib>
-#include <vector>
-
 #include "Server.hpp"
+#include "env.hpp"
 
 #define DEFAULT_CONF "conf/sample.conf"
 
