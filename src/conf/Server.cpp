@@ -166,6 +166,10 @@ const std::string &Server::getPort() const {
 	return _port;
 }
 
+const std::string getListen() {
+	return getIpAddress() + ":" + getPort();
+}
+
 const std::string &Server::getRoot() const {
 	return _root;
 }

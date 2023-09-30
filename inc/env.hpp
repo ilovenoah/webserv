@@ -21,7 +21,13 @@
 #include <vector>
 
 #define ARGS_ERROR "Too many arguments provided.\nUsage: ./webserv [config_file] or ./webserv"
-#define FAIL_OPEN "Failed to open file."
+#define FAIL_OPEN "Failed to open file"
 #define UNKOWN_KEY "Unknown key: "
+#define SOCKET_ERROR "Socket creation failed"
+#define NONBLOCK_ERROR "Setting non-blocking failed"
+#define FAIL_SOCKOPT "Setsockopt failed"
+#define FAIL_GET_ADDR "getaddrinfo failed"
+#define BIND_ERROR "Bind failed for"
+#define FAIL_LISTEN "listen failed"
 
 #endif

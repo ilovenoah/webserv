@@ -10,6 +10,7 @@ class GenericException : public std::exception {
    public:
 	GenericException(const std::string &message);
 	~GenericException() throw();
+
 	const char *what() const throw();
 };
 
