@@ -1,9 +1,5 @@
 #include "CreateSocket.hpp"
 
-#include "Config.hpp"
-#include "main.hpp"
-#define MAXLEN 10
-
 int setNonBlocking(int fd) {
 	int flags = fcntl(fd, F_GETFL, 0);
 	if (flags == -1)
@@ -70,8 +66,7 @@ std::vector<int> getSockets(const std::vector<Server> &servervec) {
 			sockfd = getSocket(res);
 			setSocketOption(sockfd, res);
 			if (bind(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
-				throw GenericException("Bind failed for " + servervec[i].getIpAddress() + ":" + servervec[i].getPort() + 
-					". Error: " + strerror(errno));
+				throw GenericException("Bind failed for " + servervec[i].getIpAddress() + ":" + servervec[i].getPort() + ". Error: " + strerror(errno));
 			}
 			if (listen(sockfd, MAXLEN) == -1) {	 // 10は待ち行列の最大数
 				throw GenericException("listen failed.");

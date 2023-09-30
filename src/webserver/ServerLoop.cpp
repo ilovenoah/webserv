@@ -1,11 +1,5 @@
 #include "ServerLoop.hpp"
 
-#include "Config.hpp"
-#include "CreateSocket.hpp"
-
-#define MAXEVENTS 10
-#define BUFFER_SIZE 1024
-
 int initilizeEpollfd(std::vector<int> sockets) {
 	int epollfd = epoll_create1(0);
 	if (epollfd == -1) {
