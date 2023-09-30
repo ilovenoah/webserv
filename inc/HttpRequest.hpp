@@ -11,6 +11,6 @@ class HttpRequest {
 	std::string _body;
 
    public:
-}
+};
 
 #endif
