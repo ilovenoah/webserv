@@ -1,11 +1,8 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <fstream>
-#include <iostream>
-#include <vector>
-
 #include "Location.hpp"
+#include "env.hpp"
 
 class Server {
    private:

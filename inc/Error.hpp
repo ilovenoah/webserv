@@ -1,13 +1,7 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
-#include <iostream>
-#include <stdexcept>
-#include <string>
-
-#define ARGS_ERROR "Too many arguments provided.\nUsage: ./webserv [config_file] or ./webserv"
-#define FAIL_OPEN "Failed to open file."
-#define FAIL_KEY "Unknown key: "
+#include "env.hpp"
 
 class GenericException : public std::exception {
    private:

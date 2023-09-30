@@ -1,11 +1,9 @@
-#include <sys/epoll.h>
-#include <sys/socket.h>
-#include <unistd.h>
-
-#include <iostream>
-#include <string>
-#include <vector>
+#ifndef SERVERLOOP_HPP
+#define SERVERLOOP_HPP
 
 #include "Config.hpp"
+#include "env.hpp"
 
 int startServerLoop(Config &conf_info);
+
+#endif
