@@ -205,7 +205,7 @@ const std::map<std::string, std::string> &Server::getReturn() const {
 void Server::execSetterMap(std::string &keys, std::string &value, std::ifstream &fileStream) {
 	try {
 		if (_srvSetterMap.find(keys) == _srvSetterMap.end()) {
-			throw GenericException(FAIL_KEY + keys);
+			throw GenericException(UNKOWN_KEY + keys);
 		} else {
 			(this->*_srvSetterMap[keys])(value, fileStream);
 		}
