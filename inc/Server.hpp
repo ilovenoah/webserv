@@ -1,11 +1,8 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <fstream>
-#include <iostream>
-#include <vector>
-
 #include "Location.hpp"
+#include "env.hpp"
 
 class Server {
    private:
@@ -45,6 +42,7 @@ class Server {
 	const std::string &getServerName() const;
 	const std::string &getIpAddress() const;
 	const std::string &getPort() const;
+	std::string getListen() const;
 	const std::string &getRoot() const;
 	const std::string &getAllowMethods() const;
 	const std::string &getAutoIndex() const;

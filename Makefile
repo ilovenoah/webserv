@@ -9,13 +9,16 @@ INC			=	-I inc/
 SRC_DIR		=	src/
 CONF_DIR	=	conf/
 UTILS_DIR	=	utils/
+SERV_DIR	=	webserver/
 OBJ_DIR		=	objs/
 
 MAIN_NAME	=	main.cpp
 CONF_NAME	=	Config.cpp Location.cpp Server.cpp
+SERV_NAME	=	CreateSocket.cpp ServerLoop.cpp
 UTILS_NAME	=	Error.cpp
 
 OBJ_NAME	=	$(MAIN_NAME:.cpp=.o)
+OBJ_NAME	+=	$(addprefix $(SERV_DIR), $(SERV_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(CONF_DIR), $(CONF_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(UTILS_DIR), $(UTILS_NAME:.cpp=.o))
 
@@ -34,6 +37,7 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 mkdir:
 	@mkdir -p $(OBJ_DIR)$(CONF_DIR)
 	@mkdir -p $(OBJ_DIR)$(UTILS_DIR)
+	@mkdir -p $(OBJ_DIR)$(SERV_DIR)
 	@echo "##### Creating obj directory #####"
 
 clean:
