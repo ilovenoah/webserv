@@ -60,8 +60,6 @@ int startServerLoop(Config &conf_info) {
 					close(events[i].data.fd);
 					continue;
 				}
-				buffer[bytesRead] = '\0';
-				std::cout << buffer << std::endl;
 				struct epoll_event event;
 				event.data.fd = events[i].data.fd;
 				event.events = EPOLLIN | EPOLLOUT;

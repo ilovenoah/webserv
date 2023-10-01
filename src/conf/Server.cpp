@@ -1,7 +1,4 @@
 #include "Server.hpp"
-
-#include <vector>
-
 #include "Config.hpp"
 
 std::map<std::string, void (Server::*)(const std::string &, std::ifstream &)> Server::_srvSetterMap;

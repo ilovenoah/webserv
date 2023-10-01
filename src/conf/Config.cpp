@@ -1,7 +1,5 @@
 #include "Config.hpp"
 
-#include <iostream>
-
 Config::Config() {
 }
 

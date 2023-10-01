@@ -1,7 +1,5 @@
 #include "Location.hpp"
 
-#include <map>
-
 std::map<std::string, void (Location::*)(const std::string &)> Location::_locSetterMap;
 
 Location::Location() {
