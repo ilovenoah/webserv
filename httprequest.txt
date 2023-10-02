@@ -16,13 +16,27 @@ Accept-Language: ja,en-US;q=0.9,en;q=0.8
 Cookie: _ga=GA1.1.1728055280.1695457724; _ga_KZEMFP46NG=GS1.1.1695700269.8.0.1695700269.0.0.0
 
 SERVER_SOFTWARE: サーバーが使用しているソフトウェアの名前とバージョンを示します。
-SERVER_NAME: サーバーの名前。ドメイン名またはIPアドレスとして示されることが多い。
+	固定
 GATEWAY_INTERFACE: CGIのバージョンを示す。例："CGI/1.1"。
-SERVER_PROTOCOL: サーバーがサポートしているプロトコルの名前とバージョン。例："HTTP/1.1"。
+	固定
+
+SERVER_NAME: サーバーの名前。ドメイン名またはIPアドレスとして示されることが多い。
+	hostの1個目
 SERVER_PORT: サーバーがリクエストを受け取ったポート番号を示す。
+	hostの2個目
+
 REQUEST_METHOD: リクエストのHTTPメソッド（例：GET、POST）。
+	1行目の1個目
 PATH_INFO: スクリプトのURIの後の追加のパス情報。
+	1行目の2個目
 PATH_TRANSLATED: PATH_INFOに対応するサーバーのファイルシステム上の実際のパス。
+	1行目の2個目
 SCRIPT_NAME: CGIスクリプトのURI。
+	1行目の2個目
 QUERY_STRING: リクエストURIにおいて"?"の後に続くクエリ情報。
+	1行目の2個目
+SERVER_PROTOCOL: サーバーがサポートしているプロトコルの名前とバージョン。例："HTTP/1.1"。
+	1行目の3個目
+
 REMOTE_ADDR: リクエストを行ったクライアントのIPアドレス。
+	accept

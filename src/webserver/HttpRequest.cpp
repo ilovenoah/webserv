@@ -82,69 +82,85 @@ void HttpRequest::setBody(const std::string &values) {
 	_body = values;
 }
 
-const std::string HttpRequest::getServerSoftware() const {
+const std::string &HttpRequest::getServerSoftware() const {
 	return _server_software;
 }
 
-const std::string HttpRequest::getServerName() const {
+const std::string &HttpRequest::getServerName() const {
 	return _server_name;
 }
 
-const std::string HttpRequest::getGatewayInterface() const {
+const std::string &HttpRequest::getGatewayInterface() const {
 	return _gateway_interface;
 }
 
-const std::string HttpRequest::getServerProtocol() const {
+const std::string &HttpRequest::getServerProtocol() const {
 	return _server_protocol;
 }
 
-const std::string HttpRequest::getServerPort() const {
+const std::string &HttpRequest::getServerPort() const {
 	return _server_port;
 }
 
-const std::string HttpRequest::getRequestMethod() const {
+const std::string &HttpRequest::getRequestMethod() const {
 	return _request_method;
 }
 
-const std::string HttpRequest::getPathInfo() const {
+const std::string &HttpRequest::getPathInfo() const {
 	return _path_info;
 }
 
-const std::string HttpRequest::getPathTranslated() const {
+const std::string &HttpRequest::getPathTranslated() const {
 	return _path_translated;
 }
 
-const std::string HttpRequest::getScriptName() const {
+const std::string &HttpRequest::getScriptName() const {
 	return _script_name;
 }
 
-const std::string HttpRequest::getQueryString() const {
+const std::string &HttpRequest::getQueryString() const {
 	return _query_string;
 }
 
-const std::string HttpRequest::getRemoteAddr() const {
+const std::string &HttpRequest::getRemoteAddr() const {
 	return _remote_addr;
 }
 
-const std::string HttpRequest::getBody() const {
+const std::string &HttpRequest::getBody() const {
 	return _body;
 }
 
-std::Boolean HttpRequest::isGet() {
+bool HttpRequest::isGet() {
 	return _request_method == "GET";
 }
 
-std::Boolean HttpRequest::isPost() {
+bool HttpRequest::isPost() {
 	return _request_method == "POST";
 }
 
-std::Boolean HttpRequest::isDelete() {
+bool HttpRequest::isDelete() {
 	return _request_method == "DELETE";
 }
 
-std::Boolean HttpRequest::parseHeader(int fd) {
+void setQueryURI(const std::string &values) {
+	std::vector<std::string> lines;
+
+	lines = std::split(values, "?");
+	if (lines.size() == 2) {
+		setPathInfo(lines[0]);
+		// PATH_TRANSLATED
+		// SCRIPT_NAME
+		setQueryString(lines[1]);
+	} else {
+		setPathInfo(values);
+		// PATH_TRANSLATED
+		// SCRIPT_NAME
+	}
+}
+
+bool HttpRequest::parseHeader(int fd) {
 	std::string request;
-	std::Boolean endFlag = false;
+	bool endFlag = false;
 	char buffer[BUFFER_SIZE];
 	int bytes;
 
@@ -164,17 +180,29 @@ std::Boolean HttpRequest::parseHeader(int fd) {
 	std::vector<std::string> lines;
 	std::vector<std::string> headers;
 
-	lines = split(request, "\r\n");
+	lines = std::split(request, "\r\n");
+	if (_buffer.size() > 0) {
+		lines[0] = _buffer + lines[0];
+		_buffer.clear();
+	}
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
 		if ((pos = it->find(": ")) != std::string::npos) {
 			key = it->substr(0, pos);
 			value = it->substr(pos + 2);
+			if (key == "Host") {
+				pos = value.find(":");
+				setServerName(value.substr(0, pos));
+				setServerPort(value.substr(pos + 1));
+			}
 		} else {
-			headers = split(*it, " ");
+			headers = std::split(*it, " ");
 			setRequestMethod(headers[0]);
-			set(headers[1]);
+			setQueryURI(headers[1]);
 			setServerProtocol(headers[2]);
 		}
+	}
+	if (endFlag) {
+		setBody(request.substr(request.find("\r\n\r\n") + 4));
 	}
 	return true;
 }

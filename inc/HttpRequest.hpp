@@ -59,9 +59,11 @@ class HttpRequest {
 	const std::string &getBody() const;
 	const std::string &getClientIp() const;
 
-	std::Boolean isGet();
-	std::Boolean isPost();
-	std::Boolean isDelete();
+	bool isGet();
+	bool isPost();
+	bool isDelete();
+
+	bool parseRequest(std::string &request);
 };
 
 #endif
