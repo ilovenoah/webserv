@@ -4,9 +4,8 @@ HttpRequest::HttpRequest()
 	: _server_software(SERVER_SOFTWARE), _gateway_interface(GATEWAY_INTERFACE) {
 }
 
-HttpRequest::HttpRequest(std::string &client_ip)
-	: HttpRequest() {
-	setRemoteAddr(client_ip);
+HttpRequest::HttpRequest(std::string &remote_addr)
+	: _server_software(SERVER_SOFTWARE), _gateway_interface(GATEWAY_INTERFACE), _remote_addr(remote_addr) {
 }
 
 HttpRequest::~HttpRequest() {
@@ -142,10 +141,11 @@ bool HttpRequest::isDelete() {
 	return _request_method == "DELETE";
 }
 
-void setQueryURI(const std::string &values) {
+// TODO: 2個目を分解
+void HttpRequest::setQueryURI(const std::string &values) {
 	std::vector<std::string> lines;
 
-	lines = std::split(values, "?");
+	lines = split(values, "?");
 	if (lines.size() == 2) {
 		setPathInfo(lines[0]);
 		// PATH_TRANSLATED
@@ -180,7 +180,7 @@ bool HttpRequest::parseHeader(int fd) {
 	std::vector<std::string> lines;
 	std::vector<std::string> headers;
 
-	lines = std::split(request, "\r\n");
+	lines = split(request, "\r\n");
 	if (_buffer.size() > 0) {
 		lines[0] = _buffer + lines[0];
 		_buffer.clear();
@@ -195,10 +195,13 @@ bool HttpRequest::parseHeader(int fd) {
 				setServerPort(value.substr(pos + 1));
 			}
 		} else {
-			headers = std::split(*it, " ");
-			setRequestMethod(headers[0]);
-			setQueryURI(headers[1]);
-			setServerProtocol(headers[2]);
+			headers = split(*it, " ");
+			if (headers[0] == "GET" || headers[0] == "POST" || headers[0] == "DELETE") {
+				std::cout << GREEN << "pass" << RESET << std::endl;
+				setRequestMethod(headers[0]);
+				setQueryURI(headers[1]);
+				setServerProtocol(headers[2]);
+			}
 		}
 	}
 	if (endFlag) {

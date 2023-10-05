@@ -27,7 +27,7 @@ class HttpRequest {
 
    public:
 	HttpRequest();
-	HttpRequest(std::string &client_ip);
+	HttpRequest(std::string &remote_addr);
 	~HttpRequest();
 	HttpRequest(const HttpRequest &other);
 	HttpRequest &operator=(const HttpRequest &other);
@@ -63,7 +63,8 @@ class HttpRequest {
 	bool isPost();
 	bool isDelete();
 
-	bool parseRequest(std::string &request);
+	bool parseHeader(int fd);
+	void setQueryURI(const std::string &values);
 };
 
 #endif
