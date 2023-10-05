@@ -20,6 +20,14 @@
 #include <string>
 #include <vector>
 
+#include "utils.hpp"
+#include "Error.hpp"
+
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define RESET "\033[0m"
+
 #define ARGS_ERROR "Too many arguments provided.\nUsage: ./webserv [config_file] or ./webserv"
 #define FAIL_OPEN "Failed to open file"
 #define UNKOWN_KEY "Unknown key: "

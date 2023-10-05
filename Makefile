@@ -15,7 +15,7 @@ OBJ_DIR		=	objs/
 MAIN_NAME	=	main.cpp
 CONF_NAME	=	Config.cpp Location.cpp Server.cpp
 SERV_NAME	=	CreateSocket.cpp ServerLoop.cpp HttpRequest.cpp
-UTILS_NAME	=	Error.cpp
+UTILS_NAME	=	Error.cpp utils.cpp
 
 OBJ_NAME	=	$(MAIN_NAME:.cpp=.o)
 OBJ_NAME	+=	$(addprefix $(SERV_DIR), $(SERV_NAME:.cpp=.o))
