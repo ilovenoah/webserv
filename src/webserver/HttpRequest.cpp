@@ -195,8 +195,9 @@ bool HttpRequest::parseHeader(int fd) {
 				setServerPort(value.substr(pos + 1));
 			}
 		} else {
+			std::string methodList[3] = {"GET", "POST", "DELETE"};
 			headers = split(*it, " ");
-			if (headers[0] == "GET" || headers[0] == "POST" || headers[0] == "DELETE") {
+			if (std::find(std::begin(methodList), std::end(methodList), headers[0])) {
 				std::cout << GREEN << "pass" << RESET << std::endl;
 				setRequestMethod(headers[0]);
 				setQueryURI(headers[1]);
