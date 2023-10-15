@@ -8,8 +8,8 @@ int main(int argc, const char *argv[]) {
 	// debug用
 	HttpRequest req;
 	int fd = open("httprequest.txt", O_RDONLY);
-	for (int i = 0; i < 10; i++) {
-		req.parseHeader(fd);
+	for (int i = 0; i < 2; i++) {
+		req.parseRequest(fd);
 	}
 	std::cout << "ServerSoftware  : " << "|" << req.getServerSoftware() << "|" << std::endl;
 	std::cout << "ServerName      : " << "|" << req.getServerName() << "|" << std::endl;
@@ -22,8 +22,8 @@ int main(int argc, const char *argv[]) {
 	std::cout << "ScriptName      : " << "|" << req.getScriptName() << "|" << std::endl;
 	std::cout << "QueryString     : " << "|" << req.getQueryString() << "|" << std::endl;
 	std::cout << "RemoteAddr      : " << "|" << req.getRemoteAddr() << "|" << std::endl;
-	std::cout << "Body            : " << "|" << req.getBody() << "|" << std::endl;
-	return 0;
+	std::cout << "Body            : " << std::endl << "|" << req.getBody() << "|" << std::endl;
+	return (0);
 
 	startServerLoop(config);
 	return (0);

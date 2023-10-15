@@ -22,8 +22,14 @@ class HttpRequest {
 	std::string _query_string;
 	std::string _remote_addr;
 	std::string _body;
+	std::size_t _content_length;
 
 	std::string _buffer;
+	std::map<std::string, std::string> _others;
+
+	bool _has_request_line;
+	bool _has_header;
+	bool _has_body;
 
    public:
 	HttpRequest();
@@ -57,13 +63,17 @@ class HttpRequest {
 	const std::string &getQueryString() const;
 	const std::string &getRemoteAddr() const;
 	const std::string &getBody() const;
-	const std::string &getClientIp() const;
+	const std::map<std::string, std::string> &getOthers() const;
+	std::size_t getContentLength();
 
 	bool isGet();
 	bool isPost();
 	bool isDelete();
 
-	bool parseHeader(int fd);
+	bool parseRequest(int fd);
+	void parseRequestLine(std::string &buffer);
+	void parseHeader(std::string &buffer);
+	void parseBody(std::string &buffer);
 	void setQueryURI(const std::string &values);
 };
 

@@ -1,11 +1,11 @@
 #include "HttpRequest.hpp"
 
 HttpRequest::HttpRequest()
-	: _server_software(SERVER_SOFTWARE), _gateway_interface(GATEWAY_INTERFACE) {
+	: _server_software(SERVER_SOFTWARE), _gateway_interface(GATEWAY_INTERFACE), _content_length(0) {
 }
 
 HttpRequest::HttpRequest(std::string &remote_addr)
-	: _server_software(SERVER_SOFTWARE), _gateway_interface(GATEWAY_INTERFACE), _remote_addr(remote_addr) {
+	: _server_software(SERVER_SOFTWARE), _gateway_interface(GATEWAY_INTERFACE), _remote_addr(remote_addr), _content_length(0) {
 }
 
 HttpRequest::~HttpRequest() {
@@ -29,6 +29,7 @@ HttpRequest &HttpRequest::operator=(const HttpRequest &copy) {
 		_query_string = copy._query_string;
 		_remote_addr = copy._remote_addr;
 		_body = copy._body;
+		_others = copy._others;
 	}
 	return *this;
 }
@@ -129,6 +130,14 @@ const std::string &HttpRequest::getBody() const {
 	return _body;
 }
 
+const std::map<std::string, std::string> &HttpRequest::getOthers() const {
+	return _others;
+}
+
+std::size_t HttpRequest::getContentLength() {
+	return _content_length;
+}
+
 bool HttpRequest::isGet() {
 	return _request_method == "GET";
 }
@@ -158,9 +167,8 @@ void HttpRequest::setQueryURI(const std::string &values) {
 	}
 }
 
-bool HttpRequest::parseHeader(int fd) {
-	std::string request;
-	bool endFlag = false;
+bool HttpRequest::parseRequest(int fd) {
+	std::string line;
 	char buffer[BUFFER_SIZE];
 	int bytes;
 
@@ -168,23 +176,64 @@ bool HttpRequest::parseHeader(int fd) {
 		return false;
 	}
 	buffer[bytes] = '\0';
-	request = buffer;
+	line = buffer;
+	try {
+		parseRequestLine(line);
+		parseHeader(line);
+		parseBody(line);
+	} catch (GenericException &e) {
+		return (false);
+	}
+	return (true);
+}
 
-	if (request.find("\r\n\r\n") != std::string::npos) {
-		endFlag = true;
+// TODO: error handling
+void HttpRequest::parseRequestLine(std::string &buffer) {
+	if (_has_request_line) {
+		return;
+	}
+
+	std::size_t pos;
+	std::string headerLine;
+	std::vector<std::string> contents;
+
+	pos = buffer.find("\r\n");
+	headerLine = buffer.substr(0, pos);
+	contents = split(headerLine, " ");
+	setRequestMethod(contents[0]);
+	setQueryURI(contents[1]);
+	setServerProtocol(contents[2]);
+	_has_request_line = true;
+	buffer.erase(0, pos);
+}
+
+void HttpRequest::parseHeader(std::string &buffer) {
+	if (_has_header) {
+		return;
+	}
+
+	std::size_t pos;
+	std::vector<std::string> lines;
+
+	buffer = _buffer + buffer;
+	if ((pos = buffer.find("\r\n\r\n")) != std::string::npos) {
+		if (pos + 4 < buffer.size()) {
+			_body = buffer.substr(pos + 4);
+			buffer.erase(pos);
+			_has_body = true;
+		}
+		_has_header = true;
+		lines = split(buffer, "\r\n");
+		buffer.clear();
+	} else {
+		lines = split(buffer, "\r\n");
+		_buffer = lines.back();
+		lines.pop_back();
 	}
 
 	std::string key;
 	std::string value;
-	std::size_t pos;
-	std::vector<std::string> lines;
-	std::vector<std::string> headers;
 
-	lines = split(request, "\r\n");
-	if (_buffer.size() > 0) {
-		lines[0] = _buffer + lines[0];
-		_buffer.clear();
-	}
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
 		if ((pos = it->find(": ")) != std::string::npos) {
 			key = it->substr(0, pos);
@@ -193,20 +242,24 @@ bool HttpRequest::parseHeader(int fd) {
 				pos = value.find(":");
 				setServerName(value.substr(0, pos));
 				setServerPort(value.substr(pos + 1));
-			}
-		} else {
-			std::string methodList[3] = {"GET", "POST", "DELETE"};
-			headers = split(*it, " ");
-			if (std::find(std::begin(methodList), std::end(methodList), headers[0])) {
-				std::cout << GREEN << "pass" << RESET << std::endl;
-				setRequestMethod(headers[0]);
-				setQueryURI(headers[1]);
-				setServerProtocol(headers[2]);
+			} else if (key == "Content-Length") {
+				_content_length = atoi(value.c_str());
+			} else {
+				_others[key] = value;
 			}
 		}
 	}
-	if (endFlag) {
-		setBody(request.substr(request.find("\r\n\r\n") + 4));
+}
+
+void HttpRequest::parseBody(std::string &buffer) {
+	if (!_has_body || _content_length == 0) {
+		return;
 	}
-	return true;
+
+	if (_body.size() < _content_length) {
+		_body += buffer;
+	}
+	if (_body.size() == _content_length) {
+		_has_body = false;
+	}
 }

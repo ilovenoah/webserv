@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "utils.hpp"
 #include "Error.hpp"
+#include "utils.hpp"
 
 #define RED "\033[31m"
 #define GREEN "\033[32m"

@@ -6,7 +6,7 @@ std::vector<std::string> split(std::string line, const char *sep) {
 
 	while ((pos = line.find(sep)) != std::string::npos){
 		lines.push_back(line.substr(0, pos));
-		line.erase(0, pos + 1);
+		line.erase(0, pos + strlen(sep));
 	}
 	lines.push_back(line);
 	return lines;

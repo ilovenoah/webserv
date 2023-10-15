@@ -104,7 +104,7 @@ void Config::parseConfig(int argc, const char *argv[]) {
 		}
 		setFilePath(file_path);
 		readFile();
-	} catch (const std::exception &e) {
+	} catch (GenericException &e) {
 		std::cerr << e.what() << std::endl;
 	}
 }
