@@ -7,8 +7,8 @@ int main(int argc, const char *argv[]) {
 
 	// debug用
 	HttpRequest req;
-	int fd = open("httprequest.txt", O_RDONLY);
-	for (int i = 0; i < 2; i++) {
+	int fd = open("sample.txt", O_RDONLY);
+	for (int i = 0; i < 10; i++) {
 		req.parseRequest(fd);
 	}
 	std::cout << "ServerSoftware  : " << "|" << req.getServerSoftware() << "|" << std::endl;

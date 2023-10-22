@@ -244,6 +244,10 @@ void HttpRequest::parseHeader(std::string &buffer) {
 				setServerPort(value.substr(pos + 1));
 			} else if (key == "Content-Length") {
 				_content_length = atoi(value.c_str());
+			} else if (key == "Transfer-Encoding") {
+				if (value.find("chunked") != std::string::npos) {
+					_is_chunked = true;
+				}
 			} else {
 				_others[key] = value;
 			}
@@ -252,10 +256,26 @@ void HttpRequest::parseHeader(std::string &buffer) {
 }
 
 void HttpRequest::parseBody(std::string &buffer) {
-	if (!_has_body || _content_length == 0) {
+	if (!(_has_body && _is_chunked)) {
 		return;
 	}
-
+	while (_is_chunked) {
+		std::string len_str = buffer.substr(0, buffer.find("\r\n"));
+		int len = atoi((len_str).c_str());
+		
+		std::cout << RED << "len: " << len_str << RESET << std::endl;
+		if (len == 0) {
+			_is_chunked = false;
+			break;
+		}
+		std::string chunk = buffer.substr(buffer.find("\r\n") + 2, len);
+		std::cout << RED << "chunk: " << chunk << RESET << std::endl;
+		_body += chunk;
+		buffer.erase(0, len + 2 + len_str.size());
+	}
+	if (_is_chunked) {
+		_buffer = buffer;
+	}
 	if (_body.size() < _content_length) {
 		_body += buffer;
 	}

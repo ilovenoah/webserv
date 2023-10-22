@@ -3,7 +3,7 @@
 
 #include "env.hpp"
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 10
 
 #define SERVER_SOFTWARE "webserv/1.0"
 #define GATEWAY_INTERFACE "CGI/1.1"
@@ -24,17 +24,21 @@ class HttpRequest {
 	std::string _body;
 	std::size_t _content_length;
 
+	std::string _socket_time; // time out用
+
 	std::string _buffer;
 	std::map<std::string, std::string> _others;
 
 	bool _has_request_line;
 	bool _has_header;
 	bool _has_body;
+	bool _is_chunked;
 
    public:
 	HttpRequest();
 	HttpRequest(std::string &remote_addr);
 	~HttpRequest();
+
 	HttpRequest(const HttpRequest &other);
 	HttpRequest &operator=(const HttpRequest &other);
 

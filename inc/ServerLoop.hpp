@@ -6,7 +6,7 @@
 #include "env.hpp"
 
 #define MAXEVENTS 10
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 10
 
 int startServerLoop(Config &conf_info);
 
