@@ -1,13 +1,13 @@
 #include "loop.hpp"
 
-static std::string convertIPAddress(in_addr_t address) {
-    std::ostringstream oss;
-    oss << (address & 0xFF) << '.'               // 最下位のバイト
-        << ((address >> 8) & 0xFF) << '.'        // さらに次のバイト
-        << ((address >> 16) & 0xFF) << '.'       // 次のバイト
-        << ((address >> 24) & 0xFF);             // 最上位のバイト
-    return oss.str();
-}
+// static std::string convertIPAddress(in_addr_t address) {
+//     std::ostringstream oss;
+//     oss << (address & 0xFF) << '.'               // 最下位のバイト
+//         << ((address >> 8) & 0xFF) << '.'        // さらに次のバイト
+//         << ((address >> 16) & 0xFF) << '.'       // 次のバイト
+//         << ((address >> 24) & 0xFF);             // 最上位のバイト
+//     return oss.str();
+// }
 
 static bool setRevents(std::map<int, ServerSocket> &ssmap) {
     std::vector<struct pollfd> pollfds;
@@ -26,4 +26,16 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap) {
         ssmap[iter->fd].setRevents(iter->revents);
     }
     return true;
+}
+
+bool loop(std::map<int, ServerSocket> &ssmap) {
+    while(true) {
+        if (setRevents(ssmap) == false) {
+            return false;
+        }
+        for(std::map<int, ServerSocket>::iterator iter = ssmap.begin(); iter != ssmap.end(); ++iter) {
+            std::pair<int, sockaddr_in> socketInfo = iter->second.tryAccept();
+            (void)socketInfo;
+        }
+    }
 }
