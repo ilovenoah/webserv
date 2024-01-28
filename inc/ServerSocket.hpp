@@ -17,11 +17,13 @@ class ServerSocket {
         int _fd;
         std::string _ipaddress;
         std::string _port;
+        short _revents;
         ServerSocket();
         
     public:
         ServerSocket(std::string ipaddress, std::string port);
         bool init();
+        void setRevents(short revents);
 
 };
 

@@ -54,7 +54,11 @@ bool ServerSocket::init() {
     return true;
 }
 
-int main() {
-	ServerSocket ss("8.8.8.8", "8080");
-	ss.init();
+void ServerSocket::setRevents(short revents) {
+	this->_revents = revents;
 }
+
+// int main() {
+// 	ServerSocket ss("8.8.8.8", "8080");
+// 	ss.init();
+// }
