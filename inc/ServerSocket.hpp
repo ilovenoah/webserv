@@ -7,6 +7,7 @@
 #include <sstream>
 #include <sys/types.h>
 #include <fcntl.h>
+#include "utils.hpp"
 
 
 #define LISTEN_BACKLOG 1000
