@@ -36,6 +36,13 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, ClientS
     return true;
 }
 
+static void indicateDisconnection(std::map<int, ClientSocket> &csmap) {
+    for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
+        if ((iter->second.getRevents() & POLLHUP) == POLLHUP) {iter->second.setPhase(ClientSocket::CLOSE); }
+        // if (timeout?) { iter->second.setPhase(ClientSocket::CLOSE); }
+    }
+}
+
 static ClientSocket createCsocket(std::pair<int, sockaddr_in> socketInfo) {
     ClientSocket cs(socketInfo.first);
     return cs;    
@@ -49,13 +56,24 @@ bool loop(std::map<int, ServerSocket> &ssmap) {
             std::pair<int, sockaddr_in> socketInfo = iter->second.tryAccept();
             if (socketInfo.first == -1) { continue; }
             csmap.insert(std::pair<int, ClientSocket>(socketInfo.first, createCsocket(socketInfo)));
-            std::cout << csmap[socketInfo.first].getFd() << std::endl; 
         }
-        for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
-            if (iter->second.tryRecv() == false) { continue; }
-        }
-        for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
-            if (iter->second.trySend() == false) { continue; }
+        indicateDisconnection(csmap);
+        for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end();) {
+            switch (iter->second.getPhase()) {
+                case ClientSocket::RECV:
+                    iter->second.setPhase(iter->second.tryRecv());
+                    ++iter;
+                    break;
+                case ClientSocket::SEND:
+                    iter->second.setPhase(iter->second.trySend());
+                    ++iter;
+                    break;
+                case ClientSocket::CLOSE:
+                    std::map<int, ClientSocket>::iterator toErase = iter;
+                    ++iter;
+                    csmap.erase(toErase);
+                    break;
+            }
         }
     }
     return true;
