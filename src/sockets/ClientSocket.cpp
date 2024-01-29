@@ -31,11 +31,19 @@ ClientSocket::csphase ClientSocket::tryRecv() {
 }
 
 ClientSocket::csphase ClientSocket::trySend() {
+#if defined(_LINUX)
+    const int flags = MSG_DONTWAIT | MSG_NOSIGNAL;
+#elif defined(_DARWIN)
+    const int flags = MSG_DONTWAIT | SO_NOSIGPIPE;
+#else
+    const int flags = MSG_DONTWAIT | MSG_NOSIGNAL;
+#endif
     const char *msg = "HTTP/1.1 200 Ok\nContent-Length: 11\n\nHelloworld!";
     if ((this->_revents & POLLOUT) != POLLOUT) {
         return this->_phase;
     }
-    if (send(this->_fd, msg, std::strlen(msg), MSG_DONTWAIT | MSG_NOSIGNAL) == -1) {
+
+    if (send(this->_fd, msg, std::strlen(msg), flags) == -1) {
         utils::putSysError("send");
         return ClientSocket::CLOSE;
     }
