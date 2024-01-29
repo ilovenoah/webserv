@@ -18,14 +18,18 @@ short ClientSocket::getRevents() const {
 
 ClientSocket::csphase ClientSocket::tryRecv() {
     char buf[BUFFERSIZE];
+    ssize_t recvlen;
+
     if ((this->_revents & POLLIN) != POLLIN) {
         return this->_phase;
     }
     std::memset(&buf, 0, sizeof(buf));
-    if (recv(this->_fd, buf, BUFFERSIZE - 1, 0) == -1) {
+    recvlen = recv(this->_fd, buf, BUFFERSIZE - 1, 0);
+    if (recvlen == -1) {
         utils::putSysError("recv");
         return ClientSocket::CLOSE;
     }
+    if (recvlen == 0) { return ClientSocket::CLOSE; }
     this->_lastSendTimestamp = std::time(NULL);
     return ClientSocket::SEND;
 }
