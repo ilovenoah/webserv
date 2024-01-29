@@ -3,7 +3,6 @@
 
 #include <fcntl.h>
 #include <netdb.h>
-#include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -31,5 +30,8 @@
 #define FAIL_LISTEN "listen failed"
 #define EPOLL_CREATE_ERROR "epoll_create1 failed."
 #define EPOLL_CTL_ERROR "epoll_ctl failed"
+
+#define RED "\033[31m"
+#define RESET "\033[0m"
 
 #endif
