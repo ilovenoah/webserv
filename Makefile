@@ -1,5 +1,5 @@
 CXX			=	c++
-CXXFLAGS	=	-Wall -Werror -Wextra -std=c++98
+CXXFLAGS	=	-Wall -Werror -Wextra -std=c++98 -fsanitize=address
 RM			=	rm -rf
 AR			=	ar rcs
 NAME		=	webserv
@@ -30,7 +30,7 @@ OBJ			=	$(addprefix $(OBJ_DIR), $(OBJ_NAME))
 all: mkdir $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CXX) -o $@ $^
+	@$(CXX) $(CXXFLAGS) -o $@ $^
 	@echo "##### $@ compiling finished! #####"
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
