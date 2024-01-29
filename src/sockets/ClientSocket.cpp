@@ -11,3 +11,32 @@ int ClientSocket::getFd() const {
 void ClientSocket::setRevents(short revents) {
 	this->_revents = revents;
 }
+
+bool ClientSocket::tryRecv() {
+    char buf[BUFFERSIZE];
+    if ((this->_revents & POLLIN) != POLLIN) {
+        return false;
+    }
+    std::memset(&buf, 0, sizeof(buf));
+    if (recv(this->_fd, buf, BUFFERSIZE - 1, 0) == -1) {
+        utils::putSysError("recv");
+        this->_revents = 0;
+        return false;
+    } 
+    this->_revents = 0;
+    return true;
+}
+
+bool ClientSocket::trySend() {
+    const char *msg = "HTTP/1.1 200 Ok\nContent-Length: 12\n\nHelloworld!";
+    if ((this->_revents & POLLOUT) != POLLOUT) {
+        return false;
+    }
+    if (send(this->_fd, msg, std::strlen(msg), MSG_DONTWAIT) == -1) {
+        utils::putSysError("send");
+        this->_revents = 0;
+        return false;
+    }
+    this->_revents = 0;
+    return true;
+}
