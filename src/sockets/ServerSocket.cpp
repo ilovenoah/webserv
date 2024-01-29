@@ -60,12 +60,13 @@ void ServerSocket::setRevents(short revents) {
 
 std::pair<int, struct sockaddr_in> ServerSocket::tryAccept() {
 	struct sockaddr_in s_addr;
+	socklen_t s_addr_len(sizeof(struct sockaddr_in));
 	int fd;
 	std::memset(&s_addr, 0, sizeof(struct sockaddr_in));
 	if ((this->_revents & POLLIN) != POLLIN) {
 		return std::pair<int, struct sockaddr_in>(-1, s_addr);	
 	}
-	fd = accept(this->_fd, (struct sockaddr *)&s_addr, (socklen_t *)sizeof(struct sockaddr_in));
+	fd = accept(this->_fd, (struct sockaddr *)&s_addr, (socklen_t *)&s_addr_len);
 	if (fd == -1) {
 		utils::putSysError("accept");
 		return std::pair<int, struct sockaddr_in>(-1, s_addr);
