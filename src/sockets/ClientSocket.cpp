@@ -20,10 +20,8 @@ bool ClientSocket::tryRecv() {
     std::memset(&buf, 0, sizeof(buf));
     if (recv(this->_fd, buf, BUFFERSIZE - 1, 0) == -1) {
         utils::putSysError("recv");
-        this->_revents = 0;
         return false;
     } 
-    this->_revents = 0;
     return true;
 }
 
@@ -34,10 +32,8 @@ bool ClientSocket::trySend() {
     }
     if (send(this->_fd, msg, std::strlen(msg), MSG_DONTWAIT | MSG_NOSIGNAL) == -1) {
         utils::putSysError("send");
-        this->_revents = 0;
         return false;
     }
-    this->_revents = 0;
     return true;
 }
 
