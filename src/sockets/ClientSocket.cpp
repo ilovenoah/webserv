@@ -2,7 +2,7 @@
 
 ClientSocket::ClientSocket() {}
 
-ClientSocket::ClientSocket(int const fd) : _fd(fd), _phase(ClientSocket::RECV) {}
+ClientSocket::ClientSocket(int const fd) : _fd(fd), _phase(ClientSocket::RECV), _lastSendTimestamp(std::time(NULL)) {}
 
 int ClientSocket::getFd() const {
     return this->_fd;
@@ -47,4 +47,12 @@ void ClientSocket::setPhase(ClientSocket::csphase const phase) {
 
 ClientSocket::csphase ClientSocket::getPhase() const {
     return this->_phase;
+}
+
+std::time_t ClientSocket::getLastSendTimestamp() const {
+    return this->_lastSendTimestamp;
+}
+
+void ClientSocket::setLastSendTimestamp(std::time_t const lastSendTimestamp) {
+    this->_lastSendTimestamp = lastSendTimestamp;
 }
