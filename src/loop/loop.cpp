@@ -15,7 +15,7 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, ClientS
         struct pollfd pfd;
         std::memset(&pfd, 0, sizeof(struct pollfd));
         pfd.fd = iter->first;
-        pfd.events = POLLIN | POLLOUT | POLLHUP;
+        pfd.events = POLLIN | POLLHUP;
         pollfds.push_back(pfd);
     }
     for(std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
@@ -52,6 +52,9 @@ bool loop(std::map<int, ServerSocket> &ssmap) {
             if (socketInfo.first == -1) { continue; }
             csmap.insert(std::pair<int, ClientSocket>(socketInfo.first, createCsocket(socketInfo)));
             std::cout << csmap[socketInfo.first].getFd() << std::endl; 
+        }
+        for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
+
         }
     }
 }
