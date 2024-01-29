@@ -70,7 +70,7 @@ bool loop(std::map<int, ServerSocket> &ssmap) {
                 case ClientSocket::CLOSE:
                     std::map<int, ClientSocket>::iterator toErase = iter;
                     ++iter;
-                    close(iter->second.getFd());
+                    iter->second.close();
                     csmap.erase(toErase);
                     break;
             }
