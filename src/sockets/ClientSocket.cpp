@@ -50,6 +50,10 @@ ClientSocket::csphase ClientSocket::trySend() {
     return ClientSocket::RECV;
 }
 
+void ClientSocket::close() {
+    if (::close(this->_fd) == -1) { utils::putSysError("close"); }
+}
+
 void ClientSocket::setPhase(ClientSocket::csphase const phase) {
     this->_phase = phase;
 }
