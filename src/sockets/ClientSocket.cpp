@@ -40,3 +40,11 @@ bool ClientSocket::trySend() {
     this->_revents = 0;
     return true;
 }
+
+void ClientSocket::setPhase(ClientSocket::csphase const phase) {
+    this->_phase = phase;
+}
+
+ClientSocket::csphase ClientSocket::getPhase() const {
+    return this->_phase;
+}
