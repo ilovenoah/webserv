@@ -22,7 +22,7 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, ClientS
         struct pollfd pfd;
         std::memset(&pfd, 0, sizeof(struct pollfd));
         pfd.fd = iter->first;
-        pfd.events = POLLIN | POLLOUT;
+        pfd.events = POLLIN | POLLOUT | POLLHUP;
         pollfds.push_back(pfd);
     }
     if (poll(pollfds.data(), pollfds.size(), 0) == -1) {
@@ -45,6 +45,7 @@ static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
     if (std::difftime(std::time(NULL), cs.getLastSendTimestamp()) > 5) {
         return ClientSocket::CLOSE;
     }
+    if ((cs.getPhase() & POLLHUP) == POLLHUP) { return ClientSocket::CLOSE; }
     return cs.getPhase();
 }
 
