@@ -36,10 +36,13 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, ClientS
     return true;
 }
 
-static void indicateDisconnection(std::map<int, ClientSocket> &csmap) {
+static void checkClosedAndTimedOutClientSockets(std::map<int, ClientSocket> &csmap) {
     for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
         if ((iter->second.getRevents() & POLLHUP) == POLLHUP) {iter->second.setPhase(ClientSocket::CLOSE); }
-        // if (timeout?) { iter->second.setPhase(ClientSocket::CLOSE); }
+        else if (std::difftime(std::time(NULL), iter->second.getLastSendTimestamp()) > 5) {
+            close(iter->second.getFd());
+            iter->second.setPhase(ClientSocket::CLOSE);
+        }
     }
 }
 
@@ -57,7 +60,7 @@ bool loop(std::map<int, ServerSocket> &ssmap) {
             if (socketInfo.first == -1) { continue; }
             csmap.insert(std::pair<int, ClientSocket>(socketInfo.first, createCsocket(socketInfo)));
         }
-        indicateDisconnection(csmap);
+        checkClosedAndTimedOutClientSockets(csmap);
         for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end();) {
             switch (iter->second.getPhase()) {
                 case ClientSocket::RECV:
