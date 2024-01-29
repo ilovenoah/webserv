@@ -28,14 +28,22 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap) {
     return true;
 }
 
+static ClientSocket createCsocket(std::pair<int, sockaddr_in> socketInfo) {
+    ClientSocket cs(socketInfo.first);
+    return cs;    
+}
+
 bool loop(std::map<int, ServerSocket> &ssmap) {
+    std::map<int, ClientSocket> csmap;
     while(true) {
         if (setRevents(ssmap) == false) {
             return false;
         }
         for(std::map<int, ServerSocket>::iterator iter = ssmap.begin(); iter != ssmap.end(); ++iter) {
             std::pair<int, sockaddr_in> socketInfo = iter->second.tryAccept();
-            (void)socketInfo;
+            if (socketInfo.first == -1) { continue; }
+            csmap.insert(std::pair<int, ClientSocket>(socketInfo.first, createCsocket(socketInfo)));
+            std::cout << csmap[socketInfo.first].getFd() << std::endl; 
         }
     }
 }

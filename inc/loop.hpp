@@ -7,6 +7,7 @@
 #include <vector>
 #include <utility>
 #include "ServerSocket.hpp"
+#include "ClientSocket.hpp"
 #include "utils.hpp"
 
 bool loop(std::map<int, ServerSocket> &ssmap);

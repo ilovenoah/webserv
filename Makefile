@@ -15,7 +15,7 @@ LOOP_DIR	=	loop/
 
 MAIN_NAME	=	main.cpp
 CONF_NAME	=	Config.cpp Location.cpp Server.cpp
-SOCK_NAME	=	ServerSocket.cpp
+SOCK_NAME	=	ServerSocket.cpp ClientSocket.cpp
 UTILS_NAME	=	Error.cpp utils.cpp
 LOOP_NAME	=	loop.cpp
 
