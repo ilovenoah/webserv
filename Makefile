@@ -3,6 +3,7 @@ CXXFLAGS	=	-Wall -Werror -Wextra -std=c++98
 RM			=	rm -rf
 AR			=	ar rcs
 NAME		=	webserv
+UNAME_OS	=	$(shell uname -s)
 
 INC			=	-I inc/
 
@@ -26,6 +27,12 @@ OBJ_NAME	+=	$(addprefix $(LOOP_DIR), $(LOOP_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(SOCK_DIR), $(SOCK_NAME:.cpp=.o))
 
 OBJ			=	$(addprefix $(OBJ_DIR), $(OBJ_NAME))
+
+ifeq ($(UNAME_OS), Linux)
+CXXFLAGS 			+= -D_LINUX
+else ifeq ($(UNAME_OS), Darwin)
+CXXFLAGS 			+= -D_DARWIN
+endif
 
 all: mkdir $(NAME)
 
