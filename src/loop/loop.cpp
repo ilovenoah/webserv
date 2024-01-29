@@ -30,8 +30,8 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, ClientS
         return false;
     }
     for(std::vector<struct pollfd>::iterator iter = pollfds.begin(); iter != pollfds.end(); ++iter) {
-        ssmap[iter->fd].setRevents(iter->revents);
-        csmap[iter->fd].setRevents(iter->revents);
+        if (ssmap.find(iter->fd) != ssmap.end()) { ssmap[iter->fd].setRevents(iter->revents); }
+        else if (csmap.find(iter->fd) != csmap.end()) { csmap[iter->fd].setRevents(iter->revents); }
     }
     return true;
 }
@@ -44,9 +44,7 @@ static ClientSocket createCsocket(std::pair<int, sockaddr_in> socketInfo) {
 bool loop(std::map<int, ServerSocket> &ssmap) {
     std::map<int, ClientSocket> csmap;
     while(true) {
-        if (setRevents(ssmap, csmap) == false) {
-            return false;
-        }
+        if (setRevents(ssmap, csmap) == false) { return false; }
         for(std::map<int, ServerSocket>::iterator iter = ssmap.begin(); iter != ssmap.end(); ++iter) {
             std::pair<int, sockaddr_in> socketInfo = iter->second.tryAccept();
             if (socketInfo.first == -1) { continue; }
@@ -54,7 +52,11 @@ bool loop(std::map<int, ServerSocket> &ssmap) {
             std::cout << csmap[socketInfo.first].getFd() << std::endl; 
         }
         for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
-
+            if (iter->second.tryRecv() == false) { continue; }
+        }
+        for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
+            if (iter->second.trySend() == false) { continue; }
         }
     }
+    return true;
 }
