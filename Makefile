@@ -15,7 +15,7 @@ LOOP_DIR	=	loop/
 
 MAIN_NAME	=	main.cpp
 CONF_NAME	=	Config.cpp Location.cpp Server.cpp
-SOCK_NAME	=	ServerSocket.cpp
+SOCK_NAME	=	ServerSocket.cpp ClientSocket.cpp
 UTILS_NAME	=	Error.cpp utils.cpp
 LOOP_NAME	=	loop.cpp
 
@@ -30,7 +30,7 @@ OBJ			=	$(addprefix $(OBJ_DIR), $(OBJ_NAME))
 all: mkdir $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CXX) -o $@ $^
+	@$(CXX) $(CXXFLAGS) -o $@ $^
 	@echo "##### $@ compiling finished! #####"
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp

@@ -9,9 +9,16 @@
 //     return oss.str();
 // }
 
-static bool setRevents(std::map<int, ServerSocket> &ssmap) {
+static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, ClientSocket> &csmap) {
     std::vector<struct pollfd> pollfds;
     for(std::map<int, ServerSocket>::iterator iter = ssmap.begin(); iter != ssmap.end(); ++iter) {
+        struct pollfd pfd;
+        std::memset(&pfd, 0, sizeof(struct pollfd));
+        pfd.fd = iter->first;
+        pfd.events = POLLIN | POLLHUP;
+        pollfds.push_back(pfd);
+    }
+    for(std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
         struct pollfd pfd;
         std::memset(&pfd, 0, sizeof(struct pollfd));
         pfd.fd = iter->first;
@@ -23,19 +30,33 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap) {
         return false;
     }
     for(std::vector<struct pollfd>::iterator iter = pollfds.begin(); iter != pollfds.end(); ++iter) {
-        ssmap[iter->fd].setRevents(iter->revents);
+        if (ssmap.find(iter->fd) != ssmap.end()) { ssmap[iter->fd].setRevents(iter->revents); }
+        else if (csmap.find(iter->fd) != csmap.end()) { csmap[iter->fd].setRevents(iter->revents); }
     }
     return true;
 }
 
+static ClientSocket createCsocket(std::pair<int, sockaddr_in> socketInfo) {
+    ClientSocket cs(socketInfo.first);
+    return cs;    
+}
+
 bool loop(std::map<int, ServerSocket> &ssmap) {
+    std::map<int, ClientSocket> csmap;
     while(true) {
-        if (setRevents(ssmap) == false) {
-            return false;
-        }
+        if (setRevents(ssmap, csmap) == false) { return false; }
         for(std::map<int, ServerSocket>::iterator iter = ssmap.begin(); iter != ssmap.end(); ++iter) {
             std::pair<int, sockaddr_in> socketInfo = iter->second.tryAccept();
-            (void)socketInfo;
+            if (socketInfo.first == -1) { continue; }
+            csmap.insert(std::pair<int, ClientSocket>(socketInfo.first, createCsocket(socketInfo)));
+            std::cout << csmap[socketInfo.first].getFd() << std::endl; 
+        }
+        for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
+            if (iter->second.tryRecv() == false) { continue; }
+        }
+        for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
+            if (iter->second.trySend() == false) { continue; }
         }
     }
+    return true;
 }

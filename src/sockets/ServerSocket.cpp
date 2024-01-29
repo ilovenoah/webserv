@@ -71,6 +71,10 @@ std::pair<int, struct sockaddr_in> ServerSocket::tryAccept() {
 		utils::putSysError("accept");
 		return std::pair<int, struct sockaddr_in>(-1, s_addr);
 	}
+    if (fcntl(this->_fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1) {
+        utils::putSysError("fcntl");
+        return std::pair<int, struct sockaddr_in>(-1, s_addr);
+    }
 	return std::pair<int, struct sockaddr_in>(fd, s_addr);
 }
 
