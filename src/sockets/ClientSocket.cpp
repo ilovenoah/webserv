@@ -2,7 +2,7 @@
 
 ClientSocket::ClientSocket() {}
 
-ClientSocket::ClientSocket(int const fd) : _fd(fd) {}
+ClientSocket::ClientSocket(int const fd) : _fd(fd), _phase(ClientSocket::RECV), _lastSendTimestamp(std::time(NULL)) {}
 
 int ClientSocket::getFd() const {
     return this->_fd;
@@ -12,31 +12,48 @@ void ClientSocket::setRevents(short revents) {
 	this->_revents = revents;
 }
 
-bool ClientSocket::tryRecv() {
+short ClientSocket::getRevents() const {
+    return this->_revents;
+}
+
+ClientSocket::csphase ClientSocket::tryRecv() {
     char buf[BUFFERSIZE];
     if ((this->_revents & POLLIN) != POLLIN) {
-        return false;
+        return this->_phase;
     }
     std::memset(&buf, 0, sizeof(buf));
     if (recv(this->_fd, buf, BUFFERSIZE - 1, 0) == -1) {
         utils::putSysError("recv");
-        this->_revents = 0;
-        return false;
-    } 
-    this->_revents = 0;
-    return true;
+        return ClientSocket::CLOSE;
+    }
+    this->_lastSendTimestamp = std::time(NULL);
+    return ClientSocket::SEND;
 }
 
-bool ClientSocket::trySend() {
-    const char *msg = "HTTP/1.1 200 Ok\nContent-Length: 12\n\nHelloworld!";
+ClientSocket::csphase ClientSocket::trySend() {
+    const char *msg = "HTTP/1.1 200 Ok\nContent-Length: 11\n\nHelloworld!";
     if ((this->_revents & POLLOUT) != POLLOUT) {
-        return false;
+        return this->_phase;
     }
     if (send(this->_fd, msg, std::strlen(msg), MSG_DONTWAIT | MSG_NOSIGNAL) == -1) {
         utils::putSysError("send");
-        this->_revents = 0;
-        return false;
+        return ClientSocket::CLOSE;
     }
-    this->_revents = 0;
-    return true;
+    return ClientSocket::RECV;
+}
+
+void ClientSocket::setPhase(ClientSocket::csphase const phase) {
+    this->_phase = phase;
+}
+
+ClientSocket::csphase ClientSocket::getPhase() const {
+    return this->_phase;
+}
+
+std::time_t ClientSocket::getLastSendTimestamp() const {
+    return this->_lastSendTimestamp;
+}
+
+void ClientSocket::setLastSendTimestamp(std::time_t const lastSendTimestamp) {
+    this->_lastSendTimestamp = lastSendTimestamp;
 }

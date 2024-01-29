@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    clang-formatter.yml                                :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: shtanemu <shtanemu@student.42.fr>          +#+  +:+       +#+         #
+#    By: taiphyyy <taiphyyy@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/09/02 15:36:37 by shtanemu          #+#    #+#              #
-#    Updated: 2024/01/29 15:42:11 by shtanemu         ###   ########.fr        #
+#    Updated: 2024/01/29 17:08:55 by taiphyyy         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
   workflow_dispatch:
   
 name: Clang-format Code Formatter
