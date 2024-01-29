@@ -2,7 +2,7 @@
 
 ClientSocket::ClientSocket() {}
 
-ClientSocket::ClientSocket(int const fd) : _fd(fd), _phase(ClientSocket::RECV), _lastSendTimestamp(std::time(NULL)) {}
+ClientSocket::ClientSocket(int const fd) : _fd(fd), _revents(0), _phase(ClientSocket::RECV), _lastSendTimestamp(std::time(NULL)) {}
 
 int ClientSocket::getFd() const {
     return this->_fd;
@@ -18,28 +18,44 @@ short ClientSocket::getRevents() const {
 
 ClientSocket::csphase ClientSocket::tryRecv() {
     char buf[BUFFERSIZE];
+    ssize_t recvlen;
+
     if ((this->_revents & POLLIN) != POLLIN) {
         return this->_phase;
     }
     std::memset(&buf, 0, sizeof(buf));
-    if (recv(this->_fd, buf, BUFFERSIZE - 1, 0) == -1) {
+    recvlen = recv(this->_fd, buf, BUFFERSIZE - 1, 0);
+    if (recvlen == -1) {
         utils::putSysError("recv");
         return ClientSocket::CLOSE;
     }
+    if (recvlen == 0) { return ClientSocket::CLOSE; }
     this->_lastSendTimestamp = std::time(NULL);
     return ClientSocket::SEND;
 }
 
 ClientSocket::csphase ClientSocket::trySend() {
+#if defined(_LINUX)
+    const int flags = MSG_DONTWAIT | MSG_NOSIGNAL;
+#elif defined(_DARWIN)
+    const int flags = MSG_DONTWAIT | SO_NOSIGPIPE;
+#else
+    const int flags = MSG_DONTWAIT | MSG_NOSIGNAL;
+#endif
     const char *msg = "HTTP/1.1 200 Ok\nContent-Length: 11\n\nHelloworld!";
     if ((this->_revents & POLLOUT) != POLLOUT) {
         return this->_phase;
     }
-    if (send(this->_fd, msg, std::strlen(msg), MSG_DONTWAIT | MSG_NOSIGNAL) == -1) {
+
+    if (send(this->_fd, msg, std::strlen(msg), flags) == -1) {
         utils::putSysError("send");
         return ClientSocket::CLOSE;
     }
     return ClientSocket::RECV;
+}
+
+void ClientSocket::close() {
+    if (::close(this->_fd) == -1) { utils::putSysError("close"); }
 }
 
 void ClientSocket::setPhase(ClientSocket::csphase const phase) {

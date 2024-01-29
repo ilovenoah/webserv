@@ -1,6 +1,7 @@
 #ifndef CLIENTSOCKET_HPP
 #define CLIENTSOCKET_HPP
 
+#include <unistd.h>
 #include <poll.h>
 #include <sys/socket.h>
 #include "utils.hpp"
@@ -30,6 +31,7 @@ class ClientSocket {
         short getRevents() const;
         ClientSocket::csphase tryRecv();
         ClientSocket::csphase trySend();
+        void close();
         void setPhase(ClientSocket::csphase const phase);
         ClientSocket::csphase getPhase() const;
         std::time_t getLastSendTimestamp() const;
