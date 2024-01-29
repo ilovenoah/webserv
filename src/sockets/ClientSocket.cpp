@@ -25,7 +25,8 @@ ClientSocket::csphase ClientSocket::tryRecv() {
     if (recv(this->_fd, buf, BUFFERSIZE - 1, 0) == -1) {
         utils::putSysError("recv");
         return ClientSocket::CLOSE;
-    } 
+    }
+    this->_lastSendTimestamp = std::time(NULL);
     return ClientSocket::SEND;
 }
 
