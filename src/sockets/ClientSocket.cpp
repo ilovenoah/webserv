@@ -2,7 +2,7 @@
 
 ClientSocket::ClientSocket() {}
 
-ClientSocket::ClientSocket(int const fd) : _fd(fd), _phase(ClientSocket::RECV), _lastSendTimestamp(std::time(NULL)) {}
+ClientSocket::ClientSocket(int const fd) : _fd(fd), _revents(0), _phase(ClientSocket::RECV), _lastSendTimestamp(std::time(NULL)) {}
 
 int ClientSocket::getFd() const {
     return this->_fd;

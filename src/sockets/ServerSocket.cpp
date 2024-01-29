@@ -1,7 +1,7 @@
 #include "ServerSocket.hpp"
 
 ServerSocket::ServerSocket() {}
-ServerSocket::ServerSocket(std::string ipaddress, std::string port) : _ipaddress(ipaddress), _port(port) {}
+ServerSocket::ServerSocket(std::string ipaddress, std::string port) : _ipaddress(ipaddress), _port(port), _revents(0) {}
 
 static u_int32_t convertIpStrToUint(std::string const &ipaddr) {
 	u_int32_t s_addr(0);
