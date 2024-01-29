@@ -25,8 +25,9 @@ class ClientSocket {
         ClientSocket(int const fd);
         int getFd() const;
         void setRevents(short revents);
-        bool tryRecv();
-        bool trySend();
+        short getRevents() const;
+        ClientSocket::csphase tryRecv();
+        ClientSocket::csphase trySend();
         void setPhase(ClientSocket::csphase const phase);
         ClientSocket::csphase getPhase() const;
 };
