@@ -32,7 +32,7 @@ bool ClientSocket::trySend() {
     if ((this->_revents & POLLOUT) != POLLOUT) {
         return false;
     }
-    if (send(this->_fd, msg, std::strlen(msg), MSG_DONTWAIT) == -1) {
+    if (send(this->_fd, msg, std::strlen(msg), MSG_DONTWAIT | MSG_NOSIGNAL) == -1) {
         utils::putSysError("send");
         this->_revents = 0;
         return false;
