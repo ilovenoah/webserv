@@ -23,3 +23,7 @@ void Request::setHttpVersion(std::string const &httpVersion){
 std::string const &Request::getHttpVersion() const{
     return this->_httpVersion;
 }
+
+ClientSocket::csphase Request::load(std::stringstream &buffer) {
+    
+}
