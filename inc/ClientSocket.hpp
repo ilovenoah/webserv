@@ -22,7 +22,7 @@ class ClientSocket {
         short _revents;
         ClientSocket::csphase _phase;
         std::time_t _lastSendTimestamp;
-        std::istringstream _buffer;
+        std::stringstream _buffer;
 
     public:
         ClientSocket();
