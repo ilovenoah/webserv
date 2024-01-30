@@ -12,79 +12,69 @@ echo -e "
 ====================================================================
 "
 
-webserv_client() {
-    host="$1"
-    port="$2"
-    lines="$3"
-
-    res=$(telnet $host $port <<EOF\n$lines\nEOF\n)
-	echo "$res"
-}
-
-GREEN="\u001b[32m"
+# 色の設定
+GREEN="\033[0;32m"
+RED="\033[0;31m"
 RESET="\033[0m"
 
+# HTTPレスポンスをテストする関数
 assert_response() {
-    host="$1"
-    port="$2"
-    lines="$3"
-	exp_status_code="$4"
-	exp_headers="$5"
-	exp_body="$6"
+    url="$1"
+    expected_status="$2"
+    declare -a expected_headers=("${!3}")
+    expected_body="$4"
 
-	# Provided output
-	output=$(webserv_client $host $port $lines)
+    # curlを使用してHTTPレスポンスを取得
+    response=$(curl -s -i $url)
 
-	http_response=$(echo "$output" | awk '/HTTP\/1.1/{flag=1; next} flag')
+    # HTTPステータスコードを取得
+    status=$(echo "$response" | grep HTTP/ | awk '{print $2}')
 
-	# Extract HTTP status code
-	status_code=$(echo "$http_response" | awk 'NR==1 {print $2}')
+    # レスポンスヘッダーを取得
+    headers=$(echo "$response" | grep -o '^[^ ]*:' | tr '\n' ' ')
+    IFS=' ' read -ra headers_array <<< "$headers"
 
-	# Extract headers as an array
-	headers=$(echo "$http_response" | awk '/^[A-Za-z-]*:/ {print $1}' | tr '\n' ' ')
-	IFS=' ' read -ra headers_array <<< "$headers"
+    # レスポンスボディを取得
+    body=$(echo "$response" | sed -n '/^\r$/,$p')
 
-	# Extract body
-	body=$(echo "$http_response" | sed -n '/^<HTML>/,$p')
+    # 結果の表示
+    echo "HTTP Status Code: $status"
+    echo "Headers:"
+    for header in "${headers_array[@]}"; do
+        echo "  $header"
+    done
+    echo "Body:"
+    echo "$body"
 
-	# Print the results
-	echo "HTTP Status Code: $status_code"
-	echo "Headers:"
-	for header in "${headers_array[@]}"; do
-	echo "  $header"
-	done
-	echo "Body:"
-	echo "$body"
+    # 結果の検証
+    if [[ "$status" == "$expected_status" ]]; then
+        echo -e "${GREEN}Status OK${RESET}"
+    else
+        echo -e "${RED}Status KO${RESET}"
+    fi
 
-	# Assert the results and expecexpectations
-	if [[ "$status_code" == "$exp_status_code" ]]; then
-		echo "$GREEN" "Status OK" "$RESET"
-	else
-		echo "${RED}Status KO${RESET}"
-	fi
-	for header in "${headers_array[@]}"; do
-		is_find = 0
-		for exp_header in "${exp_headers[@]}"; do
-			if [ "$header" = "$exp_header" ]; then
-				is_find = 1
-				break
-			fi
-		done
-		if [ is_find -eq 0 ]; then
-			echo "$RED" "Header KO" "$RESET"
-			break
-		fi
-	done
-	if [[ is_find -eq 1 ]]; then
-		echo "$GREEN" "Header OK" "$RESET"
-	fi
-	if [[ "$body" == "$exp_body" ]]; then
-		echo "$GREEN" "Body OK" "$RESET"
-	else
-		echo "$RED" "Body KO" "$RESET"
-	fi
+    header_found=0
+    for expected_header in "${expected_headers[@]}"; do
+        if echo "${headers_array[@]}" | grep -q "$expected_header"; then
+            header_found=$((header_found+1))
+        fi
+    done
+
+    if [[ $header_found -eq ${#expected_headers[@]} ]]; then
+        echo -e "${GREEN}Headers OK${RESET}"
+    else
+        echo -e "${RED}Headers KO${RESET}"
+    fi
+
+    if [[ "$body" == *"$expected_body"* ]]; then
+        echo -e "${GREEN}Body OK${RESET}"
+    else
+        echo -e "${RED}Body KO${RESET}"
+    fi
 }
 
-declare -a headers=("Location: http://www.google.com/" "Content-Type: text/html; charset=UTF-8" "Content-Security-Policy-Report-Only: object-src 'none';base-uri 'self';script-src 'nonce-TTIGkYYoZFPRiSm1mrk7eg' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other-hp")
+# 期待されるヘッダーの配列を定義
+declare -a expected_headers=("Location:" "Content-Type:" "Content-Security-Policy-Report-Only:")
 
-assert_response "google.com" "80" "GET / HTTP/1.1\nHost: google.com\n\n" "301" "$headers" "aaaaaaa"
+# 関数を呼び出してテストを実行
+assert_response "http://google.com" "301" expected_headers[@] "aaaaaaa"
