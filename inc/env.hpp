@@ -20,6 +20,7 @@
 #include <vector>
 
 #define ARGS_ERROR "Too many arguments provided.\nUsage: ./webserv [config_file] or ./webserv"
+#define CONFIG_ERROR "Invalid config values"
 #define FAIL_OPEN "Failed to open file"
 #define UNKOWN_KEY "Unknown key: "
 #define SOCKET_ERROR "Socket creation failed"
