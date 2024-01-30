@@ -51,12 +51,14 @@ static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
 
 bool loop(std::map<int, ServerSocket> &ssmap) {
     std::map<int, ClientSocket> csmap;
+    std::map<int, Request> rqmap;
     while(true) {
         if (setRevents(ssmap, csmap) == false) { return false; }
         for(std::map<int, ServerSocket>::iterator iter = ssmap.begin(); iter != ssmap.end(); ++iter) {
             std::pair<int, sockaddr_in> socketInfo = iter->second.tryAccept();
             if (socketInfo.first == -1) { continue; }
             csmap.insert(std::pair<int, ClientSocket>(socketInfo.first, createCsocket(socketInfo)));
+            rqmap.insert(std::pair<int, Request>(socketInfo.first, Request()));
         }
         for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end();) {
             iter->second.setPhase(detectTimedOutClientSocket(iter->second));
@@ -74,6 +76,13 @@ bool loop(std::map<int, ServerSocket> &ssmap) {
                     iter->second.close();
                     csmap.erase(toErase);
                     break;
+            }
+        }
+        for (std::map<int, Request>::iterator iter = rqmap.begin(); iter != rqmap.end();) {
+            std::map<int, ClientSocket>::iterator csiter = csmap.find(iter->first);
+            if (csiter != csmap.end() && csiter->second.buffer.str().find("\r\n") != std::string::npos) {
+                ClientSocket::csphase nextcsphase = iter->second.load(csiter->second.buffer);
+                csiter->second.setPhase(nextcsphase);
             }
         }
     }

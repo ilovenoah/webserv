@@ -9,6 +9,7 @@
 #include "ServerSocket.hpp"
 #include "ClientSocket.hpp"
 #include "utils.hpp"
+#include "Request.hpp"
 
 bool loop(std::map<int, ServerSocket> &ssmap);
 
