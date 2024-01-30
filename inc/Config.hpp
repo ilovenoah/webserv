@@ -11,6 +11,8 @@ class Config {
 	std::vector<Server> _servers;
 	std::string _filePath;
 
+	int _bracket_count;
+
    public:
 	Config();
 	~Config();
