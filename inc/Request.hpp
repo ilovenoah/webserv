@@ -19,6 +19,7 @@ class Request {
         std::string const &getPath() const;
         void setHttpVersion(std::string const &httpVersion);
         std::string const &getHttpVersion() const;
+        ClientSocket::csphase load(std::stringstream &buffer);
 };
 
 #endif
