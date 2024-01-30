@@ -69,11 +69,18 @@ void Server::setRoot(const std::string &values, std::ifstream &fileStream) {
 
 void Server::setAllowMethods(const std::string &values, std::ifstream &fileStream) {
 	(void)fileStream;
+
+	if (values.find("GET") == std::string::npos && values.find("POST") == std::string::npos && values.find("DELETE") == std::string::npos) {
+		throw GenericException(CONFIG_ERROR);
+	}
 	_allow_methods = values;
 }
 
 void Server::setAutoIndex(const std::string &values, std::ifstream &fileStream) {
 	(void)fileStream;
+	if (values != "on" && values != "off") {
+		throw GenericException(CONFIG_ERROR);
+	}
 	_autoindex = values;
 }
 
@@ -84,7 +91,14 @@ void Server::setIndex(const std::string &values, std::ifstream &fileStream) {
 
 void Server::setClientBodyLimit(const std::string &values, std::ifstream &fileStream) {
 	(void)fileStream;
-	_client_body_limit = values;
+
+	std::istringstream iss(values);
+	std::size_t num;
+	if (!(iss >> num) || iss.peek() != EOF || num < 0 || num > INT_MAX) {
+		throw std::runtime_error(CONFIG_ERROR);
+	}
+
+	_client_body_limit = num;
 }
 
 void Server::setCgiInfo(const std::string &values, std::ifstream &fileStream) {
@@ -218,5 +232,6 @@ void Server::execSetterMap(std::string &keys, std::string &value, std::ifstream 
 		}
 	} catch (GenericException &e) {
 		std::cerr << e.what() << std::endl;
+		exit(1);
 	}
 }
