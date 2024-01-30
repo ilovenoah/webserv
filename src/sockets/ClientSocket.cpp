@@ -31,7 +31,7 @@ ClientSocket::csphase ClientSocket::tryRecv() {
     }
     if (recvlen == 0) { return ClientSocket::CLOSE; }
     this->_lastSendTimestamp = std::time(NULL);
-    this->_buffer << buf;
+    this->buffer << buf;
     return ClientSocket::SEND;
 }
 
