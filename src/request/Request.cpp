@@ -25,5 +25,11 @@ std::string const &Request::getHttpVersion() const{
 }
 
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
-    
+    std::string line;
+    std::getline(buffer, line);
+    std::stringstream ss(line);
+    ss >> this->_method;
+    ss >> this->_path;
+    ss >> this->_httpVersion;
+    return ClientSocket::CLOSE;
 }

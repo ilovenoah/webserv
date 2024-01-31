@@ -4,6 +4,7 @@
 
 #include <string>
 #include <map>
+#include "ClientSocket.hpp"
 
 class Request {
     private:
