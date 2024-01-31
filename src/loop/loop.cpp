@@ -9,7 +9,7 @@
 //     return oss.str();
 // }
 
-static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, ClientSocket> &csmap) {
+static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, std::pair<ClientSocket, std::stringstream>> &csmap) {
     std::vector<struct pollfd> pollfds;
     for(std::map<int, ServerSocket>::iterator iter = ssmap.begin(); iter != ssmap.end(); ++iter) {
         struct pollfd pfd;
@@ -18,7 +18,7 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, ClientS
         pfd.events = POLLIN;
         pollfds.push_back(pfd);
     }
-    for(std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
+    for(std::map<int, std::pair<ClientSocket, std::stringstream>>::iterator iter = csmap.begin(); iter != csmap.end(); ++iter) {
         struct pollfd pfd;
         std::memset(&pfd, 0, sizeof(struct pollfd));
         pfd.fd = iter->first;
@@ -31,7 +31,7 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap, std::map<int, ClientS
     }
     for(std::vector<struct pollfd>::iterator iter = pollfds.begin(); iter != pollfds.end(); ++iter) {
         if (ssmap.find(iter->fd) != ssmap.end()) { ssmap[iter->fd].setRevents(iter->revents); }
-        else if (csmap.find(iter->fd) != csmap.end()) { csmap[iter->fd].setRevents(iter->revents); }
+        else if (csmap.find(iter->fd) != csmap.end()) { csmap[iter->fd].first.setRevents(iter->revents); }
     }
     return true;
 }
@@ -50,39 +50,39 @@ static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
 }
 
 bool loop(std::map<int, ServerSocket> &ssmap) {
-    std::map<int, ClientSocket> csmap;
+    std::map<int, std::pair<ClientSocket, std::stringstream>> csmap;
     std::map<int, Request> rqmap;
     while(true) {
         if (setRevents(ssmap, csmap) == false) { return false; }
         for(std::map<int, ServerSocket>::iterator iter = ssmap.begin(); iter != ssmap.end(); ++iter) {
             std::pair<int, sockaddr_in> socketInfo = iter->second.tryAccept();
             if (socketInfo.first == -1) { continue; }
-            csmap.insert(std::pair<int, ClientSocket>(socketInfo.first, createCsocket(socketInfo)));
+            csmap.insert(std::pair<int, std::pair<ClientSocket, std::stringstream>>(socketInfo.first, std::pair<ClientSocket, std::stringstream>(createCsocket(socketInfo), std::stringstream())));
             rqmap.insert(std::pair<int, Request>(socketInfo.first, Request()));
         }
-        for (std::map<int, ClientSocket>::iterator iter = csmap.begin(); iter != csmap.end();) {
-            iter->second.setPhase(detectTimedOutClientSocket(iter->second));
-            switch (iter->second.getPhase()) {
+        for (std::map<int, std::pair<ClientSocket, std::stringstream>>::iterator iter = csmap.begin(); iter != csmap.end();) {
+            iter->second.first.setPhase(detectTimedOutClientSocket(iter->second.first));
+            switch (iter->second.first.getPhase()) {
                 case ClientSocket::RECV:
-                    iter->second.setPhase(iter->second.tryRecv());
+                    iter->second.first.setPhase(iter->second.first.tryRecv());
                     ++iter;
                     break;
                 case ClientSocket::SEND:
-                    iter->second.setPhase(iter->second.trySend());
+                    iter->second.first.setPhase(iter->second.first.trySend());
                     break;
                 case ClientSocket::CLOSE:
-                    std::map<int, ClientSocket>::iterator toErase = iter;
+                    std::map<int, std::pair<ClientSocket, std::stringstream>>::iterator toErase = iter;
                     ++iter;
-                    iter->second.close();
+                    iter->second.first.close();
                     csmap.erase(toErase);
                     break;
             }
         }
         for (std::map<int, Request>::iterator iter = rqmap.begin(); iter != rqmap.end();) {
-            std::map<int, ClientSocket>::iterator csiter = csmap.find(iter->first);
-            if (csiter != csmap.end() && csiter->second.buffer.str().find("\r\n") != std::string::npos) {
-                ClientSocket::csphase nextcsphase = iter->second.load(csiter->second.buffer);
-                csiter->second.setPhase(nextcsphase);
+            std::map<int, std::pair<ClientSocket, std::stringstream>>::iterator csiter = csmap.find(iter->first);
+            if (csiter != csmap.end() && csiter->second.second.str().find("\r\n") != std::string::npos) {
+                ClientSocket::csphase nextcsphase = iter->second.load(csiter->second.second);
+                csiter->second.first. setPhase(nextcsphase);
             }
         }
     }
