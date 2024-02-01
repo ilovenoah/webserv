@@ -7,13 +7,23 @@
 #include "ClientSocket.hpp"
 
 class Request {
+    public:
+        enum rqphase {
+            RQLINE,
+            RQHEADER,
+            RQBODY,
+            RQFIN
+        };
     private:
         std::string _method;
         std::string _path;
         std::string _httpVersion;
         std::map<std::string, std::string> _header;
         std::string _body;
+        Request::rqphase _phase;
     public:
+        void setReqphase(Request::rqphase const rqphase);
+        Request::rqphase getReqphase() const;
         void setMethod(std::string const &method);
         std::string const &getMethod() const;
         void setPath(std::string const &path);

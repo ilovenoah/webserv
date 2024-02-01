@@ -1,5 +1,13 @@
 #include "Request.hpp"
 
+void Request::setReqphase(Request::rqphase const rqphase) {
+    this->_phase = rqphase;
+}
+
+Request::rqphase Request::getReqphase() const {
+    return this->_phase;
+}
+
 void Request::setMethod(std::string const &method) {
     this->_method = method;
 }
