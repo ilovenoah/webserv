@@ -36,6 +36,11 @@ else ifeq ($(UNAME_OS), Darwin)
 CXXFLAGS 			+= -D_DARWIN
 endif
 
+ifeq ($(MAKECMDGOALS), debug)
+CXXFLAGS 			+= -D_DEBUG
+CXXFLAGS 			+= -fsanitize=address
+endif
+
 all: mkdir $(NAME)
 
 $(NAME): $(OBJ)
@@ -63,5 +68,7 @@ fclean: clean
 	@echo "##### Removed binary files #####"
 
 re: fclean all
+
+debug: all
 
 .PHONY: all mkdir clean fclean re

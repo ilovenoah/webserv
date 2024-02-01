@@ -74,6 +74,9 @@ bool loop(std::map<int, ServerSocket> &ssmap) {
                     ++iter;
                     break;
                 case ClientSocket::SEND:
+#if defined(_DEBUG)
+					std::clog << rqmap[iter->first].getEntireData() << std::endl;
+#endif
                     iter->second->setPhase(iter->second->trySend());
                     ++iter;
                     break;
@@ -82,7 +85,12 @@ bool loop(std::map<int, ServerSocket> &ssmap) {
                     ++iter;
                     toErase->second->close();
                     delete toErase->second;
+                    rqmap.erase(toErase->first);
                     csmap.erase(toErase);
+#if defined(_DEBUG)
+					std::clog << "ClientSocket size: " << csmap.size() << std::endl;
+					std::clog << "Request size: " << rqmap.size() << std::endl;
+#endif
                     break;
             }
         }
