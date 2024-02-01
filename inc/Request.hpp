@@ -22,6 +22,7 @@ class Request {
         std::string _body;
         Request::rqphase _phase;
     public:
+		Request();
         void setReqphase(Request::rqphase const rqphase);
         Request::rqphase getReqphase() const;
         void setMethod(std::string const &method);
@@ -31,6 +32,7 @@ class Request {
         void setHttpVersion(std::string const &httpVersion);
         std::string const &getHttpVersion() const;
         ClientSocket::csphase load(std::stringstream &buffer);
+		std::string getEntireData() const;
 };
 
 #endif
