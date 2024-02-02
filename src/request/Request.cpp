@@ -83,6 +83,10 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			actReadsize = buffer.readsome(buf, expReadsize);
 			if (buffer.fail()) {
 				utils::putSysError("readsome");
+				nextcsphase = ClientSocket::SEND;
+				this->_phase = Request::RQFIN;
+				//response status code 500
+				break;
 			}
 			this->_body.append(buf, actReadsize);
 			if (this->_body.size() < contentLength) {
