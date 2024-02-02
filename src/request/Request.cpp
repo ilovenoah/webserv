@@ -64,7 +64,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			std::getline(ss, value, ':');
 			spaceremover << value;
 			value.clear();
-			spaceremover >> value; 
+			spaceremover >> value;
 			this->_header.insert(std::pair<std::string, std::string>(key, value));
 			this->_phase = Request::RQHEADER;
 			nextcsphase = ClientSocket::RECV;
@@ -73,14 +73,20 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 		case Request::RQBODY: {
 			std::stringstream ss(this->_header["Content-Length"]);
 			std::size_t contentLength;
-			std::size_t readsize;
+			std::size_t expReadsize;
+			std::size_t actReadsize;
+
 			ss >> contentLength;
-			readsize = contentLength - this->_body.size();
-			char buf[readsize + 1];
-			std::memset(buf, 0, (sizeof(char) * readsize) + 1);
-			buffer.readsome(buf, readsize);
-			this->_body.append(buf);
+			expReadsize = contentLength - this->_body.size();
+			char buf[expReadsize];
+			std::memset(buf, 0, expReadsize);
+			actReadsize = buffer.readsome(buf, expReadsize);
+			if (buffer.fail()) {
+				utils::putSysError("readsome");
+			}
+			this->_body.append(buf, actReadsize);
 			if (this->_body.size() < contentLength) {
+				this->_phase = Request::RQBODY;
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
