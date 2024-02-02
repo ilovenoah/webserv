@@ -108,7 +108,7 @@ std::string Request::getEntireData() const {
 	for (std::map<std::string, std::string>::const_iterator iter = this->_header.begin(); iter != this->_header.end(); ++iter) {
 		entireData.append(iter->first);
 		entireData.append(": ");
-		entireData.append(iter->first);
+		entireData.append(iter->second);
 		entireData.append("\r\n");
 	}
 	entireData.append("\r\n");
