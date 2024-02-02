@@ -35,12 +35,12 @@ std::string const &Request::getHttpVersion() const{
 }
 
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
-	std::string line;
-	std::getline(buffer, line);
-	std::stringstream ss(line);
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()){
 		case Request::RQLINE: {
+			std::string line;
+			std::getline(buffer, line);
+			std::stringstream ss(line);
 			ss >> this->_method;
 			ss >> this->_path;
 			ss >> this->_httpVersion;
@@ -49,22 +49,43 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			break;
 		}
 		case Request::RQHEADER: {
+			std::string line;
+			std::getline(buffer, line);
+			if (line.compare("\r") == 0) {
+				this->_phase = Request::RQBODY;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
+			std::stringstream ss(line);
 			std::string key;
 			std::string value;
 			std::stringstream spaceremover;
 			std::getline(ss, key, ':');
-			std::getline(ss, value);
+			std::getline(ss, value, ':');
 			spaceremover << value;
 			value.clear();
-			spaceremover >> value;
+			spaceremover >> value; 
 			this->_header.insert(std::pair<std::string, std::string>(key, value));
-			this->_phase = Request::RQBODY;
+			this->_phase = Request::RQHEADER;
 			nextcsphase = ClientSocket::RECV;
 			break;
 		}
 		case Request::RQBODY: {
-			this->_phase = Request::RQFIN;
+			std::stringstream ss(this->_header["Content-Length"]);
+			std::size_t contentLength;
+			std::size_t readsize;
+			ss >> contentLength;
+			readsize = contentLength - this->_body.size();
+			char buf[readsize + 1];
+			std::memset(buf, 0, (sizeof(char) * readsize) + 1);
+			buffer.readsome(buf, readsize);
+			this->_body.append(buf);
+			if (this->_body.size() < contentLength) {
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			nextcsphase = ClientSocket::SEND;
+			this->_phase = Request::RQFIN;
 			break;
 		}
 		case Request::RQFIN: {
