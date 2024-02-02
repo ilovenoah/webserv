@@ -73,16 +73,59 @@ def process_request_file(file_path):
         print(diff_result)
         return False
 
-requests_dir = './testdatafile'
-total_tests = 0
-successful_tests = 0
 
-for file in os.listdir(requests_dir):
-    file_path = os.path.join(requests_dir, file)
-    if os.path.isfile(file_path):
-        total_tests += 1
-        if process_request_file(file_path):
-            successful_tests += 1
+def start_server(server_command, config_path):
+    """サーバーを指定された設定ファイルで起動する"""
+    process = subprocess.Popen(server_command.split() + [config_path],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    return process
 
-print(f"\nTotal tests conducted: {total_tests}")
-print_colored(f"Successful tests: {successful_tests}", "green" if successful_tests == total_tests else "red")
+def stop_server(process):
+    """サーバープロセスを停止する"""
+    process.terminate()
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        process.kill()
+
+def run_tests(tests_dir):
+    """テストを実行し、結果を返す"""
+    total_tests = successful_tests = 0
+    for file in os.listdir(tests_dir):
+        file_path = os.path.join(tests_dir, file)
+        if os.path.isfile(file_path):
+            total_tests += 1
+            if process_request_file(file_path):
+                successful_tests += 1
+    return total_tests, successful_tests
+
+def main():
+    config_dir = './testconf'
+    tests_dir = './testdatafile'
+    nginx_config_dir = './nginxconf'
+    
+    for config_file in os.listdir(config_dir):
+        config_path = os.path.join(config_dir, config_file)
+        nginx_config_path = os.path.join(nginx_config_dir, config_file)  # nginx用の設定ファイルパス
+        
+        print(f"Testing with config: {config_path}")
+        
+        # Webservを起動
+        webserv_process = start_server("./webserv", config_path)
+        # Nginxを起動（nginxの設定ファイルパスが必要な場合は適宜修正）
+        nginx_process = start_server("nginx -c", nginx_config_path)
+        
+        # テストを実行
+        total_tests, successful_tests = run_tests(tests_dir)
+        print(f"Total tests conducted: {total_tests}")
+        print_colored(f"Successful tests: {successful_tests}", "green" if successful_tests == total_tests else "red")
+        
+        # サーバーを停止
+        stop_server(webserv_process)
+        stop_server(nginx_process)
+
+        print("\n" + "="*50 + "\n")
+
+if __name__ == "__main__":
+    main()
