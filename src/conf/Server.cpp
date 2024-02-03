@@ -94,7 +94,7 @@ void Server::setClientBodyLimit(const std::string &values, std::ifstream &fileSt
 
 	std::istringstream iss(values);
 	std::size_t num;
-	if (!(iss >> num) || iss.peek() != EOF || num < 0 || num > INT_MAX) {
+	if (!(iss >> num) || iss.peek() != EOF || num > INT_MAX) {
 		throw std::runtime_error(CONFIG_ERROR);
 	}
 
