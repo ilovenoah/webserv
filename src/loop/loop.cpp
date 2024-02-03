@@ -82,6 +82,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
 					std::map<int, Response>::iterator rsiter = rsmap.find(iter->first);
 					if (rsiter == rsmap.end()) {
                     	iter->second->setPhase(iter->second->trySend(rsiter->second.getEntireData()));
+						rsmap.erase(rsiter);
 					}
                     ++iter;
                     break;
@@ -96,6 +97,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
 #if defined(_DEBUG)
 					std::clog << "ClientSocket size: " << csmap.size() << std::endl;
 					std::clog << "Request size: " << rqmap.size() << std::endl;
+					std::clog << "Response size: " << rsmap.size() << std::endl;
 #endif
                     break;
 				}
