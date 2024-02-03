@@ -12,3 +12,14 @@ ClientSocket::csphase Response::load(Config const &config, Request const &reques
 	this->_body = "Helloworld!";
 	return ClientSocket::SEND;
 }
+
+std::string Response::getEntireData() const {
+	std::string entireData;
+	entireData += this->_httpVersion + " " + this->_status + " " + this->_statusMsg + "\r\n";
+	for (std::map<std::string, std::string>::const_iterator iter = this->_headers.begin(); iter != this->_headers.end(); ++iter) {
+		entireData += iter->first + ": " + iter->second + "\r\n";
+	}
+	entireData += "\r\n";
+	entireData += this->_body;
+	return entireData;
+}

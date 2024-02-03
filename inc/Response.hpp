@@ -20,6 +20,7 @@ class Response {
 	public:
 		Response();
 		ClientSocket::csphase load(Config const &config, Request const &request);
+		std::string getEntireData() const;
 };
 
 #endif

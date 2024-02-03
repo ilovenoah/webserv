@@ -70,18 +70,23 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
         for (std::map<int, ClientSocket*>::iterator iter = csmap.begin(); iter != csmap.end();) {
             iter->second->setPhase(detectTimedOutClientSocket(*(iter->second)));
             switch (iter->second->getPhase()) {
-                case ClientSocket::RECV:
+                case ClientSocket::RECV: {
                     iter->second->setPhase(iter->second->tryRecv());
                     ++iter;
                     break;
-                case ClientSocket::SEND:
+				}
+                case ClientSocket::SEND: {
 #if defined(_DEBUG)
 					std::clog << rqmap[iter->first].getEntireData() << std::endl;
 #endif
-                    iter->second->setPhase(iter->second->trySend());
+					std::map<int, Response>::iterator rsiter = rsmap.find(iter->first);
+					if (rsiter == rsmap.end()) {
+                    	iter->second->setPhase(iter->second->trySend(rsiter->second.getEntireData()));
+					}
                     ++iter;
                     break;
-                case ClientSocket::CLOSE:
+				}
+                case ClientSocket::CLOSE: {
                     std::map<int, ClientSocket*>::iterator toErase = iter;
                     ++iter;
                     toErase->second->close();
@@ -93,6 +98,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
 					std::clog << "Request size: " << rqmap.size() << std::endl;
 #endif
                     break;
+				}
             }
         }
         for (std::map<int, Request>::iterator iter = rqmap.begin(); iter != rqmap.end(); ++iter) {
@@ -108,8 +114,10 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
         }
         for (std::map<int, Response>::iterator iter = rsmap.begin(); iter != rsmap.end(); ++iter) {
 			std::map<int, Request>::iterator rqiter = rqmap.find(iter->first);
-			if (rqiter != rqmap.end()) {
-				iter->second.load(config, rqiter->second);
+			std::map<int, ClientSocket*>::iterator csiter = csmap.find(iter->first);
+			if (rqiter != rqmap.end() && csiter != csmap.end()) {
+				ClientSocket::csphase nextcsphase = iter->second.load(config, rqiter->second);
+				csiter->second->setPhase(nextcsphase);
 			}
 		}
 		
