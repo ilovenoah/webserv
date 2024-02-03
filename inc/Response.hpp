@@ -1,7 +1,15 @@
+#ifndef RESPONSE_HPP
+#define RESPONSE_HPP
 #include <string>
 #include <map>
+#include "ClientSocket.hpp"
+#include "Config.hpp"
+#include "Request.hpp"
 
 class Response {
+	// public:
+	// 	enum rsphase {
+	// 	};
 	private:
 		std::string _httpVersion;
 		std::string _status;
@@ -11,5 +19,7 @@ class Response {
 
 	public:
 		Response();
-
+		ClientSocket::csphase load(Config const &config, Request const &request);
 };
+
+#endif
