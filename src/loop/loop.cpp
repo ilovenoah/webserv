@@ -80,19 +80,22 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
 					std::clog << rqmap[iter->first].getEntireData() << std::endl;
 #endif
 					std::map<int, Response>::iterator rsiter = rsmap.find(iter->first);
-					if (rsiter != rsmap.end()) {
+					std::map<int, Request>::iterator rqiter = rqmap.find(iter->first);
+					if (rsiter != rsmap.end() && rqiter != rqmap.end()) {
                     	iter->second->setPhase(iter->second->trySend(rsiter->second.getEntireData()));
 						rsmap.erase(rsiter);
+						rqiter->second.init();
 					}
                     ++iter;
                     break;
 				}
                 case ClientSocket::CLOSE: {
                     std::map<int, ClientSocket*>::iterator toErase = iter;
-                                        ++iter;
+                    std::map<int, Request>::iterator rqiter = rqmap.find(toErase->first);
+					if (rqiter != rqmap.end()) { rqmap.erase(rqiter); }
+                    ++iter;
                     toErase->second->close();
                     delete toErase->second;
-                    rqmap.erase(toErase->first);
                     csmap.erase(toErase);
 #if defined(_DEBUG)
 					std::clog << "ClientSocket size: " << csmap.size() << std::endl;
