@@ -14,6 +14,7 @@ SOCK_DIR	=	sockets/
 OBJ_DIR		=	objs/
 LOOP_DIR	=	loop/
 REQU_DIR	=	request/
+RESP_DIR	=	response/
 
 MAIN_NAME	=	main.cpp
 CONF_NAME	=	Config.cpp Location.cpp Server.cpp
@@ -21,6 +22,7 @@ SOCK_NAME	=	ServerSocket.cpp ClientSocket.cpp
 UTILS_NAME	=	Error.cpp utils.cpp
 LOOP_NAME	=	loop.cpp
 REQU_NAME	=	Request.cpp
+RESP_NAME	=	Response.cpp
 
 OBJ_NAME	=	$(MAIN_NAME:.cpp=.o)
 OBJ_NAME	+=	$(addprefix $(CONF_DIR), $(CONF_NAME:.cpp=.o))
@@ -28,6 +30,7 @@ OBJ_NAME	+=	$(addprefix $(UTILS_DIR), $(UTILS_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(LOOP_DIR), $(LOOP_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(SOCK_DIR), $(SOCK_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(REQU_DIR), $(REQU_NAME:.cpp=.o))
+OBJ_NAME	+=	$(addprefix $(RESP_DIR), $(RESP_NAME:.cpp=.o))
 OBJ			=	$(addprefix $(OBJ_DIR), $(OBJ_NAME))
 
 ifeq ($(UNAME_OS), Linux)
@@ -57,6 +60,7 @@ mkdir:
 	@mkdir -p $(OBJ_DIR)$(SOCK_DIR)
 	@mkdir -p $(OBJ_DIR)$(LOOP_DIR)
 	@mkdir -p $(OBJ_DIR)$(REQU_DIR)
+	@mkdir -p $(OBJ_DIR)$(RESP_DIR)
 	@echo "##### Creating obj directory #####"
 
 clean:
