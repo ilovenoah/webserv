@@ -98,6 +98,9 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
 					std::clog << "ClientSocket size: " << csmap.size() << std::endl;
 					std::clog << "Request size: " << rqmap.size() << std::endl;
 					std::clog << "Response size: " << rsmap.size() << std::endl;
+					int checkFd = open("/dev/null", O_RONLY);
+					std::clog << "check fd: " << checkFd << std::endl;
+					close(checkFd);
 #endif
                     break;
 				}
