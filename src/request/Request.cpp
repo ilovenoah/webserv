@@ -49,6 +49,11 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 		case Request::RQLINE: {
 			std::string line;
 			std::getline(buffer, line);
+			if (line.compare("\r") == 0) {
+				this->_phase = Request::RQLINE;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			std::stringstream ss(line);
 			ss >> this->_method;
 			ss >> this->_path;
