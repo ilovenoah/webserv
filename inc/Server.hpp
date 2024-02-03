@@ -3,6 +3,7 @@
 
 #include "Location.hpp"
 #include "env.hpp"
+#include <limits.h>
 
 class Server {
    private:
