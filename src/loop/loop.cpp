@@ -51,6 +51,7 @@ static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
 bool loop(std::map<int, ServerSocket> &ssmap) {
     std::map<int, ClientSocket*> csmap;
     std::map<int, Request> rqmap;
+	std::map<int, Response> rsmap;
     while(true) {
         if (setRevents(ssmap, csmap) == false) { return false; }
         for(std::map<int, ServerSocket>::iterator iter = ssmap.begin(); iter != ssmap.end(); ++iter) {
@@ -100,6 +101,10 @@ bool loop(std::map<int, ServerSocket> &ssmap) {
                 ClientSocket::csphase nextcsphase = iter->second.load(csiter->second->buffer);
                 csiter->second->setPhase(nextcsphase);
             }
+            std::map<int, Response>::iterator rsiter = rsmap.find(iter->first);
+			if (csiter == csmap.end() && iter->second.getReqphase() == Request::RQFIN) {
+				rsmap.insert(std::pair<int, Response>(iter->first, Response()));
+			}
         }
     }
     return true;
