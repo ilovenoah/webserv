@@ -2,6 +2,15 @@
 
 Request::Request() : _phase(Request::RQLINE) {}
 
+void Request::init() {
+	this->_method.clear();
+	this->_path.clear();
+	this->_httpVersion.clear();
+	this->_header.clear();
+	this->_body.clear();
+	this->_phase = Request::RQLINE;
+}
+
 void Request::setReqphase(Request::rqphase const rqphase) {
     this->_phase = rqphase;
 }

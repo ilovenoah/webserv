@@ -23,6 +23,7 @@ class Request {
         Request::rqphase _phase;
     public:
 		Request();
+		void init();
         void setReqphase(Request::rqphase const rqphase);
         Request::rqphase getReqphase() const;
         void setMethod(std::string const &method);
