@@ -55,13 +55,31 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 	@echo "##### Creating" [ $@ ] " #####"
 
 mkdir:
-	@mkdir -p $(OBJ_DIR)$(CONF_DIR)
-	@mkdir -p $(OBJ_DIR)$(UTILS_DIR)
-	@mkdir -p $(OBJ_DIR)$(SOCK_DIR)
-	@mkdir -p $(OBJ_DIR)$(LOOP_DIR)
-	@mkdir -p $(OBJ_DIR)$(REQU_DIR)
-	@mkdir -p $(OBJ_DIR)$(RESP_DIR)
-	@echo "##### Creating obj directory #####"
+	@if [ ! -d "$(OBJ_DIR)$(CONF_DIR)" ]; then \
+		mkdir -p $(OBJ_DIR)$(CONF_DIR) && \
+		echo "##### Creating $(OBJ_DIR)$(CONF_DIR) directory #####"; \
+	fi
+	@if [ ! -d "$(OBJ_DIR)$(UTILS_DIR)" ]; then \
+		mkdir -p $(OBJ_DIR)$(UTILS_DIR) && \
+		echo "##### Creating $(OBJ_DIR)$(UTILS_DIR) directory #####"; \
+	fi
+	@if [ ! -d "$(OBJ_DIR)$(SOCK_DIR)" ]; then \
+		mkdir -p $(OBJ_DIR)$(SOCK_DIR) && \
+		echo "##### Creating $(OBJ_DIR)$(SOCK_DIR) directory #####"; \
+	fi
+	@if [ ! -d "$(OBJ_DIR)$(LOOP_DIR)" ]; then \
+		mkdir -p $(OBJ_DIR)$(LOOP_DIR) && \
+		echo "##### Creating $(OBJ_DIR)$(LOOP_DIR) directory #####"; \
+	fi
+	@if [ ! -d "$(OBJ_DIR)$(REQU_DIR)" ]; then \
+		mkdir -p $(OBJ_DIR)$(REQU_DIR) && \
+		echo "##### Creating $(OBJ_DIR)$(REQU_DIR) directory #####"; \
+	fi
+	@if [ ! -d "$(OBJ_DIR)$(RESP_DIR)" ]; then \
+		mkdir -p $(OBJ_DIR)$(RESP_DIR) && \
+		echo "##### Creating $(OBJ_DIR)$(RESP_DIR) directory #####"; \
+	fi
+
 
 clean:
 	@$(RM) $(OBJ_DIR)
