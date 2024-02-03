@@ -23,7 +23,7 @@ LOOP_NAME	=	loop.cpp
 REQU_NAME	=	Request.cpp
 
 OBJ_NAME	=	$(MAIN_NAME:.cpp=.o)
-# OBJ_NAME	+=	$(addprefix $(CONF_DIR), $(CONF_NAME:.cpp=.o))
+OBJ_NAME	+=	$(addprefix $(CONF_DIR), $(CONF_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(UTILS_DIR), $(UTILS_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(LOOP_DIR), $(LOOP_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(SOCK_DIR), $(SOCK_NAME:.cpp=.o))
