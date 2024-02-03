@@ -71,21 +71,32 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			break;
 		}
 		case Request::RQBODY: {
-			std::stringstream ss(this->_header["Content-Length"]);
-			std::size_t contentLength;
+			std::size_t contentLength(0);
 			std::size_t expReadsize;
 			std::size_t actReadsize;
 
+			std::map<std::string, std::string>::iterator cliter = this->_header.find("Content-Length");
+			if (cliter == this->_header.end()) {
+				nextcsphase = ClientSocket::RECV;
+				this->_phase = Request::RQFIN;
+				break;
+			}
+
+			std::stringstream ss(cliter->second);
 			ss >> contentLength;
 			expReadsize = contentLength - this->_body.size();
+			if (expReadsize == 0) {
+				nextcsphase = ClientSocket::RECV;
+				this->_phase = Request::RQFIN;
+				break;
+			}
 			char buf[expReadsize];
 			std::memset(buf, 0, expReadsize);
 			actReadsize = buffer.readsome(buf, expReadsize);
 			if (buffer.fail()) {
 				utils::putSysError("readsome");
-				nextcsphase = ClientSocket::SEND;
+				nextcsphase = ClientSocket::RECV;
 				this->_phase = Request::RQFIN;
-				//response status code 500
 				break;
 			}
 			this->_body.append(buf, actReadsize);
@@ -94,7 +105,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
-			nextcsphase = ClientSocket::SEND;
+			nextcsphase = ClientSocket::RECV;
 			this->_phase = Request::RQFIN;
 			break;
 		}
