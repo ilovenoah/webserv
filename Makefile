@@ -42,6 +42,7 @@ endif
 ifeq ($(MAKECMDGOALS), debug)
 CXXFLAGS 			+= -D_DEBUG
 CXXFLAGS 			+= -fsanitize=address
+CXXFLAGS 			+= -g
 endif
 
 all: mkdir $(NAME)
