@@ -37,6 +37,7 @@ class ClientSocket {
         ClientSocket::csphase getPhase() const;
         std::time_t getLastSendTimestamp() const;
         void setLastSendTimestamp(std::time_t const lastSendTimestamp);
+		bool findCRLF();
 };
 
 #endif

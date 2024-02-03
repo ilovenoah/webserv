@@ -74,3 +74,11 @@ std::time_t ClientSocket::getLastSendTimestamp() const {
 void ClientSocket::setLastSendTimestamp(std::time_t const lastSendTimestamp) {
     this->_lastSendTimestamp = lastSendTimestamp;
 }
+
+bool ClientSocket::findCRLF() {
+    std::streampos originalPos = this->buffer.tellg();
+    std::string remainingContent((std::istreambuf_iterator<char>(this->buffer)), std::istreambuf_iterator<char>());
+    bool foundCRLF = remainingContent.find("\r\n") != std::string::npos;
+    buffer.seekg(originalPos);
+    return foundCRLF;
+}
