@@ -111,7 +111,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
         }
         for (std::map<int, Request>::iterator iter = rqmap.begin(); iter != rqmap.end(); ++iter) {
             std::map<int, ClientSocket*>::iterator csiter = csmap.find(iter->first);
-            if (csiter != csmap.end() && (csiter->second->findCRLF() ||  iter->second.getReqphase() == Request::RQBODY)) {
+            if (csiter != csmap.end() && (utils::findCRLF(csiter->second->buffer) ||  iter->second.getReqphase() == Request::RQBODY)) {
                 ClientSocket::csphase nextcsphase = iter->second.load(csiter->second->buffer);
                 csiter->second->setPhase(nextcsphase);
             }
