@@ -9,7 +9,7 @@ namespace utils {
     void putSysError(char const *msg);
 	std::size_t decStrToSizeT(std::string &str);
 	std::size_t hexStrToSizeT(std::string &str);
-	bool findCRLF(std::stringstream &stream)
+	bool findCRLF(std::stringstream &stream);
 }
 
 #endif
