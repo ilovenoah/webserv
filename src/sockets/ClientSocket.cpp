@@ -31,10 +31,11 @@ ClientSocket::csphase ClientSocket::tryRecv() {
     }
     if (recvlen == 0) { return ClientSocket::CLOSE; }
     this->_lastSendTimestamp = std::time(NULL);
-    return ClientSocket::SEND;
+    this->buffer.write(buf, recvlen);
+    return ClientSocket::RECV;
 }
 
-ClientSocket::csphase ClientSocket::trySend() {
+ClientSocket::csphase ClientSocket::trySend(std::string const &msg) {
 #if defined(_LINUX)
     const int flags = MSG_DONTWAIT | MSG_NOSIGNAL;
 #elif defined(_DARWIN)
@@ -42,12 +43,12 @@ ClientSocket::csphase ClientSocket::trySend() {
 #else
     const int flags = MSG_DONTWAIT | MSG_NOSIGNAL;
 #endif
-    const char *msg = "HTTP/1.1 200 Ok\nContent-Length: 11\n\nHelloworld!";
+
     if ((this->_revents & POLLOUT) != POLLOUT) {
         return this->_phase;
     }
 
-    if (send(this->_fd, msg, std::strlen(msg), flags) == -1) {
+    if (send(this->_fd, msg.c_str(), msg.size(), flags) == -1) {
         utils::putSysError("send");
         return ClientSocket::CLOSE;
     }

@@ -24,18 +24,20 @@ class ClientSocket {
         std::time_t _lastSendTimestamp;
 
     public:
+        std::stringstream buffer;
         ClientSocket();
         ClientSocket(int const fd);
         int getFd() const;
         void setRevents(short revents);
         short getRevents() const;
         ClientSocket::csphase tryRecv();
-        ClientSocket::csphase trySend();
+        ClientSocket::csphase trySend(std::string const &msg);
         void close();
         void setPhase(ClientSocket::csphase const phase);
         ClientSocket::csphase getPhase() const;
         std::time_t getLastSendTimestamp() const;
         void setLastSendTimestamp(std::time_t const lastSendTimestamp);
+		bool findCRLF();
 };
 
 #endif
