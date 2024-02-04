@@ -43,6 +43,10 @@ std::string const &Request::getHttpVersion() const{
     return this->_httpVersion;
 }
 
+std::string const &Request::getBody() const {
+	return this->_body;
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()){
