@@ -14,7 +14,7 @@ class Response {
 		std::string _httpVersion;
 		std::string _status;
 		std::string _statusMsg;
-		std::map<std::string, std::string> _headers;
+		std::map<std::string, std::string, CaseInsensitiveCompare> _headers;
 		std::string _body;
 
 	public:

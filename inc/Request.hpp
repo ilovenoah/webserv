@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include "ClientSocket.hpp"
+#include "CaseInsensitiveCompare.hpp"
 
 class Request {
     public:
@@ -18,7 +19,7 @@ class Request {
         std::string _method;
         std::string _path;
         std::string _httpVersion;
-        std::map<std::string, std::string> _header;
+        std::map<std::string, std::string, CaseInsensitiveCompare> _header;
         std::string _body;
         Request::rqphase _phase;
 		std::size_t _chunksize;
