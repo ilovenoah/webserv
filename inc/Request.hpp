@@ -21,6 +21,7 @@ class Request {
         std::map<std::string, std::string> _header;
         std::string _body;
         Request::rqphase _phase;
+		std::size_t _chunksize;
     public:
 		Request();
 		void init();

@@ -1,6 +1,6 @@
 #include "Request.hpp"
 
-Request::Request() : _phase(Request::RQLINE) {}
+Request::Request() : _phase(Request::RQLINE), _chunksize(0) {}
 
 void Request::init() {
 	this->_method.clear();
@@ -88,14 +88,55 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			std::size_t contentLength(0);
 			std::size_t expReadsize;
 			std::size_t actReadsize;
-
 			std::map<std::string, std::string>::iterator cliter = this->_header.find("Content-Length");
-			if (cliter == this->_header.end()) {
+			std::map<std::string, std::string>::iterator teiter = this->_header.find("Transfer-Encoding");
+			if (cliter == this->_header.end() && teiter == this->_header.end()) {
 				nextcsphase = ClientSocket::RECV;
 				this->_phase = Request::RQFIN;
 				break;
+			} else if (cliter == this->_header.end() && teiter != this->_header.end()) {
+				// chunkedじゃなければ400でかえす
+				if (teiter->second.compare("chunked") != 0) {}
+				if (findCRLF(buffer) == false) {
+					this->_phase = Request::RQBODY;
+					nextcsphase = ClientSocket::RECV;
+					break;
+				}
+				if (this->_chunksize == 0) {
+					std::string line;
+					std::getline(buffer, line);
+					if (line.compare("\r") == 0) {
+						this->_phase = Request::RQBODY;
+						nextcsphase = ClientSocket::RECV;
+						break;
+					}
+					std::stringstream ss;
+					ss << std::hex << line;
+					ss >> this->_chunksize;
+					std::clog << "|" << line << "|" << std::endl;
+					std::clog << this->_chunksize << std::endl;
+					if (this->_chunksize == 0) {
+						nextcsphase = ClientSocket::RECV;
+						this->_phase = Request::RQFIN;
+						break;
+					}
+				}
+				char buf[this->_chunksize];
+				std::memset(buf, 0, this->_chunksize);
+				actReadsize = buffer.readsome(buf, this->_chunksize);
+				if (buffer.fail()) {
+					utils::putSysError("readsome");
+					nextcsphase = ClientSocket::RECV;
+					this->_phase = Request::RQFIN;
+					break;
+				}
+				this->_body.append(buf, actReadsize);
+				std::string nl;
+				this->_chunksize -= actReadsize;
+				this->_phase = Request::RQBODY;
+				nextcsphase = ClientSocket::RECV;
+				break;
 			}
-
 			std::stringstream ss(cliter->second);
 			ss >> contentLength;
 			expReadsize = contentLength - this->_body.size();
