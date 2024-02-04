@@ -97,7 +97,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			} else if (cliter == this->_header.end() && teiter != this->_header.end()) {
 				// chunkedじゃなければ400でかえす
 				if (teiter->second.compare("chunked") != 0) {}
-				if (findCRLF(buffer) == false) {
+				if (utils::findCRLF(buffer) == false) {
 					this->_phase = Request::RQBODY;
 					nextcsphase = ClientSocket::RECV;
 					break;
@@ -113,8 +113,6 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 					std::stringstream ss;
 					ss << std::hex << line;
 					ss >> this->_chunksize;
-					std::clog << "|" << line << "|" << std::endl;
-					std::clog << this->_chunksize << std::endl;
 					if (this->_chunksize == 0) {
 						nextcsphase = ClientSocket::RECV;
 						this->_phase = Request::RQFIN;
