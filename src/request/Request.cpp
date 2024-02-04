@@ -12,44 +12,32 @@ void Request::init() {
 }
 
 void Request::setReqphase(Request::rqphase const rqphase) {
-    this->_phase = rqphase;
+	this->_phase = rqphase;
 }
 
-Request::rqphase Request::getReqphase() const {
-    return this->_phase;
+Request::rqphase Request::getReqphase() const { return this->_phase; }
+
+void Request::setMethod(std::string const &method) { this->_method = method; }
+
+std::string const &Request::getMethod() const { return this->_method; }
+
+void Request::setPath(std::string const &path) { this->_path = path; }
+
+std::string const &Request::getPath() const { return this->_path; }
+
+void Request::setHttpVersion(std::string const &httpVersion) {
+	this->_httpVersion = httpVersion;
 }
 
-void Request::setMethod(std::string const &method) {
-    this->_method = method;
+std::string const &Request::getHttpVersion() const {
+	return this->_httpVersion;
 }
 
-std::string const &Request::getMethod() const {
-    return this->_method;
-}
-
-void Request::setPath(std::string const &path){
-    this->_path = path;
-}
-
-std::string const &Request::getPath() const{
-    return this->_path;
-}
-
-void Request::setHttpVersion(std::string const &httpVersion){
-    this->_httpVersion = httpVersion;
-}
-
-std::string const &Request::getHttpVersion() const{
-    return this->_httpVersion;
-}
-
-std::string const &Request::getBody() const {
-	return this->_body;
-}
+std::string const &Request::getBody() const { return this->_body; }
 
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
-	switch (this->getReqphase()){
+	switch (this->getReqphase()) {
 		case Request::RQLINE: {
 			std::string line;
 			std::getline(buffer, line);
@@ -83,7 +71,8 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			spaceremover << value;
 			value.clear();
 			spaceremover >> value;
-			this->_header.insert(std::pair<std::string, std::string>(key, value));
+			this->_header.insert(
+				std::pair<std::string, std::string>(key, value));
 			this->_phase = Request::RQHEADER;
 			nextcsphase = ClientSocket::RECV;
 			break;
@@ -92,15 +81,20 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			std::size_t contentLength(0);
 			std::size_t expReadsize;
 			std::size_t actReadsize;
-			std::map<std::string, std::string>::iterator cliter = this->_header.find("Content-Length");
-			std::map<std::string, std::string>::iterator teiter = this->_header.find("Transfer-Encoding");
-			if (cliter == this->_header.end() && teiter == this->_header.end()) {
+			std::map<std::string, std::string>::iterator cliter =
+				this->_header.find("Content-Length");
+			std::map<std::string, std::string>::iterator teiter =
+				this->_header.find("Transfer-Encoding");
+			if (cliter == this->_header.end() &&
+				teiter == this->_header.end()) {
 				nextcsphase = ClientSocket::RECV;
 				this->_phase = Request::RQFIN;
 				break;
-			} else if (cliter == this->_header.end() && teiter != this->_header.end()) {
+			} else if (cliter == this->_header.end() &&
+					   teiter != this->_header.end()) {
 				// chunkedじゃなければ400でかえす
-				if (teiter->second.compare("chunked") != 0) {}
+				if (teiter->second.compare("chunked") != 0) {
+				}
 				if (utils::findCRLF(buffer) == false) {
 					this->_phase = Request::RQBODY;
 					nextcsphase = ClientSocket::RECV;
@@ -172,7 +166,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			break;
 		}
 	}
-    return nextcsphase;
+	return nextcsphase;
 }
 
 std::string Request::getEntireData() const {
@@ -183,7 +177,9 @@ std::string Request::getEntireData() const {
 	entireData.append(" ");
 	entireData.append(this->_httpVersion);
 	entireData.append("\r\n");
-	for (std::map<std::string, std::string>::const_iterator iter = this->_header.begin(); iter != this->_header.end(); ++iter) {
+	for (std::map<std::string, std::string>::const_iterator iter =
+			 this->_header.begin();
+		 iter != this->_header.end(); ++iter) {
 		entireData.append(iter->first);
 		entireData.append(": ");
 		entireData.append(iter->second);

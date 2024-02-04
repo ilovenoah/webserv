@@ -1,8 +1,8 @@
 #ifndef CASEINSENSITIVECOMPARE_HPP
-# define CASEINSENSITIVECOMPARE_HPP
+#define CASEINSENSITIVECOMPARE_HPP
 
-#include <string>
 #include <algorithm>
+#include <string>
 
 class CaseInsensitiveCompare {
 	private:

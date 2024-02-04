@@ -1,17 +1,19 @@
 #ifndef LOOP_HPP
 #define LOOP_HPP
 
-#define POLLTIMEOUT 
+#define POLLTIMEOUT
 #include <poll.h>
+
 #include <map>
-#include <vector>
 #include <utility>
-#include "Config.hpp"
-#include "ServerSocket.hpp"
+#include <vector>
+
 #include "ClientSocket.hpp"
-#include "utils.hpp"
+#include "Config.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
+#include "ServerSocket.hpp"
+#include "utils.hpp"
 
 bool loop(std::map<int, ServerSocket> &ssmap, Config const &config);
 

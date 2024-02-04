@@ -4,7 +4,8 @@
 
 #include "Config.hpp"
 
-std::map<std::string, void (Server::*)(const std::string &, std::ifstream &)> Server::_srvSetterMap;
+std::map<std::string, void (Server::*)(const std::string &, std::ifstream &)>
+	Server::_srvSetterMap;
 
 Server::Server() {
 	_srvSetterMap["server_name"] = &Server::setServerName;
@@ -20,12 +21,9 @@ Server::Server() {
 	_srvSetterMap["error_page"] = &Server::setErrorPage;
 }
 
-Server::~Server() {
-}
+Server::~Server() {}
 
-Server::Server(const Server &copy) {
-	*this = copy;
-}
+Server::Server(const Server &copy) { *this = copy; }
 
 Server &Server::operator=(const Server &copy) {
 	if (this != &copy) {
@@ -45,7 +43,8 @@ Server &Server::operator=(const Server &copy) {
 	return *this;
 }
 
-void Server::setServerName(const std::string &values, std::ifstream &fileStream) {
+void Server::setServerName(const std::string &values,
+						   std::ifstream &fileStream) {
 	(void)fileStream;
 	_server_name = values;
 }
@@ -67,16 +66,20 @@ void Server::setRoot(const std::string &values, std::ifstream &fileStream) {
 	_root = values;
 }
 
-void Server::setAllowMethods(const std::string &values, std::ifstream &fileStream) {
+void Server::setAllowMethods(const std::string &values,
+							 std::ifstream &fileStream) {
 	(void)fileStream;
 
-	if (values.find("GET") == std::string::npos && values.find("POST") == std::string::npos && values.find("DELETE") == std::string::npos) {
+	if (values.find("GET") == std::string::npos &&
+		values.find("POST") == std::string::npos &&
+		values.find("DELETE") == std::string::npos) {
 		throw GenericException(CONFIG_ERROR);
 	}
 	_allow_methods = values;
 }
 
-void Server::setAutoIndex(const std::string &values, std::ifstream &fileStream) {
+void Server::setAutoIndex(const std::string &values,
+						  std::ifstream &fileStream) {
 	(void)fileStream;
 	if (values != "on" && values != "off") {
 		throw GenericException(CONFIG_ERROR);
@@ -89,7 +92,8 @@ void Server::setIndex(const std::string &values, std::ifstream &fileStream) {
 	_index = values;
 }
 
-void Server::setClientBodyLimit(const std::string &values, std::ifstream &fileStream) {
+void Server::setClientBodyLimit(const std::string &values,
+								std::ifstream &fileStream) {
 	(void)fileStream;
 
 	std::istringstream iss(values);
@@ -134,7 +138,8 @@ void Server::setLocation(const std::string &values, std::ifstream &fileStream) {
 	}
 }
 
-void Server::setErrorPage(const std::string &values, std::ifstream &fileStream) {
+void Server::setErrorPage(const std::string &values,
+						  std::ifstream &fileStream) {
 	(void)fileStream;
 	std::string keys;
 	std::string value;
@@ -168,17 +173,11 @@ void Server::setReturn(const std::string &values, std::ifstream &fileStream) {
 	_return[key] = value;
 }
 
-const std::string &Server::getServerName() const {
-	return _server_name;
-}
+const std::string &Server::getServerName() const { return _server_name; }
 
-const std::string &Server::getIpAddress() const {
-	return _ip_address;
-}
+const std::string &Server::getIpAddress() const { return _ip_address; }
 
-const std::string &Server::getPort() const {
-	return _port;
-}
+const std::string &Server::getPort() const { return _port; }
 
 std::string Server::getListen() const {
 	std::string ipAddress = getIpAddress();
@@ -187,33 +186,21 @@ std::string Server::getListen() const {
 	return ipAddress + ":" + port;
 }
 
-const std::string &Server::getRoot() const {
-	return _root;
-}
+const std::string &Server::getRoot() const { return _root; }
 
-const std::string &Server::getAllowMethods() const {
-	return _allow_methods;
-}
+const std::string &Server::getAllowMethods() const { return _allow_methods; }
 
-const std::string &Server::getAutoIndex() const {
-	return _autoindex;
-}
+const std::string &Server::getAutoIndex() const { return _autoindex; }
 
-const std::string &Server::getIndex() const {
-	return _index;
-}
+const std::string &Server::getIndex() const { return _index; }
 
 const std::string &Server::getClientBodyLimit() const {
 	return _client_body_limit;
 }
 
-const std::string &Server::getCgiInfo() const {
-	return _cgi_info;
-}
+const std::string &Server::getCgiInfo() const { return _cgi_info; }
 
-const std::vector<Location> &Server::getLocation() const {
-	return _location;
-}
+const std::vector<Location> &Server::getLocation() const { return _location; }
 
 const std::map<std::string, std::string> &Server::getErrorPage() const {
 	return _error_page;
@@ -223,7 +210,8 @@ const std::map<std::string, std::string> &Server::getReturn() const {
 	return _return;
 }
 
-void Server::execSetterMap(std::string &keys, std::string &value, std::ifstream &fileStream) {
+void Server::execSetterMap(std::string &keys, std::string &value,
+						   std::ifstream &fileStream) {
 	try {
 		if (_srvSetterMap.find(keys) == _srvSetterMap.end()) {
 			throw GenericException(UNKOWN_KEY + keys);
