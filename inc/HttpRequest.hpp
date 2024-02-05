@@ -4,13 +4,13 @@
 #include "env.hpp"
 
 class HttpRequest {
-   private:
-	std::string _method;
-	std::string _version;
-	std::string _path;
-	std::string _body;
+	private:
+		std::string _method;
+		std::string _version;
+		std::string _path;
+		std::string _body;
 
-   public:
+	public:
 };
 
 #endif

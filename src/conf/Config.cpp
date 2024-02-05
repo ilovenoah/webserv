@@ -2,16 +2,11 @@
 
 #include <iostream>
 
-Config::Config() {
-	_bracket_count = 0;
-}
+Config::Config() { _bracket_count = 0; }
 
-Config::~Config() {
-}
+Config::~Config() {}
 
-Config::Config(const Config &copy) {
-	*this = copy;
-}
+Config::Config(const Config &copy) { *this = copy; }
 
 Config &Config::operator=(const Config &copy) {
 	if (this != &copy) {
@@ -24,23 +19,18 @@ void Config::setServers(int argc, const char *argv[]) {
 	parseConfig(argc, argv);
 }
 
-void Config::setFilePath(std::string file_path) {
-	_filePath = file_path;
-}
+void Config::setFilePath(std::string file_path) { _filePath = file_path; }
 
-const std::vector<Server> &Config::getServers() const {
-	return _servers;
-}
+const std::vector<Server> &Config::getServers() const { return _servers; }
 
-const std::string &Config::getFilePath() const {
-	return _filePath;
-}
+const std::string &Config::getFilePath() const { return _filePath; }
 
 void Config::removeUnwanted(std::string &line) {
 	std::string toRemove = "\r\t{};";
 
 	for (std::string::size_type i = 0; i < toRemove.length(); ++i) {
-		line.erase(std::remove(line.begin(), line.end(), toRemove[i]), line.end());
+		line.erase(std::remove(line.begin(), line.end(), toRemove[i]),
+				   line.end());
 	}
 
 	std::size_t first = line.find_first_not_of(" ");
