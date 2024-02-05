@@ -12,6 +12,7 @@ static bool startUpServerSockets(std::map<int, ServerSocket> &ssmap, Config &con
 		if (port.empty() == true) { port = "8000"; }
 		ServerSocket ss(ipAddr, port);
 		if (ss.init() == false) { return false; }
+		std::cout << "Start up server: " << ipAddr << ":" << port << std::endl;
 		ssmap.insert(std::pair<int, ServerSocket>(ss.getFd(), ss));
 	}
 	return true;
