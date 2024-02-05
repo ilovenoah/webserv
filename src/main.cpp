@@ -22,6 +22,6 @@ int main(int argc, const char *argv[]) {
 	Config config;
 
 	config.setServers(argc, argv);
-	startUpServerSockets(ssmap, config);
+	if (startUpServerSockets(ssmap, config) == false) { exit(1); }
 	loop(ssmap, config);
 }
