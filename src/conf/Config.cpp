@@ -29,6 +29,18 @@ bool Config::close() {
 	return true;
 }
 
+bool Config::load() {
+	std::string line;
+	while (std::getline(this->_file, line)){
+		
+	}
+	if (this->_servers.size() == 0) {
+		std::cerr << RED << "Webserv: Error: no server is defined." << RESET << std::endl;
+		return false;
+	}
+	return true;
+}
+
 // int main(int argc, char *argv[]) {
 // 	Config test;
 
