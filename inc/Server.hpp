@@ -17,6 +17,7 @@ class Server {
 		std::vector<std::string> _cgi_extensions;
 		std::map<std::string, Location> _locations;
 		std::map<std::string, std::string> _returns;
+		std::map<std::string, std::string> _errorPages;
 
 	public:
 		const std::string &getServername() const;
@@ -35,6 +36,7 @@ class Server {
 		void setClientMaxBodySize(std::size_t const &clientMaxBodySize);
 		const std::map<std::string, Location> &getLocations() const;
 		const std::map<std::string, std::string> &getReturns() const;
+		const std::map<std::string, std::string> &getErrorPages() const;
 };
 
 #endif
