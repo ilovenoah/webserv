@@ -29,10 +29,30 @@ bool Config::close() {
 	return true;
 }
 
+static bool shouldIgnore(std::string const &line) {
+	if (line.empty() == true) { return true; }
+	std::stringstream ss(line);
+	std::string elem;
+
+	ss >> elem;
+	if (elem.empty() == true) { return true; }
+	if (elem[0] == '#') { return true; }
+	return false;
+}
+
 bool Config::load() {
 	std::string line;
 	while (std::getline(this->_file, line)){
-		
+		if (shouldIgnore(line)) { continue; }
+		std::clog << "hello" << std::endl;
+		// std::stringstream ss(line);
+		// std::string elem;
+		// char bracket;
+		// ss >> elem >> bracket;
+		// if (ss.fail() || !ss.eof()) {
+			
+		// }
+		// if (elem )
 	}
 	if (this->_servers.size() == 0) {
 		std::cerr << RED << "Webserv: Error: no server is defined." << RESET << std::endl;
@@ -45,4 +65,6 @@ bool Config::load() {
 // 	Config test;
 
 // 	test.open(argv[1]);
+// 	test.load();
+// 	test.close();
 // }
