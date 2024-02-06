@@ -63,3 +63,7 @@ const std::map<std::string, Location> &Server::getLocations() const {
 const std::map<std::string, std::string> &Server::getReturns() const {
 	return this->_returns;
 }
+
+const std::map<std::string, std::string> &getErrorPages() const; {
+	return this->_errorPages;
+}
