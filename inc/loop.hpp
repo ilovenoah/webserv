@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "ClientSocket.hpp"
-#include "Config.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
 #include "ServerSocket.hpp"

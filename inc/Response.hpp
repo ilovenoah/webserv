@@ -4,7 +4,6 @@
 #include <string>
 
 #include "ClientSocket.hpp"
-#include "Config.hpp"
 #include "Request.hpp"
 
 class Response {
