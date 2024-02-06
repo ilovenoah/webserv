@@ -4,13 +4,16 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "Location.hpp"
+
+#define ONEMEGA 1000000
 
 class Server {
 	private:
 		std::string _servername;
 		std::string _ipAddr;
 		std::string _port;
-		std::string _allowMethods;
+		std::vector<std::string> _allowMethods;
 		bool _autoindex;
 		std::string _index;
 		std::size_t _clientMaxBodySize;
@@ -18,16 +21,17 @@ class Server {
 		std::map<std::string, Location> _locations;
 		std::map<std::string, std::string> _returns;
 		std::map<std::string, std::string> _errorPages;
+		static std::map<std::string, void (Server::*)(const std::string&, std::fstream&)> _setterMap;
 
 	public:
+		Server();
 		const std::string &getServername() const;
 		void setServername(std::string const &servername);
 		const std::string &getIpaddr() const;
 		void setIpaddr(std::string const &ipaddr);
 		const std::string &getPort() const;
 		void setPort(std::string const &port);
-		const std::string &getAllowMethods() const;
-		void setAllowMethods(std::string const &allowMethods);
+		const std::vector<std::string> &getAllowMethods() const;
 		const bool &getAutoindex() const;
 		void setAutoindex(bool const &autoindex);
 		const std::string &getIndex() const;

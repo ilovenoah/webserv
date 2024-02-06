@@ -18,7 +18,7 @@ bool Config::open(char const *path) {
 		return false;
 	}
 	return true;
-} 
+}
 
 bool Config::close() {
 	this->_file.close();
@@ -40,19 +40,42 @@ static bool shouldIgnore(std::string const &line) {
 	return false;
 }
 
+static Server createServerInstance(std::fstream &file, std::size_t lineCount) {
+	std::string line;
+
+	while (std::getline(file, line)) {
+		lineCount++;
+		if (shouldIgnore(line)) { continue; }
+		std::stringstream ss(line);
+		std::string elem;
+		ss >> elem;
+
+	} 
+}
+
 bool Config::load() {
 	std::string line;
-	while (std::getline(this->_file, line)){
+	std::size_t lineCount = 0;
+	while (std::getline(this->_file, line)) {
+		lineCount++;
 		if (shouldIgnore(line)) { continue; }
-		std::clog << "hello" << std::endl;
-		// std::stringstream ss(line);
-		// std::string elem;
-		// char bracket;
-		// ss >> elem >> bracket;
-		// if (ss.fail() || !ss.eof()) {
-			
-		// }
-		// if (elem )
+		std::stringstream ss(line);
+		std::string elem;
+		ss >> elem;
+		char bracket;
+		ss >> bracket;
+		if (ss.fail() || !ss.eof()) {
+			// error handling	
+		}
+		if (elem.compare("server") == 0 && bracket == '{') {
+			try {
+				Server server = createServerInstance(this->_file, lineCount);
+
+			} catch {
+				//
+			}
+
+		}
 	}
 	if (this->_servers.size() == 0) {
 		std::cerr << RED << "Webserv: Error: no server is defined." << RESET << std::endl;
