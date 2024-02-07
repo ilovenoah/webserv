@@ -16,6 +16,7 @@ class Server {
 		std::string _servername;
 		std::string _ipAddr;
 		std::string _port;
+		std::string _root;
 		std::vector<std::string> _allowMethods;
 		bool _autoindex;
 		std::string _index;
@@ -35,6 +36,8 @@ class Server {
 		bool setIpaddr(std::string const &ipaddr);
 		const std::string &getPort() const;
 		bool setPort(std::string const &port);
+		bool setRoot(std::string const &attribute, std::fstream &file);
+		const std::string &getRoot() const;
 		const std::vector<std::string> &getAllowMethods() const;
 		const bool &getAutoindex() const;
 		bool setAutoindex(bool const &autoindex);

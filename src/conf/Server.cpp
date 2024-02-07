@@ -82,6 +82,23 @@ bool Server::setPort(std::string const &port) {
 	return true;
 }
 
+bool Server::setRoot(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	ss >> elem;
+	if (ss.eof() == true) { return false; }
+	elem.clear();
+	ss >> elem;
+	if (ss.eof() == false) { return false; }
+	this->_root = elem;
+	return true;
+}
+
+const std::string &Server::getRoot() const {
+	return this->_root;
+}
+
 const std::vector<std::string> &Server::getAllowMethods() const {
 	return this->_allowMethods;
 }

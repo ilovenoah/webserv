@@ -5,7 +5,7 @@ std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Confi
 	std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> srvSetterMap;
 	srvSetterMap["server_name"] = &Server::setServername;
 	srvSetterMap["listen"] = &Server::setListen;
-	// srvSetterMap["root"] = &Server::setRoot;
+	srvSetterMap["root"] = &Server::setRoot;
 	// srvSetterMap["allow_methods"] = &Server::setAllowMethods;
 	// srvSetterMap["autoindex"] = &Server::setAutoIndex;
 	// srvSetterMap["index"] = &Server::setIndex;
@@ -116,6 +116,7 @@ void Config::printServers() const {
 		std::clog << "====================================" << std::endl;
 		std::clog << "Server name: " << iter->second.getServername() << std::endl;
 		std::clog << "Listen: " << iter->second.getListen() << std::endl;
+		std::clog << "Root: " << iter->second.getRoot() << std::endl;
 		std::clog << "====================================" << std::endl;
 	}
 }
