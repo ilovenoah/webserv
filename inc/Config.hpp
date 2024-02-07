@@ -21,6 +21,7 @@ class Config {
 		bool open(char const *path);
 		bool close();
 		bool load();
+		void printServers() const;
 };
 
 

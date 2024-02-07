@@ -108,6 +108,14 @@ bool Config::load() {
 	return true;
 }
 
+void Config::printServers() const {
+	for (std::map<std::string, Server>::const_iterator iter = this->_servers.begin(); iter != this->_servers.end(); ++iter) {
+		std::clog << "====================================" << std::endl;
+		std::clog << "Server name: " << iter->second.getServername() << std::endl;
+		std::clog << "====================================" << std::endl;
+	}
+}
+
 // int main(int argc, char *argv[]) {
 // 	Config test;
 
