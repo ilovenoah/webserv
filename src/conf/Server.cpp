@@ -20,6 +20,7 @@ bool Server::setServername(std::string const &attribute, std::fstream &file) {
 	std::string elem;
 	ss >> elem;
 	if (ss.eof() == true) { return false; }
+	elem.clear();
 	ss >> elem;
 	if (ss.eof() == false) { return false; }
 	this->_servername = elem;
