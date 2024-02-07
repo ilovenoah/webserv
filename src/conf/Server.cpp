@@ -1,8 +1,8 @@
 #include "Server.hpp"
 
-static std::map<std::string, void (Server::*)(const std::string&, std::fstream&)> initSetterMap() {
-	std::map<std::string, void (Server::*)(const std::string&, std::fstream&)> srvSetterMap;
-	srvSetterMap["server_name"] = &Server::setServerName;
+std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Server::initSetterMap() {
+	std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> srvSetterMap;
+	srvSetterMap["server_name"] = &Server::setServername;
 	srvSetterMap["listen"] = &Server::setListen;
 	srvSetterMap["root"] = &Server::setRoot;
 	srvSetterMap["allow_methods"] = &Server::setAllowMethods;
@@ -13,9 +13,10 @@ static std::map<std::string, void (Server::*)(const std::string&, std::fstream&)
 	srvSetterMap["return"] = &Server::setReturn;
 	srvSetterMap["location"] = &Server::setLocation;
 	srvSetterMap["error_page"] = &Server::setErrorPage;
+	return srvSetterMap;
 }
 
-std::map<std::string, void (Server::*)(const std::string&, std::fstream&)> Server::_setterMap = initSetterMap();
+std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Server::_setterMap = initSetterMap();
 
 static std::vector<std::string> initAllowedMethods() {
     std::vector<std::string> methods;
@@ -31,15 +32,23 @@ const std::string &Server::getServername() const {
 	return this->_servername;
 }
 
-void Server::setServername(std::string const &servername) {
-	this->_servername = servername;
+bool Server::setServername(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	ss >> elem;
+	if (ss.eof() == true) { return false; }
+	ss >> elem;
+	if (ss.eof() == false) { return false; }
+	this->_servername = elem;
+	return true;
 }
 
 const std::string &Server::getIpaddr() const {
 	return this->_ipAddr;
 }
 
-void Server::setIpaddr(std::string const &ipaddr) {
+bool Server::setIpaddr(std::string const &ipaddr) {
 	this->_ipAddr = ipaddr;
 }
 
@@ -47,7 +56,7 @@ const std::string &Server::getPort() const {
 	return this->_port;
 }
 
-void Server::setPort(std::string const &port) {
+bool Server::setPort(std::string const &port) {
 	this->_port = port;
 }
 
@@ -59,7 +68,7 @@ const bool &Server::getAutoindex() const {
 	return this->_autoindex;
 }
 
-void Server::setAutoindex(bool const &autoindex) {
+bool Server::setAutoindex(bool const &autoindex) {
 	this->_autoindex = autoindex;
 }
 
@@ -67,7 +76,7 @@ const std::string &Server::getIndex() const {
 	return this->_index;
 }
 
-void Server::setIndex(std::string const &index) {
+bool Server::setIndex(std::string const &index) {
 	this->_index = index;
 }
 
@@ -75,7 +84,7 @@ const std::size_t &Server::getClientMaxBodySize() const {
 	return this->_clientMaxBodySize;
 }
 
-void Server::setClientMaxBodySize(std::size_t const &clientMaxBodySize) {
+bool Server::setClientMaxBodySize(std::size_t const &clientMaxBodySize) {
 	this->_clientMaxBodySize = clientMaxBodySize;
 }
 

@@ -21,23 +21,25 @@ class Server {
 		std::map<std::string, Location> _locations;
 		std::map<std::string, std::string> _returns;
 		std::map<std::string, std::string> _errorPages;
-		static std::map<std::string, void (Server::*)(const std::string&, std::fstream&)> _setterMap;
+		Server _createServerInstance(std::fstream &file, std::size_t lineCoun);
+		static std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> _setterMap;
+		static std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> initSetterMap();
 
 	public:
 		Server();
 		const std::string &getServername() const;
-		void setServername(std::string const &servername);
+		bool setServername(std::string const &attribute, std::fstream &file);
 		const std::string &getIpaddr() const;
-		void setIpaddr(std::string const &ipaddr);
+		bool setIpaddr(std::string const &ipaddr);
 		const std::string &getPort() const;
-		void setPort(std::string const &port);
+		bool setPort(std::string const &port);
 		const std::vector<std::string> &getAllowMethods() const;
 		const bool &getAutoindex() const;
-		void setAutoindex(bool const &autoindex);
+		bool setAutoindex(bool const &autoindex);
 		const std::string &getIndex() const;
-		void setIndex(std::string const &index);
+		bool setIndex(std::string const &index);
 		const std::size_t &getClientMaxBodySize() const;
-		void setClientMaxBodySize(std::size_t const &clientMaxBodySize);
+		bool setClientMaxBodySize(std::size_t const &clientMaxBodySize);
 		const std::map<std::string, Location> &getLocations() const;
 		const std::map<std::string, std::string> &getReturns() const;
 		const std::map<std::string, std::string> &getErrorPages() const;
