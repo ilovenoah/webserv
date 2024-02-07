@@ -21,9 +21,6 @@ class Server {
 		std::map<std::string, Location> _locations;
 		std::map<std::string, std::string> _returns;
 		std::map<std::string, std::string> _errorPages;
-		Server _createServerInstance(std::fstream &file, std::size_t lineCoun);
-		static std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> _setterMap;
-		static std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> initSetterMap();
 
 	public:
 		Server();
