@@ -27,6 +27,12 @@ bool Server::setServername(std::string const &attribute, std::fstream &file) {
 	return true;
 }
 
+static bool isPortOutOfRange(std::string &port) {
+	std::size_t portNum(utils::decStrToSizeT(port));
+
+	return MIN_USERPORT > portNum || portNum > MAX_USERPORT;
+}
+
 bool Server::setListen(std::string const &attribute, std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
@@ -44,8 +50,10 @@ bool Server::setListen(std::string const &attribute, std::fstream &file) {
 	std::getline(ss, ipAddr, ':');
 	if (ss.eof() == true) {
 		this->_port = ipAddr;
+		if (isPortOutOfRange(port) == true) { return false; }
 		return true;
 	}
+	if (isPortOutOfRange(port) == true) { return false; }
 	std::getline(ss, port);
 	this->_ipAddr = ipAddr;
 	this->_port = port;
