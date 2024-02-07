@@ -40,17 +40,23 @@ static bool shouldIgnore(std::string const &line) {
 	return false;
 }
 
-static Server createServerInstance(std::fstream &file, std::size_t lineCount) {
+Server Server::_createServerInstance(std::fstream &file, std::size_t lineCount) {
 	std::string line;
+	Server server;
 
 	while (std::getline(file, line)) {
 		lineCount++;
 		if (shouldIgnore(line)) { continue; }
+		if (line.back() != ';') { /* errorhandling; */ }
+		line.pop_back();
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
-
-	} 
+		std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)>::iterator iter = this->_setterMap.find(elem);
+		if (iter == this->_setterMap.end()) { /* errorhandling; */ }
+		if ((this->*(iter->second))(line, file) == false) { /* errorhandling; */ }
+	}
+	return server;
 }
 
 bool Config::load() {
