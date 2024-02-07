@@ -27,6 +27,35 @@ bool Server::setServername(std::string const &attribute, std::fstream &file) {
 	return true;
 }
 
+bool Server::setListen(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	std::string ipAddr;
+	std::string port;
+	ss >> elem;
+	if (ss.eof() == true) { return false; }
+	elem.clear();
+	ss >> elem;
+	if (ss.eof() == false) { return false; }
+	ss.str("");
+	ss.clear();
+	ss << elem;
+	std::getline(ss, ipAddr, ':');
+	if (ss.eof() == true) {
+		this->_port = ipAddr;
+		return true;
+	}
+	std::getline(ss, port);
+	this->_ipAddr = ipAddr;
+	this->_port = port;
+	return true;
+}
+
+std::string Server::getListen() const {
+	return this->_ipAddr + ':' + this->_port;
+}
+
 const std::string &Server::getIpaddr() const {
 	return this->_ipAddr;
 }

@@ -26,6 +26,8 @@ class Server {
 		Server();
 		const std::string &getServername() const;
 		bool setServername(std::string const &attribute, std::fstream &file);
+		bool setListen(std::string const &attribute, std::fstream &file);
+		std::string getListen() const;
 		const std::string &getIpaddr() const;
 		bool setIpaddr(std::string const &ipaddr);
 		const std::string &getPort() const;
