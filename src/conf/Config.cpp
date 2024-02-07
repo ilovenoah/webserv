@@ -39,6 +39,7 @@ bool Config::open(char const *path) {
 }
 
 bool Config::close() {
+	this->_file.clear();
 	this->_file.close();
 	if (this->_file.fail()) {
 		utils::putSysError("close");
@@ -66,12 +67,14 @@ Server Config::_createServerInstance(std::fstream &file, std::size_t lineCount) 
 		lineCount++;
 		if (shouldIgnore(line)) { continue; }
 		if (line[line.size() - 1] != ';') { /* errorhandling; */ }
-		if (line.size() != 0) { line = line.substr(0, line.size() - 1); }
+		if (line.size() != 0) { line = line.substr(0, line.size() - 2); }
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
+		if (elem.compare("}") == 0) { break; }
 		std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)>::iterator iter = this->_setterMap.find(elem);
-		if (iter == this->_setterMap.end()) { /* errorhandling; */ }
+		if (iter == this->_setterMap.end()) { continue; }
+		ss >> elem;
 		if ((server.*(iter->second))(line, file) == false) { /* errorhandling; */ }
 	}
 	return server;
@@ -94,7 +97,7 @@ bool Config::load() {
 		if (elem.compare("server") == 0 && bracket == '{') {
 			try {
 				Server server = this->_createServerInstance(this->_file, lineCount);
-
+				this->_servers.insert(std::pair<std::string, Server>(server.getServername(), server));
 			} catch (std::exception &e) {
 				//
 			}
