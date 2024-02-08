@@ -107,7 +107,7 @@ bool Server::setAllowMethods(std::string const &attribute, std::fstream &file) {
 const std::vector<std::string> &Server::getAllowMethods() const {
 	return this->_allowMethods;
 }
-bool Server::setAutoindex(std::string const &attribute, std::fstream &file) {
+bool Server::setAutoIndex(std::string const &attribute, std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
 	std::string elem;

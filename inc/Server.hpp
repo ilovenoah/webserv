@@ -38,7 +38,7 @@ class Server {
 		const std::string &getRoot() const;
 		bool setAllowMethods(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getAllowMethods() const;
-		bool setAutoindex(std::string const &attribute, std::fstream &file);
+		bool setAutoIndex(std::string const &attribute, std::fstream &file);
 		const bool &getAutoindex() const;
 		bool setIndex(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getIndex() const;
