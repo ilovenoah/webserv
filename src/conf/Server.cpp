@@ -216,7 +216,7 @@ static bool isStatusCode(std::string const &str) {
 	return true;
 }
 
-bool Server::setErrorPage(std::string const &attribute, std::fstream &file) {
+bool Server::setErrorPages(std::string const &attribute, std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
 	std::string elem;

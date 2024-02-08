@@ -12,7 +12,7 @@ std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Confi
 	srvSetterMap["client_body_limit"] = &Server::setClientMaxBodySize;
 	srvSetterMap["cgi_extensions"] = &Server::setCgiExtensions;
 	srvSetterMap["return"] = &Server::setReturn;
-	// srvSetterMap["location"] = &Server::setLocation;
+	srvSetterMap["error_page"] = &Server::setErrorPages;
 	srvSetterMap["error_page"] = &Server::setErrorPage;
 	return srvSetterMap;
 }
