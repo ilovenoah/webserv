@@ -125,6 +125,30 @@ void Config::printServers() const {
 		for (std::map<std::string, std::string>::const_iterator iter2 = iter->second.getErrorPages().begin(); iter2 != iter->second.getErrorPages().end(); ++iter2) {
 			std::clog << "Error page: [" << iter2->first << "] " << iter2->second << std::endl;
 		}
+		for (std::map<std::string, Location>::const_iterator iter2 = iter->second.getLocations().begin(); iter2 != iter->second.getLocations().end(); ++iter2) {
+			std::clog << "Location: " << iter2->second.getLocationPath() << std::endl;
+			std::clog << "	Allow methods: ";
+			for (std::vector<std::string>::const_iterator iter3 = iter2->second.getAllowMethods().begin(); iter3 != iter2->second.getAllowMethods().end(); ++iter3) {
+				std::clog << *iter3 << " ";
+			}
+			std::clog << std::endl;
+			std::clog << "	Index: ";
+			for (std::vector<std::string>::const_iterator iter3 = iter2->second.getIndex().begin(); iter3 != iter2->second.getIndex().end(); ++iter3) {
+				std::clog << *iter3 << " ";
+			}
+			std::clog << std::endl;
+			std::clog << "	Autoindex: " << iter2->second.getAutoindex() << std::endl;
+			std::clog << "	Client max body size: " << iter2->second.getClientMaxBodySize() << std::endl;
+			std::clog << "	Cgi extensions: ";
+			for (std::vector<std::string>::const_iterator iter3 = iter2->second.getCgiExtensions().begin(); iter3 != iter2->second.getCgiExtensions().end(); ++iter3) {
+				std::clog << *iter3 << " ";
+			}
+			std::clog << std::endl;
+			std::clog << "	Return: " << iter2->second.getReturn() << std::endl;
+			for (std::map<std::string, std::string>::const_iterator iter3 = iter2->second.getErrorPages().begin(); iter3 != iter2->second.getErrorPages().end(); ++iter3) {
+				std::clog << "	Error page: [" << iter3->first << "] " << iter3->second << std::endl;
+			}
+		}
 		std::clog << "====================================" << std::endl;
 	}
 }
