@@ -95,6 +95,7 @@ bool Server::setAllowMethods(std::string const &attribute, std::fstream &file) {
 	std::string elem;
 	ss >> elem;
 	if (ss.eof() == true) { return false; }
+	this->_allowMethods.clear();
 	while (ss.eof() == false) {
 		elem.clear();
 		ss >> elem;
