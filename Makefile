@@ -17,7 +17,7 @@ REQU_DIR	=	request/
 RESP_DIR	=	response/
 
 MAIN_NAME	=	main.cpp
-CONF_NAME	=	Config.cpp Server.cpp
+CONF_NAME	=	Config.cpp Server.cpp AConfigurable.cpp Location.cpp
 SOCK_NAME	=	ServerSocket.cpp ClientSocket.cpp
 UTILS_NAME	=	Error.cpp utils.cpp CaseInsensitiveCompare.cpp
 LOOP_NAME	=	loop.cpp
