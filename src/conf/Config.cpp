@@ -6,10 +6,10 @@ std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Confi
 	srvSetterMap["server_name"] = &Server::setServername;
 	srvSetterMap["listen"] = &Server::setListen;
 	srvSetterMap["root"] = &Server::setRoot;
-	// srvSetterMap["allow_methods"] = &Server::setAllowMethods;
-	// srvSetterMap["autoindex"] = &Server::setAutoIndex;
-	// srvSetterMap["index"] = &Server::setIndex;
-	// srvSetterMap["client_body_limit"] = &Server::setClientBodyLimit;
+	srvSetterMap["allow_methods"] = &Server::setAllowMethods;
+	srvSetterMap["autoindex"] = &Server::setAutoIndex;
+	srvSetterMap["index"] = &Server::setIndex;
+	srvSetterMap["client_body_limit"] = &Server::setClientMaxBodySize;
 	// srvSetterMap["cgi_info"] = &Server::setCgiInfo;
 	// srvSetterMap["return"] = &Server::setReturn;
 	// srvSetterMap["location"] = &Server::setLocation;
@@ -117,6 +117,18 @@ void Config::printServers() const {
 		std::clog << "Server name: " << iter->second.getServername() << std::endl;
 		std::clog << "Listen: " << iter->second.getListen() << std::endl;
 		std::clog << "Root: " << iter->second.getRoot() << std::endl;
+		std::clog << "Allow methods: ";
+ 		for (std::vector<std::string>::const_iterator iter2 = iter->second.getAllowMethods().begin(); iter2 != iter->second.getAllowMethods().end(); ++iter2) {
+			std::clog << *iter2 << " ";
+		}
+		std::clog << std::endl;	
+		std::clog << "Index: ";
+		for (std::vector<std::string>::const_iterator iter2 = iter->second.getIndex().begin(); iter2 != iter->second.getIndex().end(); ++iter2) {
+			std::clog << *iter2 << " ";
+		}
+		std::clog << std::endl;
+		std::clog << "Autoindex: " << iter->second.getAutoindex() << std::endl;
+		std::clog << "Client max body size: " << iter->second.getClientMaxBodySize() << std::endl;
 		std::clog << "====================================" << std::endl;
 	}
 }
