@@ -13,6 +13,7 @@ class Location : public AConfigurable {
 
 	public:
 		bool setLocationPath(std::string const &attribute);
+		const std::string &getLocationPath() const;
 };
 
 #endif

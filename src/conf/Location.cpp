@@ -16,3 +16,7 @@ bool Location::setLocationPath(std::string const &attribute) {
 	if (elem.compare("{") != 0) { return false; }
 	return true;
 }
+
+const std::string &Location::getLocationPath() const {
+	return this->_path;
+}
