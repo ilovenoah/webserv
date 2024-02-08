@@ -160,6 +160,10 @@ bool AConfigurable::setErrorPages(std::string const &attribute, std::fstream &fi
 	return true;
 }
 
+const std::map<std::string, std::string> &AConfigurable::getErrorPages() const {
+	return this->_errorPages;
+}
+
 const std::string &AConfigurable::getReturn() const {
 	return this->_return;
 }
