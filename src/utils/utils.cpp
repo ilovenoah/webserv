@@ -28,4 +28,14 @@ bool findCRLF(std::stringstream &stream) {
 	stream.seekg(originalPos);
 	return foundCRLF;
 }
+bool shouldIgnoreLine(std::string const &line) {
+	if (line.empty() == true) { return true; }
+	std::stringstream ss(line);
+	std::string elem;
+
+	ss >> elem;
+	if (elem.empty() == true) { return true; }
+	if (elem[0] == '#') { return true; }
+	return false;
+}
 }  // namespace utils

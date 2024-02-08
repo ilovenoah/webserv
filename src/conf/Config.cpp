@@ -47,24 +47,13 @@ bool Config::close() {
 	return true;
 }
 
-static bool shouldIgnore(std::string const &line) {
-	if (line.empty() == true) { return true; }
-	std::stringstream ss(line);
-	std::string elem;
-
-	ss >> elem;
-	if (elem.empty() == true) { return true; }
-	if (elem[0] == '#') { return true; }
-	return false;
-}
-
 Server Config::_createServerInstance(std::fstream &file, std::size_t lineCount) {
 	std::string line;
 	Server server;
 
 	while (std::getline(file, line)) {
 		lineCount++;
-		if (shouldIgnore(line)) { continue; }
+		if (utils::shouldIgnoreLine(line)) { continue; }
 		if (line[line.size() - 1] != ';') { /* errorhandling; */ }
 		if (line.size() != 0) { line = line.substr(0, line.size() - 2); }
 		std::stringstream ss(line);
@@ -84,7 +73,7 @@ bool Config::load() {
 	std::size_t lineCount = 0;
 	while (std::getline(this->_file, line)) {
 		lineCount++;
-		if (shouldIgnore(line)) { continue; }
+		if (utils::shouldIgnoreLine(line)) { continue; }
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
