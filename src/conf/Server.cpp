@@ -208,6 +208,35 @@ bool Server::setReturn(std::string const &attribute, std::fstream &file) {
 	return true;
 }
 
+static bool isStatusCode(std::string const &str) {
+	if (str.size() != 3) { return false; }
+	for (std::string::const_iterator iter = str.begin(); iter != str.end(); ++iter) {
+		if (std::isdigit(*iter) == false) { return false; }
+	}
+	return true;
+}
+
+bool Server::setErrorPage(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	std::vector<std::string> statusCodes;
+	ss >> elem;
+	if (ss.eof() == true) { return false; }
+	elem.clear();
+	while (ss.eof() == false) {
+		ss >> elem;
+		if (isStatusCode(elem) == false) { break; }
+		statusCodes.push_back(elem);
+	}
+	if (ss.eof() == false) { return false; }
+	if (statusCodes.size() == 0) { return false; }
+	for (std::vector<std::string>::iterator iter = statusCodes.begin(); iter != statusCodes.end(); ++iter) {
+		this->_errorPages.insert(std::pair<std::string, std::string>(*iter, elem));
+	}
+	return true;
+}
+
 const std::string &Server::getReturn() const {
 	return this->_return;
 }

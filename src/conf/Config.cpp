@@ -13,7 +13,7 @@ std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Confi
 	srvSetterMap["cgi_extensions"] = &Server::setCgiExtensions;
 	srvSetterMap["return"] = &Server::setReturn;
 	// srvSetterMap["location"] = &Server::setLocation;
-	// srvSetterMap["error_page"] = &Server::setErrorPage;
+	srvSetterMap["error_page"] = &Server::setErrorPage;
 	return srvSetterMap;
 }
 
@@ -135,6 +135,9 @@ void Config::printServers() const {
 		}
 		std::clog << std::endl;
 		std::clog << "Return: " << iter->second.getReturn() << std::endl;
+		for (std::map<std::string, std::string>::const_iterator iter2 = iter->second.getErrorPages().begin(); iter2 != iter->second.getErrorPages().end(); ++iter2) {
+			std::clog << "Error page: [" << iter2->first << "] " << iter2->second << std::endl;
+		}
 		std::clog << "====================================" << std::endl;
 	}
 }

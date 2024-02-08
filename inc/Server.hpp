@@ -47,6 +47,7 @@ class Server {
 		bool setCgiExtensions(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getCgiExtensions() const;
 		bool setReturn(std::string const &attribute, std::fstream &file);
+		bool setErrorPage(std::string const &attribute, std::fstream &file);
 		const std::string &getReturn() const;
 		const std::map<std::string, Location> &getLocations() const;
 		const std::map<std::string, std::string> &getErrorPages() const;
