@@ -189,14 +189,33 @@ const std::vector<std::string> &Server::getCgiExtensions() const {
 	return this->_cgi_extensions;
 }
 
+bool Server::setReturn(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	ss >> elem;
+	if (ss.eof() == true) { return false; }
+	elem.clear();
+	ss >> elem;
+	if (ss.eof() == false) { return false; }
+	ss.str("");
+	ss.clear();
+	ss << elem;
+	std::string protocol;
+	std::getline(ss, protocol, ':');
+	if (protocol.compare("http") != 0 && protocol.compare("https") != 0) { return false ;}
+	this->_return = elem;
+	return true;
+}
+
+const std::string &Server::getReturn() const {
+	return this->_return;
+}
 
 const std::map<std::string, Location> &Server::getLocations() const {
 	return this->_locations;
 }
 
-const std::map<std::string, std::string> &Server::getReturns() const {
-	return this->_returns;
-}
 
 const std::map<std::string, std::string> &Server::getErrorPages() const {
 	return this->_errorPages;
