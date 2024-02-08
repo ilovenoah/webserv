@@ -4,17 +4,11 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include "AConfigurable.hpp"
 
-class Location {
+class Location : public AConfigurable {
 	private:
 		std::string _path;
-		std::vector<std::string> _allowMethods;
-		bool _autoindex;
-		std::vector<std::string> _index;
-		std::size_t _clientMaxBodySize;
-		std::vector<std::string> _cgi_extensions;
-		std::string _return;
-		std::map<std::string, std::string> _errorPages;
 		std::size_t _lineCount;
 
 	public:

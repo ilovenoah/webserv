@@ -2,27 +2,19 @@
 
 std::map<std::string, bool (Location::*)(std::string const&, std::fstream&)> Server::initSetterMap() {
 	std::map<std::string, bool (Location::*)(const std::string&, std::fstream&)> srvSetterMap;
-	// srvSetterMap["allow_methods"] = &Location::setAllowMethods;
-	// srvSetterMap["autoindex"] = &Location::setAutoIndex;
-	// srvSetterMap["index"] = &Location::setIndex;
-	// srvSetterMap["client_body_limit"] = &Location::setClientMaxBodySize;
-	// srvSetterMap["cgi_extensions"] = &Location::setCgiExtensions;
-	// srvSetterMap["return"] = &Location::setReturn;
-	// srvSetterMap["error_page"] = &Location::setErrorPages;
+	srvSetterMap["allow_methods"] = &Location::setAllowMethods;
+	srvSetterMap["autoindex"] = &Location::setAutoIndex;
+	srvSetterMap["index"] = &Location::setIndex;
+	srvSetterMap["client_body_limit"] = &Location::setClientMaxBodySize;
+	srvSetterMap["cgi_extensions"] = &Location::setCgiExtensions;
+	srvSetterMap["return"] = &Location::setReturn;
+	srvSetterMap["error_page"] = &Location::setErrorPages;
 	return srvSetterMap;
 }
 
 std::map<std::string, bool (Location::*)(std::string const&, std::fstream&)> Server::_setterMap = initSetterMap();
 
-static std::vector<std::string> initAllowedMethods() {
-    std::vector<std::string> methods;
-    methods.push_back("GET");
-    methods.push_back("POST");
-    methods.push_back("DELETE");
-    return methods;
-}
-
-Server::Server() : _servername(""), _ipAddr("0.0.0.0"), _port("8000"), _allowMethods(initAllowedMethods()), _autoindex(false), _clientMaxBodySize(ONEMEGA) {}
+Server::Server() : AConfigurable(), _servername(""), _ipAddr("0.0.0.0"), _port("8000") {}
 
 const std::string &Server::getServername() const {
 	return this->_servername;
@@ -103,158 +95,6 @@ const std::string &Server::getRoot() const {
 	return this->_root;
 }
 
-bool Server::setAllowMethods(std::string const &attribute, std::fstream &file) {
-	(void)file;
-	std::stringstream ss(attribute);
-	std::string elem;
-	ss >> elem;
-	if (ss.eof() == true) { return false; }
-	this->_allowMethods.clear();
-	while (ss.eof() == false) {
-		elem.clear();
-		ss >> elem;
-		if (elem != "GET" && elem != "POST" && elem != "DELETE") { return false; }
-		this->_allowMethods.push_back(elem);
-	}
-	return true;
-}
-
-const std::vector<std::string> &Server::getAllowMethods() const {
-	return this->_allowMethods;
-}
-bool Server::setAutoIndex(std::string const &attribute, std::fstream &file) {
-	(void)file;
-	std::stringstream ss(attribute);
-	std::string elem;
-	ss >> elem;
-	if (ss.eof() == true) { return false; }
-	elem.clear();
-	ss >> elem;
-	if (ss.eof() == false) { return false; }
-	if (elem == "on") {
-		this->_autoindex = true;
-	} else if (elem == "off") {
-		this->_autoindex = false;
-	} else {
-		return false;
-	}
-	return true;
-}
-
-const bool &Server::getAutoindex() const {
-	return this->_autoindex;
-}
-
-bool Server::setIndex(std::string const &attribute, std::fstream &file) {
-	(void)file;
-	std::stringstream ss(attribute);
-	std::string elem;
-	ss >> elem;
-	if (ss.eof() == true) { return false; }
-	while (ss.eof() == false) {
-		elem.clear();
-		ss >> elem;
-		this->_index.push_back(elem);
-	}
-	return true;
-}
-
-const std::vector<std::string> &Server::getIndex() const {
-	return this->_index;
-}
-
-bool Server::setClientMaxBodySize(std::string const &attribute, std::fstream &file) {
-	(void)file;
-	std::stringstream ss(attribute);
-	std::string elem;
-	ss >> elem;
-	if (ss.eof() == true) { return false; }
-	elem.clear();
-	ss >> elem;
-	if (ss.eof() == false) { return false; }
-	this->_clientMaxBodySize = utils::decStrToSizeT(elem);
-	return true;
-}
-
-const std::size_t &Server::getClientMaxBodySize() const {
-	return this->_clientMaxBodySize;
-}
-
-bool Server::setCgiExtensions(std::string const &attribute, std::fstream &file) {
-	(void)file;
-	std::stringstream ss(attribute);
-	std::string elem;
-	ss >> elem;
-	if (ss.eof() == true) { return false; }
-	this->_cgi_extensions.clear();
-	while (ss.eof() == false) {
-		elem.clear();
-		ss >> elem;
-		if (elem[0] != '.') { return false; };
-        for (size_t i = 1; i < elem.length(); ++i) {
-            if (!std::isalnum(elem[i])) { return false; }
-        }
-		this->_cgi_extensions.push_back(elem);
-	}
-	return true;
-}
-
-const std::vector<std::string> &Server::getCgiExtensions() const {
-	return this->_cgi_extensions;
-}
-
-bool Server::setReturn(std::string const &attribute, std::fstream &file) {
-	(void)file;
-	std::stringstream ss(attribute);
-	std::string elem;
-	ss >> elem;
-	if (ss.eof() == true) { return false; }
-	elem.clear();
-	ss >> elem;
-	if (ss.eof() == false) { return false; }
-	ss.str("");
-	ss.clear();
-	ss << elem;
-	std::string protocol;
-	std::getline(ss, protocol, ':');
-	if (protocol.compare("http") != 0 && protocol.compare("https") != 0) { return false ;}
-	this->_return = elem;
-	return true;
-}
-
-static bool isStatusCode(std::string const &str) {
-	if (str.size() != 3) { return false; }
-	for (std::string::const_iterator iter = str.begin(); iter != str.end(); ++iter) {
-		if (std::isdigit(*iter) == false) { return false; }
-	}
-	return true;
-}
-
-bool Server::setErrorPages(std::string const &attribute, std::fstream &file) {
-	(void)file;
-	std::stringstream ss(attribute);
-	std::string elem;
-	std::vector<std::string> statusCodes;
-	ss >> elem;
-	if (ss.eof() == true) { return false; }
-	elem.clear();
-	while (ss.eof() == false) {
-		ss >> elem;
-		if (isStatusCode(elem) == false) { break; }
-		statusCodes.push_back(elem);
-	}
-	if (ss.eof() == false) { return false; }
-	if (statusCodes.size() == 0) { return false; }
-	for (std::vector<std::string>::iterator iter = statusCodes.begin(); iter != statusCodes.end(); ++iter) {
-		this->_errorPages.insert(std::pair<std::string, std::string>(*iter, elem));
-	}
-	return true;
-}
-
-const std::string &Server::getReturn() const {
-	return this->_return;
-}
-
 bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 	std::string line;
 	Location location;
@@ -277,13 +117,9 @@ bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 		std::cerr << RED << "Webserv: Error: no location is defined." << RESET << std::endl;
 		return false;
 	}
+	return true;
 }
 
 const std::map<std::string, Location> &Server::getLocations() const {
 	return this->_locations;
-}
-
-
-const std::map<std::string, std::string> &Server::getErrorPages() const {
-	return this->_errorPages;
 }

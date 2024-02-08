@@ -4,26 +4,19 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "AConfigurable.hpp"
 #include "Location.hpp"
 #include "utils.hpp"
 
-#define ONEMEGA 1000000
 #define MIN_USERPORT 1024
 #define MAX_USERPORT 49151
 
-class Server {
+class Server : public AConfigurable {
 	private:
 		std::string _servername;
 		std::string _ipAddr;
 		std::string _port;
 		std::string _root;
-		std::vector<std::string> _allowMethods;
-		bool _autoindex;
-		std::vector<std::string> _index;
-		std::size_t _clientMaxBodySize;
-		std::vector<std::string> _cgi_extensions;
-		std::string _return;
-		std::map<std::string, std::string> _errorPages;
 		std::map<std::string, Location> _locations;
 		static std::map<std::string, bool (Location::*)(const std::string&, std::fstream&)> _setterMap;
 		static std::map<std::string, bool (Location::*)(const std::string&, std::fstream&)> initSetterMap();
@@ -38,22 +31,8 @@ class Server {
 		const std::string &getPort() const;
 		bool setRoot(std::string const &attribute, std::fstream &file);
 		const std::string &getRoot() const;
-		bool setAllowMethods(std::string const &attribute, std::fstream &file);
-		const std::vector<std::string> &getAllowMethods() const;
-		bool setAutoIndex(std::string const &attribute, std::fstream &file);
-		const bool &getAutoindex() const;
-		bool setIndex(std::string const &attribute, std::fstream &file);
-		const std::vector<std::string> &getIndex() const;
-		bool setClientMaxBodySize(std::string const &attribute, std::fstream &file);
-		const std::size_t &getClientMaxBodySize() const;
-		bool setCgiExtensions(std::string const &attribute, std::fstream &file);
-		const std::vector<std::string> &getCgiExtensions() const;
-		bool setReturn(std::string const &attribute, std::fstream &file);
-		bool setErrorPages(std::string const &attribute, std::fstream &file);
-		const std::string &getReturn() const;
 		bool setLocations(std::string const &attribute, std::fstream &file);
 		const std::map<std::string, Location> &getLocations() const;
-		const std::map<std::string, std::string> &getErrorPages() const;
 };
 
 #endif
