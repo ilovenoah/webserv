@@ -23,20 +23,20 @@ class AConfigurable {
 	public:
 		AConfigurable();
 		virtual ~AConfigurable() = 0;
-		virtual bool setAllowMethods(std::string const &attribute, std::fstream &file) = 0;
-		virtual const std::vector<std::string> &getAllowMethods() const = 0;
-		virtual bool setAutoIndex(std::string const &attribute, std::fstream &file) = 0;
-		virtual const bool &getAutoindex() const = 0;
-		virtual bool setIndex(std::string const &attribute, std::fstream &file) = 0;
-		virtual const std::vector<std::string> &getIndex() const = 0;
-		virtual bool setClientMaxBodySize(std::string const &attribute, std::fstream &file) = 0;
-		virtual const std::size_t &getClientMaxBodySize() const = 0;
-		virtual bool setCgiExtensions(std::string const &attribute, std::fstream &file) = 0;
-		virtual const std::vector<std::string> &getCgiExtensions() const = 0;
-		virtual bool setReturn(std::string const &attribute, std::fstream &file) = 0;
-		virtual bool setErrorPages(std::string const &attribute, std::fstream &file) = 0;
-		virtual const std::string &getReturn() const = 0;
-		virtual const std::map<std::string, std::string> &getErrorPages() const = 0;
+		bool setAllowMethods(std::string const &attribute, std::fstream &file);
+		const std::vector<std::string> &getAllowMethods() const;
+		bool setAutoIndex(std::string const &attribute, std::fstream &file);
+		const bool &getAutoindex() const;
+		bool setIndex(std::string const &attribute, std::fstream &file);
+		const std::vector<std::string> &getIndex() const;
+		bool setClientMaxBodySize(std::string const &attribute, std::fstream &file);
+		const std::size_t &getClientMaxBodySize() const;
+		bool setCgiExtensions(std::string const &attribute, std::fstream &file);
+		const std::vector<std::string> &getCgiExtensions() const;
+		bool setReturn(std::string const &attribute, std::fstream &file);
+		bool setErrorPages(std::string const &attribute, std::fstream &file);
+		const std::string &getReturn() const;
+		const std::map<std::string, std::string> &getErrorPages() const;
 };
 
 #endif
