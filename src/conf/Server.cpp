@@ -166,6 +166,29 @@ const std::size_t &Server::getClientMaxBodySize() const {
 	return this->_clientMaxBodySize;
 }
 
+bool Server::setCgiExtensions(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	ss >> elem;
+	if (ss.eof() == true) { return false; }
+	this->_cgi_extensions.clear();
+	while (ss.eof() == false) {
+		elem.clear();
+		ss >> elem;
+		if (elem[0] != '.') { return false; };
+        for (size_t i = 1; i < elem.length(); ++i) {
+            if (!std::isalnum(elem[i])) { return false; }
+        }
+		this->_cgi_extensions.push_back(elem);
+	}
+	return true;
+}
+
+const std::vector<std::string> &Server::getCgiExtensions() const {
+	return this->_cgi_extensions;
+}
+
 
 const std::map<std::string, Location> &Server::getLocations() const {
 	return this->_locations;
