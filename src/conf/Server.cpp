@@ -113,10 +113,7 @@ bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 		if (line.size() != 0) { line = line.substr(0, line.size() - 2); }
 		if ((location.*(iter->second))(line, file) == false) { /* errorhandling; */ }
 	}
-	if (this->_locations.size() == 0) {
-		std::cerr << RED << "Webserv: Error: no location is defined." << RESET << std::endl;
-		return false;
-	}
+	this->_locations.insert(std::pair<std::string, Location>(location.getLocationPath(), location));
 	return true;
 }
 
