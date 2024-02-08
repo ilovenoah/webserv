@@ -1,5 +1,4 @@
 #include "Config.hpp"
-#include "utils.hpp"
 
 std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Config::initSetterMap() {
 	std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> srvSetterMap;
