@@ -19,7 +19,7 @@ class Server {
 		std::string _root;
 		std::vector<std::string> _allowMethods;
 		bool _autoindex;
-		std::string _index;
+		std::vector<std::string> _index;
 		std::size_t _clientMaxBodySize;
 		std::vector<std::string> _cgi_extensions;
 		std::map<std::string, Location> _locations;
@@ -28,23 +28,22 @@ class Server {
 
 	public:
 		Server();
-		const std::string &getServername() const;
 		bool setServername(std::string const &attribute, std::fstream &file);
+		const std::string &getServername() const;
 		bool setListen(std::string const &attribute, std::fstream &file);
 		std::string getListen() const;
 		const std::string &getIpaddr() const;
-		bool setIpaddr(std::string const &ipaddr);
 		const std::string &getPort() const;
-		bool setPort(std::string const &port);
 		bool setRoot(std::string const &attribute, std::fstream &file);
 		const std::string &getRoot() const;
+		bool setAllowMethods(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getAllowMethods() const;
+		bool setAutoindex(std::string const &attribute, std::fstream &file);
 		const bool &getAutoindex() const;
-		bool setAutoindex(bool const &autoindex);
-		const std::string &getIndex() const;
-		bool setIndex(std::string const &index);
+		bool setIndex(std::string const &attribute, std::fstream &file);
+		const std::vector<std::string> &getIndex() const;
+		bool setClientMaxBodySize(std::string const &attribute, std::fstream &file);
 		const std::size_t &getClientMaxBodySize() const;
-		bool setClientMaxBodySize(std::size_t const &clientMaxBodySize);
 		const std::map<std::string, Location> &getLocations() const;
 		const std::map<std::string, std::string> &getReturns() const;
 		const std::map<std::string, std::string> &getErrorPages() const;
