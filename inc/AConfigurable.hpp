@@ -8,6 +8,8 @@
 #include <sstream>
 #include "utils.hpp"
 
+#define ONEMEGA 1000000
+
 class AConfigurable {
 	private:
 		std::vector<std::string> _allowMethods;
@@ -19,6 +21,7 @@ class AConfigurable {
 		std::map<std::string, std::string> _errorPages;
 
 	public:
+		AConfigurable();
 		virtual ~AConfigurable() = 0;
 		virtual bool setAllowMethods(std::string const &attribute, std::fstream &file) = 0;
 		virtual const std::vector<std::string> &getAllowMethods() const = 0;

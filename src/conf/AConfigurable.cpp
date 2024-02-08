@@ -1,5 +1,15 @@
 #include "AConfigurable.hpp"
 
+static std::vector<std::string> initAllowedMethods() {
+    std::vector<std::string> methods;
+    methods.push_back("GET");
+    methods.push_back("POST");
+    methods.push_back("DELETE");
+    return methods;
+}
+
+AConfigurable::AConfigurable() : _allowMethods(initAllowedMethods()), _autoindex(false), _clientMaxBodySize(ONEMEGA) {}
+
 AConfigurable::~AConfigurable() {}
 
 bool AConfigurable::setAllowMethods(std::string const &attribute, std::fstream &file) {
