@@ -1,5 +1,19 @@
 #include "Server.hpp"
 
+std::map<std::string, bool (Location::*)(std::string const&, std::fstream&)> Server::initSetterMap() {
+	std::map<std::string, bool (Location::*)(const std::string&, std::fstream&)> srvSetterMap;
+	// srvSetterMap["allow_methods"] = &Location::setAllowMethods;
+	// srvSetterMap["autoindex"] = &Location::setAutoIndex;
+	// srvSetterMap["index"] = &Location::setIndex;
+	// srvSetterMap["client_body_limit"] = &Location::setClientMaxBodySize;
+	// srvSetterMap["cgi_extensions"] = &Location::setCgiExtensions;
+	// srvSetterMap["return"] = &Location::setReturn;
+	// srvSetterMap["error_page"] = &Location::setErrorPages;
+	return srvSetterMap;
+}
+
+std::map<std::string, bool (Location::*)(std::string const&, std::fstream&)> Server::_setterMap = initSetterMap();
+
 static std::vector<std::string> initAllowedMethods() {
     std::vector<std::string> methods;
     methods.push_back("GET");
@@ -239,6 +253,30 @@ bool Server::setErrorPages(std::string const &attribute, std::fstream &file) {
 
 const std::string &Server::getReturn() const {
 	return this->_return;
+}
+
+bool Server::setLocations(std::string const &attribute, std::fstream &file) {
+	std::string line;
+	Location location;
+
+	if (location.setLocationPath(attribute) == false) { /* errorhandling; */ }
+	while (std::getline(file, line)) {
+		// lineCount++;
+		if (utils::shouldIgnoreLine(line)) { continue; }
+		std::stringstream ss(line);
+		std::string elem;
+		ss >> elem;
+		if (elem.compare("}") == 0) { break; }
+		std::map<std::string, bool (Location::*)(std::string const&, std::fstream&)>::iterator iter = this->_setterMap.find(elem);
+		if (iter == this->_setterMap.end()) { continue; }
+		if (line[line.size() - 1] != ';') { /* errorhandling; */ }
+		if (line.size() != 0) { line = line.substr(0, line.size() - 2); }
+		if ((location.*(iter->second))(line, file) == false) { /* errorhandling; */ }
+	}
+	if (this->_locations.size() == 0) {
+		std::cerr << RED << "Webserv: Error: no location is defined." << RESET << std::endl;
+		return false;
+	}
 }
 
 const std::map<std::string, Location> &Server::getLocations() const {
