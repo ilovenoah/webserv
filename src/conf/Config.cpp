@@ -10,7 +10,7 @@ std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Confi
 	srvSetterMap["autoindex"] = &Server::setAutoIndex;
 	srvSetterMap["index"] = &Server::setIndex;
 	srvSetterMap["client_body_limit"] = &Server::setClientMaxBodySize;
-	// srvSetterMap["cgi_info"] = &Server::setCgiInfo;
+	srvSetterMap["cgi_extensions"] = &Server::setCgiExtensions;
 	// srvSetterMap["return"] = &Server::setReturn;
 	// srvSetterMap["location"] = &Server::setLocation;
 	// srvSetterMap["error_page"] = &Server::setErrorPage;
@@ -129,6 +129,11 @@ void Config::printServers() const {
 		std::clog << std::endl;
 		std::clog << "Autoindex: " << iter->second.getAutoindex() << std::endl;
 		std::clog << "Client max body size: " << iter->second.getClientMaxBodySize() << std::endl;
+		std::clog << "Cgi extensions: ";
+		for (std::vector<std::string>::const_iterator iter2 = iter->second.getCgiExtensions().begin(); iter2 != iter->second.getCgiExtensions().end(); ++iter2) {
+			std::clog << *iter2 << " ";
+		}
+		std::clog << std::endl;
 		std::clog << "====================================" << std::endl;
 	}
 }
