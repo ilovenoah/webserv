@@ -5,7 +5,6 @@ bool Location::setLocationPath(std::string const &attribute) {
 	std::string elem;
 
 	ss >> elem;
-	// if (ss.eof() == true) { return false; }
 	elem.clear();
 	ss >> elem;
 	ss >> std::ws;
