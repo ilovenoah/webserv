@@ -2,6 +2,7 @@
 
 Location::Location() : AConfigurable() {
 	this->_allowMethods.clear();
+	this->_autoindex = AConfigurable::UNDEFINED;
 	this->_index.clear();
 	this->_clientMaxBodySize = -1;
 	this->_cgi_extensions.clear();
