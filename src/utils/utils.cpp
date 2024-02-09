@@ -51,4 +51,11 @@ namespace utils {
 		}
 		return false;
 	}
+
+	bool isNumber(std::string const &str) {
+		for (std::string::const_iterator iter = str.begin(); iter != str.end(); ++iter) {
+			if (std::isdigit(*iter) == false) { return false; }
+		}
+		return true;
+	}
 }

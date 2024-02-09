@@ -14,6 +14,7 @@ namespace utils {
     bool findCRLF(std::stringstream &stream);
     bool shouldIgnoreLine(std::string const &line);
     bool rmCR(std::string &line);
+	bool isNumber(std::string const &str);
 }  // namespace utils
 
 #endif
