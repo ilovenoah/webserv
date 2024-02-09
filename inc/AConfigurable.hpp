@@ -6,6 +6,7 @@
 #include <map>
 #include <fstream>
 #include <sstream>
+#include <limits.h>
 #include "utils.hpp"
 
 #define ONEMEGA 1000000

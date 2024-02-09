@@ -82,6 +82,7 @@ bool AConfigurable::setClientMaxBodySize(std::string const &attribute, std::fstr
 	ss >> elem;
 	if (ss.peek() != EOF) { return false; }
 	this->_clientMaxBodySize = utils::decStrToSizeT(elem);
+	if (this->_clientMaxBodySize > INT_MAX) { return false; }
 	return true;
 }
 
