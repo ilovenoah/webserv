@@ -140,9 +140,7 @@ bool AConfigurable::setReturn(std::string const &attribute, std::fstream &file) 
 
 static bool isStatusCode(std::string const &str) {
 	if (str.size() != 3) { return false; }
-	for (std::string::const_iterator iter = str.begin(); iter != str.end(); ++iter) {
-		if (std::isdigit(*iter) == false) { return false; }
-	}
+	if (utils::isNumber(str) == false) { return false; }
 	return true;
 }
 
