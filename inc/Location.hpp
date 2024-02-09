@@ -12,6 +12,7 @@ class Location : public AConfigurable {
 		std::size_t _lineCount;
 
 	public:
+		Location();
 		bool setLocationPath(std::string const &attribute);
 		const std::string &getLocationPath() const;
 };

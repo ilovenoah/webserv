@@ -1,5 +1,14 @@
 #include "Location.hpp"
 
+Location::Location() : AConfigurable() {
+	this->_allowMethods.clear();
+	this->_index.clear();
+	this->_clientMaxBodySize = -1;
+	this->_cgi_extensions.clear();
+	this->_return.clear();
+	this->_errorPages.clear();
+}
+
 bool Location::setLocationPath(std::string const &attribute) {
 	std::stringstream ss(attribute);
 	std::string elem;

@@ -91,7 +91,7 @@ bool AConfigurable::setClientMaxBodySize(std::string const &attribute, std::fstr
 	return true;
 }
 
-const std::size_t &AConfigurable::getClientMaxBodySize() const {
+const ssize_t &AConfigurable::getClientMaxBodySize() const {
 	return this->_clientMaxBodySize;
 }
 
