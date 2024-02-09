@@ -1,5 +1,5 @@
 CXX			=	c++
-CXXFLAGS	=	-Wall -Werror -Wextra -std=c++98
+CXXFLAGS	=	-Wall -Werror -Wextra -std=c++98 -MMD -MP
 RM			=	rm -rf
 AR			=	ar rcs
 NAME		=	webserv
@@ -17,7 +17,7 @@ REQU_DIR	=	request/
 RESP_DIR	=	response/
 
 MAIN_NAME	=	main.cpp
-CONF_NAME	=	Config.cpp Location.cpp Server.cpp
+CONF_NAME	=	Config.cpp Server.cpp AConfigurable.cpp Location.cpp
 SOCK_NAME	=	ServerSocket.cpp ClientSocket.cpp
 UTILS_NAME	=	Error.cpp utils.cpp CaseInsensitiveCompare.cpp
 LOOP_NAME	=	loop.cpp
@@ -32,6 +32,7 @@ OBJ_NAME	+=	$(addprefix $(SOCK_DIR), $(SOCK_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(REQU_DIR), $(REQU_NAME:.cpp=.o))
 OBJ_NAME	+=	$(addprefix $(RESP_DIR), $(RESP_NAME:.cpp=.o))
 OBJ			=	$(addprefix $(OBJ_DIR), $(OBJ_NAME))
+DEPS		=	$(OBJ:.o=.d)
 
 ifeq ($(UNAME_OS), Linux)
 CXXFLAGS 			+= -D_LINUX
@@ -52,7 +53,7 @@ $(NAME): $(OBJ)
 	@echo "##### $@ compiling finished! #####"
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
-	@$(CXX) $(CXXFLAGS) $(INC) -o $@ -c $^
+	@$(CXX) $(CXXFLAGS) $(INC) -o $@ -c $<
 	@echo "##### Creating" [ $@ ] " #####"
 
 mkdir:
@@ -81,6 +82,7 @@ mkdir:
 		echo "##### Creating $(OBJ_DIR)$(RESP_DIR) directory #####"; \
 	fi
 
+-include $(DEPS)
 
 clean:
 	@$(RM) $(OBJ_DIR)
@@ -93,5 +95,6 @@ fclean: clean
 re: fclean all
 
 debug: all
+
 
 .PHONY: all mkdir clean fclean re

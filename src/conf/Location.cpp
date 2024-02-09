@@ -1,55 +1,44 @@
 #include "Location.hpp"
 
-#include <map>
-
-std::map<std::string, void (Location::*)(const std::string &)>
-	Location::_locSetterMap;
-
-Location::Location() {
-	_locSetterMap["location"] = &Location::setLocation;
-	_locSetterMap["allow_methods"] = &Location::setAllowMethods;
-	_locSetterMap["root"] = &Location::setRoot;
-	_locSetterMap["index"] = &Location::setIndex;
-	_locSetterMap["cgi_info"] = &Location::setCgiInfo;
+Location::Location() : AConfigurable() {
+	this->_allowMethods.clear();
+	this->_autoindex = AConfigurable::UNDEFINED;
+	this->_index.clear();
+	this->_clientMaxBodySize = -1;
+	this->_cgi_extensions.clear();
+	this->_return.clear();
+	this->_errorPages.clear();
 }
 
-Location::~Location() {}
+bool Location::setLocationPath(std::string const &attribute) {
+	std::stringstream ss(attribute);
+	std::string elem;
 
-Location::Location(const Location &copy) { *this = copy; }
-
-Location &Location::operator=(const Location &copy) {
-	if (this != &copy) {
-		_location = copy._location;
-		_allowMethods = copy._allowMethods;
-		_root = copy._root;
-		_index = copy._index;
-		_cgiInfo = copy._cgiInfo;
-	}
-	return *this;
+	ss >> elem;
+	elem.clear();
+	ss >> elem;
+	ss >> std::ws;
+	if (elem.empty() == true) { return false; }
+	this->_path = elem;
+	elem.clear();
+	ss >> elem;
+	ss >> std::ws;
+	if (elem.empty() == true) { return false; }
+	if (elem.compare("{") != 0) { return false; }
+	if (ss.peek() != EOF) { return false; }
+	return true;
 }
 
-void Location::setLocation(const std::string &values) { _location = values; }
-
-void Location::setAllowMethods(const std::string &values) {
-	_allowMethods = values;
+const std::string &Location::getLocationPath() const {
+	return this->_path;
 }
 
-void Location::setRoot(const std::string &values) { _root = values; }
-
-void Location::setIndex(const std::string &values) { _index = values; }
-
-void Location::setCgiInfo(const std::string &values) { _cgiInfo = values; }
-
-const std::string &Location::getLocation() const { return _location; }
-
-const std::string &Location::getAllowMethods() const { return _allowMethods; }
-
-const std::string &Location::getRoot() const { return _root; }
-
-const std::string &Location::getIndex() const { return _index; }
-
-const std::string &Location::getCgiInfo() const { return _cgiInfo; }
-
-void Location::execSetterMap(std::string &keys, std::string &value) {
-	(this->*_locSetterMap[keys])(value);
+void Location::fillLocationDirectives(Server const &server) {
+	if (this->_allowMethods.size() == 0) { this->_allowMethods = server.getAllowMethods() ; }
+	if (this->_autoindex == AConfigurable::UNDEFINED ) { this->_autoindex = server.getAutoindex(); }
+	if (this->_index.size() == 0) { this->_index = server.getIndex(); }
+	if (this->_clientMaxBodySize == -1) { this->_clientMaxBodySize = server.getClientMaxBodySize(); }
+	if (this->_cgi_extensions.size() == 0) { this->_cgi_extensions = server.getCgiExtensions(); }
+	if (this->_return.empty() == true) { this->_return = server.getReturn(); }
+	if (this->_errorPages.size() == 0) { this->_errorPages = server.getErrorPages(); }
 }

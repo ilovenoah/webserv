@@ -1,119 +1,173 @@
 #include "Config.hpp"
 
-#include <iostream>
+std::size_t Config::lineCount = 0;
 
-Config::Config() { _bracket_count = 0; }
-
-Config::~Config() {}
-
-Config::Config(const Config &copy) { *this = copy; }
-
-Config &Config::operator=(const Config &copy) {
-	if (this != &copy) {
-		_servers = copy._servers;
-	}
-	return *this;
+std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Config::initSetterMap() {
+	std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> srvSetterMap;
+	srvSetterMap["server_name"] = &Server::setServername;
+	srvSetterMap["listen"] = &Server::setListen;
+	srvSetterMap["root"] = &Server::setRoot;
+	srvSetterMap["allow_methods"] = &Server::setAllowMethods;
+	srvSetterMap["autoindex"] = &Server::setAutoIndex;
+	srvSetterMap["index"] = &Server::setIndex;
+	srvSetterMap["client_body_limit"] = &Server::setClientMaxBodySize;
+	srvSetterMap["cgi_extensions"] = &Server::setCgiExtensions;
+	srvSetterMap["return"] = &Server::setReturn;
+	srvSetterMap["error_page"] = &Server::setErrorPages;
+	srvSetterMap["location"] = &Server::setLocations;
+	return srvSetterMap;
 }
 
-void Config::setServers(int argc, const char *argv[]) {
-	parseConfig(argc, argv);
+std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Config::_setterMap = initSetterMap();
+
+bool Config::open(char const *path) {
+	struct stat statbuf;
+	
+	if (stat(path, &statbuf) != 0) {
+		utils::putSysError("stat");
+		return false;
+	}
+	if (S_ISDIR(statbuf.st_mode) == true) {
+		std::cerr << RED << "Webserv: Error: a file path is directory." << RESET << std::endl;
+		return false;
+	}
+	this->_file.open(path, std::ios::in);
+	if (this->_file.fail()) { 
+		utils::putSysError("open");
+		return false;
+	}
+	return true;
 }
 
-void Config::setFilePath(std::string file_path) { _filePath = file_path; }
-
-const std::vector<Server> &Config::getServers() const { return _servers; }
-
-const std::string &Config::getFilePath() const { return _filePath; }
-
-void Config::removeUnwanted(std::string &line) {
-	std::string toRemove = "\r\t{};";
-
-	for (std::string::size_type i = 0; i < toRemove.length(); ++i) {
-		line.erase(std::remove(line.begin(), line.end(), toRemove[i]),
-				   line.end());
+bool Config::close() {
+	this->_file.clear();
+	this->_file.close();
+	if (this->_file.fail()) {
+		utils::putSysError("close");
+		return false;
 	}
-
-	std::size_t first = line.find_first_not_of(" ");
-	std::size_t last = line.find_last_not_of(" ");
-
-	if (first == std::string::npos || last == std::string::npos) {
-		line.clear();
-	} else {
-		line = line.substr(first, (last - first + 1));
-	}
+	return true;
 }
 
-void Config::removeComments(std::string &line) {
-	std::size_t pos;
-
-	if ((pos = line.find('#')) != std::string::npos) {
-		line.erase(pos);
-	}
-}
-
-void Config::parseLine(std::string &line) {
-	std::size_t pos;
-	std::string key;
-	std::string value;
-
-	if ((pos = line.find("server")) != std::string::npos) {
-		_servers.push_back(Server());
-	} else {
-		key = line.substr(0, line.find(' '));
-		value = line.substr(line.find(' ') + 1);
-		_servers.back().execSetterMap(key, value, _fileStream);
-	}
-}
-
-void Config::parseFile() {
+Server Config::_createServerInstance(std::fstream &file) {
 	std::string line;
+	Server server;
+	bool bracketFlag = false;
 
-	while (std::getline(_fileStream, line)) {
-		if (line.find('{') != std::string::npos) {
-			_bracket_count++;
-		} else if (line.find('}') != std::string::npos) {
-			_bracket_count--;
+	while (std::getline(file, line)) {
+		Config::lineCount++;
+		if (utils::shouldIgnoreLine(line)) { continue; }
+		utils::rmCR(line);
+		std::stringstream ss(line);
+		std::string elem;
+		ss >> elem;
+		if (elem.compare("}") == 0) {  bracketFlag = true; break; }
+		std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)>::iterator iter = this->_setterMap.find(elem);
+		if (iter == this->_setterMap.end()) { throw std::runtime_error(INVALID_ITEM); }
+		if (iter->first.compare("location") != 0 && line[line.size() - 1] != ';') {
+			throw std::runtime_error(SYNTAX_ERROR); 
 		}
-		removeUnwanted(line);
-		removeComments(line);
-		if (line.empty()) {
-			continue;
-		}
-		parseLine(line);
+		if (iter->first.compare("location") != 0 && line.size() != 0) { line = line.substr(0, line.size() - 1); }
+		if ((server.*(iter->second))(line, file) == false) { throw std::runtime_error(SYNTAX_ERROR); }
 	}
-	if (_bracket_count != 0) {
-		throw GenericException(CONFIG_ERROR);
-	}
+	if (bracketFlag == false) { throw std::runtime_error(SYNTAX_ERROR); }
+	server.fillLocationDirectives();
+	return server;
 }
 
-void Config::readFile() {
-	_fileStream.open(_filePath.c_str());
-
+bool Config::load() {
+	std::string line;
 	try {
-		if (_fileStream.fail()) {
-			throw GenericException(FAIL_OPEN);
+		while (std::getline(this->_file, line)) {
+			Config::lineCount++;
+			if (utils::shouldIgnoreLine(line)) { continue; }
+			utils::rmCR(line);
+			std::stringstream ss(line);
+			std::string elem;
+			ss >> elem;
+			char bracket('\0');
+			ss >> bracket;
+			ss >> std::ws;
+			if (bracket != '{' || ss.peek() != EOF) {
+				throw std::runtime_error(SYNTAX_ERROR);	
+			}
+			if (elem.compare("server") == 0 && bracket == '{') {
+				Server server = this->_createServerInstance(this->_file);
+				if (this->_servers.count(server.getServername()) > 0) {
+					throw std::runtime_error(DUPULICATE_SERVER);
+				}
+				this->_servers.insert(std::pair<std::string, Server>(server.getServername(), server));
+			}
 		}
-		parseFile();
-	} catch (GenericException &e) {
-		std::cerr << e.what() << std::endl;
-		exit(1);
+		if (this->_servers.size() == 0) {
+			throw std::runtime_error(NO_SERVER);
+		}
+	} catch (std::exception &e) {
+		std::cerr << RED << "Webserv: " << "Line " << Config::lineCount << ": Error: " << e.what() << RESET << std::endl;
+		return false;
+	}
+	return true;
+}
+
+void Config::printServers() const {
+	for (std::map<std::string, Server>::const_iterator iter = this->_servers.begin(); iter != this->_servers.end(); ++iter) {
+		std::clog << "====================================" << std::endl;
+		std::clog << "Server name: " << iter->second.getServername() << std::endl;
+		std::clog << "Listen: " << iter->second.getListen() << std::endl;
+		std::clog << "Root: " << iter->second.getRoot() << std::endl;
+		std::clog << "Allow methods: ";
+ 		for (std::vector<std::string>::const_iterator iter2 = iter->second.getAllowMethods().begin(); iter2 != iter->second.getAllowMethods().end(); ++iter2) {
+			std::clog << *iter2 << " ";
+		}
+		std::clog << std::endl;	
+		std::clog << "Index: ";
+		for (std::vector<std::string>::const_iterator iter2 = iter->second.getIndex().begin(); iter2 != iter->second.getIndex().end(); ++iter2) {
+			std::clog << *iter2 << " ";
+		}
+		std::clog << std::endl;
+		std::clog << "Autoindex: " << iter->second.getAutoindex() << std::endl;
+		std::clog << "Client max body size: " << iter->second.getClientMaxBodySize() << std::endl;
+		std::clog << "Cgi extensions: ";
+		for (std::vector<std::string>::const_iterator iter2 = iter->second.getCgiExtensions().begin(); iter2 != iter->second.getCgiExtensions().end(); ++iter2) {
+			std::clog << *iter2 << " ";
+		}
+		std::clog << std::endl;
+		std::clog << "Return: " << iter->second.getReturn() << std::endl;
+		for (std::map<std::string, std::string>::const_iterator iter2 = iter->second.getErrorPages().begin(); iter2 != iter->second.getErrorPages().end(); ++iter2) {
+			std::clog << "Error page: [" << iter2->first << "] " << iter2->second << std::endl;
+		}
+		for (std::map<std::string, Location>::const_iterator iter2 = iter->second.getLocations().begin(); iter2 != iter->second.getLocations().end(); ++iter2) {
+			std::clog << "Location: " << iter2->second.getLocationPath() << std::endl;
+			std::clog << "	Allow methods: ";
+			for (std::vector<std::string>::const_iterator iter3 = iter2->second.getAllowMethods().begin(); iter3 != iter2->second.getAllowMethods().end(); ++iter3) {
+				std::clog << *iter3 << " ";
+			}
+			std::clog << std::endl;
+			std::clog << "	Index: ";
+			for (std::vector<std::string>::const_iterator iter3 = iter2->second.getIndex().begin(); iter3 != iter2->second.getIndex().end(); ++iter3) {
+				std::clog << *iter3 << " ";
+			}
+			std::clog << std::endl;
+			std::clog << "	Autoindex: " << iter2->second.getAutoindex() << std::endl;
+			std::clog << "	Client max body size: " << iter2->second.getClientMaxBodySize() << std::endl;
+			std::clog << "	Cgi extensions: ";
+			for (std::vector<std::string>::const_iterator iter3 = iter2->second.getCgiExtensions().begin(); iter3 != iter2->second.getCgiExtensions().end(); ++iter3) {
+				std::clog << *iter3 << " ";
+			}
+			std::clog << std::endl;
+			std::clog << "	Return: " << iter2->second.getReturn() << std::endl;
+			for (std::map<std::string, std::string>::const_iterator iter3 = iter2->second.getErrorPages().begin(); iter3 != iter2->second.getErrorPages().end(); ++iter3) {
+				std::clog << "	Error page: [" << iter3->first << "] " << iter3->second << std::endl;
+			}
+		}
+		std::clog << "====================================" << std::endl;
 	}
 }
 
-void Config::parseConfig(int argc, const char *argv[]) {
-	std::string file_path = DEFAULT_CONF;
+// int main(int argc, char *argv[]) {
+// 	Config test;
 
-	try {
-		if (argc > 2) {
-			throw GenericException(ARGS_ERROR);
-		}
-		if (argv[1]) {
-			file_path = std::string(argv[1]);
-		}
-		setFilePath(file_path);
-		readFile();
-	} catch (const std::exception &e) {
-		std::cerr << e.what() << std::endl;
-		exit(1);
-	}
-}
+// 	test.open(argv[1]);
+// 	test.load();
+// 	test.close();
+// }

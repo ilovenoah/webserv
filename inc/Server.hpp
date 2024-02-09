@@ -1,67 +1,42 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <limits.h>
-
+#include <vector>
+#include <string>
+#include <map>
+#include "AConfigurable.hpp"
 #include "Location.hpp"
-#include "env.hpp"
+#include "utils.hpp"
+#include "Config.hpp"
 
-class Server {
+#define MIN_USERPORT 1024
+#define MAX_USERPORT 49151
+
+class Location;
+
+class Server : public AConfigurable {
 	private:
-		std::string _server_name;
-		std::string _ip_address;
+		std::string _servername;
+		std::string _ipAddr;
 		std::string _port;
 		std::string _root;
-		std::string _allow_methods;
-		std::string _autoindex;
-		std::string _index;
-		std::string _client_body_limit;
-		std::string _cgi_info;
-		std::vector<Location> _location;
-		std::map<std::string, std::string> _error_page;
-		std::map<std::string, std::string> _return;
-
-		static std::map<std::string,
-						void (Server::*)(const std::string &, std::ifstream &)>
-			_srvSetterMap;
+		std::map<std::string, Location> _locations;
+		static std::map<std::string, bool (Location::*)(const std::string&, std::fstream&)> _setterMap;
+		static std::map<std::string, bool (Location::*)(const std::string&, std::fstream&)> initSetterMap();
 
 	public:
 		Server();
-		~Server();
-		Server(const Server &copy);
-		Server &operator=(const Server &copy);
-
-		void setServerName(const std::string &values,
-						   std::ifstream &fileStream);
-		void setListen(const std::string &values, std::ifstream &fileStream);
-		void setRoot(const std::string &values, std::ifstream &fileStream);
-		void setAllowMethods(const std::string &values,
-							 std::ifstream &fileStream);
-		void setAutoIndex(const std::string &values, std::ifstream &fileStream);
-		void setIndex(const std::string &values, std::ifstream &fileStream);
-		void setClientBodyLimit(const std::string &values,
-								std::ifstream &fileStream);
-		void setCgiInfo(const std::string &values, std::ifstream &fileStream);
-		void setLocation(const std::string &values, std::ifstream &fileStream);
-		void setErrorPage(const std::string &values, std::ifstream &fileStream);
-		void setReturn(const std::string &values, std::ifstream &fileStream);
-
-		const std::string &getServerName() const;
-		const std::string &getIpAddress() const;
-		const std::string &getPort() const;
+		bool setServername(std::string const &attribute, std::fstream &file);
+		const std::string &getServername() const;
+		bool setListen(std::string const &attribute, std::fstream &file);
 		std::string getListen() const;
+		const std::string &getIpaddr() const;
+		const std::string &getPort() const;
+		bool setRoot(std::string const &attribute, std::fstream &file);
 		const std::string &getRoot() const;
-		const std::string &getAllowMethods() const;
-		const std::string &getAutoIndex() const;
-		const std::string &getIndex() const;
-		const std::string &getClientBodyLimit() const;
-		const std::string &getCgiInfo() const;
-		const std::vector<Location> &getLocation() const;
-		const std::map<std::string, std::string> &getErrorPage() const;
-		const std::map<std::string, std::string> &getReturn() const;
-
-		void execSetterMap(std::string &keys, std::string &value,
-						   std::ifstream &fileStream);
+		bool setLocations(std::string const &attribute, std::fstream &file);
+		const std::map<std::string, Location> &getLocations() const;
+		void fillLocationDirectives();
 };
 
 #endif

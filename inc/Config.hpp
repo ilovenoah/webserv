@@ -1,38 +1,32 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <map>
+#include <sys/stat.h>
 #include "Server.hpp"
-#include "env.hpp"
+#include "utils.hpp"
+#include "errormsg.hpp"
 
-#define DEFAULT_CONF "conf/sample.conf"
+class Server;
 
 class Config {
 	private:
-		std::vector<Server> _servers;
-		std::string _filePath;
-
-		int _bracket_count;
+		std::fstream _file;
+		std::map<std::string, Server> _servers;
+		Server _createServerInstance(std::fstream &file);
+		static std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> _setterMap;
+		static std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> initSetterMap();
 
 	public:
-		Config();
-		~Config();
-		Config(const Config &copy);
-		Config &operator=(const Config &copy);
-
-		std::ifstream _fileStream;
-
-		void setServers(int argc, const char *argv[]);
-		void setFilePath(std::string file_path);
-
-		const std::vector<Server> &getServers() const;
-		const std::string &getFilePath() const;
-
-		void parseConfig(int argc, const char *argv[]);
-		void readFile();
-		void parseFile();
-		void parseLine(std::string &line);
-		void removeUnwanted(std::string &line);
-		void removeComments(std::string &line);
+		static std::size_t lineCount;
+		bool open(char const *path);
+		bool close();
+		bool load();
+		void printServers() const;
 };
+
 
 #endif
