@@ -101,7 +101,7 @@ bool Config::load() {
 			throw std::runtime_error(NO_SERVER);
 		}
 	} catch (std::exception &e) {
-		std::cerr << RED << "Webserv:" << Config::lineCount << " Error: " << e.what() << RESET << std::endl;
+		std::cerr << RED << "Webserv: " << "Line " << Config::lineCount << ": Error: " << e.what() << RESET << std::endl;
 		return false;
 	}
 	return true;
