@@ -1,11 +1,12 @@
 #ifndef LOCATION_HPP
 #define LOCATION_HPP
 
-#include <string>
 #include <fstream>
 #include <sstream>
-#include "Server.hpp"
+#include <string>
+
 #include "AConfigurable.hpp"
+#include "Server.hpp"
 
 class Server;
 

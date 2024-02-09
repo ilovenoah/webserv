@@ -1,13 +1,14 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
+
 #include "AConfigurable.hpp"
+#include "Config.hpp"
 #include "Location.hpp"
 #include "utils.hpp"
-#include "Config.hpp"
 
 #define MIN_USERPORT 1024
 #define MAX_USERPORT 49151
@@ -21,8 +22,12 @@ class Server : public AConfigurable {
 		std::string _port;
 		std::string _root;
 		std::map<std::string, Location> _locations;
-		static std::map<std::string, bool (Location::*)(const std::string&, std::fstream&)> _setterMap;
-		static std::map<std::string, bool (Location::*)(const std::string&, std::fstream&)> initSetterMap();
+		static std::map<std::string,
+						bool (Location::*)(const std::string &, std::fstream &)>
+			_setterMap;
+		static std::map<std::string,
+						bool (Location::*)(const std::string &, std::fstream &)>
+		initSetterMap();
 
 	public:
 		Server();
