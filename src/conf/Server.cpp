@@ -56,13 +56,14 @@ bool Server::setListen(std::string const &attribute, std::fstream &file) {
 	std::getline(ss, ipAddr, ':');
 	if (ss.peek() == EOF) {
 		this->_port = ipAddr;
-		if (isPortOutOfRange(port) == true) { return false; }
+		if (isPortOutOfRange(this->_port) == true) { throw std::runtime_error(INVALID_PORT); }
 		return true;
 	}
 	if (isPortOutOfRange(port) == true) { return false; }
 	std::getline(ss, port);
 	this->_ipAddr = ipAddr;
 	this->_port = port;
+	if (isPortOutOfRange(this->_port) == true) { throw std::runtime_error(INVALID_PORT); }
 	return true;
 }
 
