@@ -1,24 +1,23 @@
 #ifndef CONFIGURABLE_HPP
 #define CONFIGURABLE_HPP
 
-#include <vector>
-#include <string>
-#include <map>
-#include <fstream>
-#include <sstream>
 #include <limits.h>
-#include "utils.hpp"
+
+#include <fstream>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include "errormsg.hpp"
+#include "utils.hpp"
 
 #define ONEMEGA 1000000
 
 class AConfigurable {
 	public:
-		enum IsAutoIndexed {
-			FALSE = 0,
-			TRUE = 1,
-			UNDEFINED = 2
-		};
+		enum IsAutoIndexed { FALSE = 0, TRUE = 1, UNDEFINED = 2 };
+
 	private:
 	protected:
 		std::vector<std::string> _allowMethods;
@@ -38,7 +37,8 @@ class AConfigurable {
 		const IsAutoIndexed &getAutoindex() const;
 		bool setIndex(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getIndex() const;
-		bool setClientMaxBodySize(std::string const &attribute, std::fstream &file);
+		bool setClientMaxBodySize(std::string const &attribute,
+								  std::fstream &file);
 		const ssize_t &getClientMaxBodySize() const;
 		bool setCgiExtensions(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getCgiExtensions() const;
