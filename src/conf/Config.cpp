@@ -1,5 +1,7 @@
 #include "Config.hpp"
 
+std::size_t Config::lineCount = 0;
+
 std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)> Config::initSetterMap() {
 	std::map<std::string, bool (Server::*)(const std::string&, std::fstream&)> srvSetterMap;
 	srvSetterMap["server_name"] = &Server::setServername;
@@ -47,52 +49,59 @@ bool Config::close() {
 	return true;
 }
 
-Server Config::_createServerInstance(std::fstream &file, std::size_t lineCount) {
+Server Config::_createServerInstance(std::fstream &file) {
 	std::string line;
 	Server server;
+	bool bracketFlag = false;
 
 	while (std::getline(file, line)) {
-		lineCount++;
+		Config::lineCount++;
 		if (utils::shouldIgnoreLine(line)) { continue; }
+		if (utils::rmCR(line) == false) { throw std::runtime_error(SYNTAX_ERROR); }
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
-		if (elem.compare("}") == 0) { break; }
+		if (elem.compare("}") == 0) {  bracketFlag = true; break; }
 		std::map<std::string, bool (Server::*)(std::string const&, std::fstream&)>::iterator iter = this->_setterMap.find(elem);
-		if (iter == this->_setterMap.end()) { continue; }
-		if (iter->first.compare("loaction") != 0 && line[line.size() - 1] != ';') { /* errorhandling; */ }
-		if (iter->first.compare("loaction") != 0 && line.size() != 0) { line = line.substr(0, line.size() - 2); }
-		if ((server.*(iter->second))(line, file) == false) { /* errorhandling; */ }
+		if (iter == this->_setterMap.end()) { throw std::runtime_error(INVALID_ITEM); }
+		if (iter->first.compare("location") != 0 && line[line.size() - 1] != ';') {
+			throw std::runtime_error(SYNTAX_ERROR); 
+		}
+		if (iter->first.compare("location") != 0 && line.size() != 0) { line = line.substr(0, line.size() - 1); }
+		if ((server.*(iter->second))(line, file) == false) { throw std::runtime_error(SYNTAX_ERROR); }
 	}
+	if (bracketFlag == false) { throw std::runtime_error(SYNTAX_ERROR); }
 	return server;
 }
 
 bool Config::load() {
 	std::string line;
-	std::size_t lineCount = 0;
-	while (std::getline(this->_file, line)) {
-		lineCount++;
-		if (utils::shouldIgnoreLine(line)) { continue; }
-		std::stringstream ss(line);
-		std::string elem;
-		ss >> elem;
-		char bracket;
-		ss >> bracket;
+	try {
+		while (std::getline(this->_file, line)) {
+			Config::lineCount++;
+			if (utils::shouldIgnoreLine(line)) { continue; }
+			if (utils::rmCR(line) == false) { throw std::runtime_error(SYNTAX_ERROR); }
+			std::stringstream ss(line);
+			std::string elem;
+			ss >> elem;
+			char bracket;
+			ss >> bracket;
 			if (ss.fail() == true || ss.peek() != EOF) {
-			// error handling	
-		}
-		if (elem.compare("server") == 0 && bracket == '{') {
-			try {
-				Server server = this->_createServerInstance(this->_file, lineCount);
-				this->_servers.insert(std::pair<std::string, Server>(server.getServername(), server));
-			} catch (std::exception &e) {
-				//
+				throw std::runtime_error(SYNTAX_ERROR);	
 			}
-
+			if (elem.compare("server") == 0 && bracket == '{') {
+				Server server = this->_createServerInstance(this->_file);
+				if (this->_servers.count(server.getServername()) > 0) {
+					throw std::runtime_error(DUPULICATE_SERVER);
+				}
+				this->_servers.insert(std::pair<std::string, Server>(server.getServername(), server));
+			}
 		}
-	}
-	if (this->_servers.size() == 0) {
-		std::cerr << RED << "Webserv: Error: no server is defined." << RESET << std::endl;
+		if (this->_servers.size() == 0) {
+			throw std::runtime_error(NO_SERVER);
+		}
+	} catch (std::exception &e) {
+		std::cerr << RED << "Webserv:" << Config::lineCount << " Error: " << e.what() << RESET << std::endl;
 		return false;
 	}
 	return true;

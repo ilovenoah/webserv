@@ -7,6 +7,7 @@
 #include "AConfigurable.hpp"
 #include "Location.hpp"
 #include "utils.hpp"
+#include "Config.hpp"
 
 #define MIN_USERPORT 1024
 #define MAX_USERPORT 49151
