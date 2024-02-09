@@ -12,6 +12,8 @@
 #define MIN_USERPORT 1024
 #define MAX_USERPORT 49151
 
+class Location;
+
 class Server : public AConfigurable {
 	private:
 		std::string _servername;

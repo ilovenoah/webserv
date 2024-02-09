@@ -4,7 +4,10 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include "Server.hpp"
 #include "AConfigurable.hpp"
+
+class Server;
 
 class Location : public AConfigurable {
 	private:
