@@ -18,6 +18,7 @@ class Location : public AConfigurable {
 		Location();
 		bool setLocationPath(std::string const &attribute);
 		const std::string &getLocationPath() const;
+		void fillLocationDirectives(Server const &server);
 };
 
 #endif

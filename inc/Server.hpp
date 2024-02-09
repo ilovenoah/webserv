@@ -36,6 +36,7 @@ class Server : public AConfigurable {
 		const std::string &getRoot() const;
 		bool setLocations(std::string const &attribute, std::fstream &file);
 		const std::map<std::string, Location> &getLocations() const;
+		void fillLocationDirectives();
 };
 
 #endif

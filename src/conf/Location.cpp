@@ -32,3 +32,13 @@ bool Location::setLocationPath(std::string const &attribute) {
 const std::string &Location::getLocationPath() const {
 	return this->_path;
 }
+
+void Location::fillLocationDirectives(Server const &server) {
+	if (this->_allowMethods.size() == 0) { this->_allowMethods = server.getAllowMethods() ; }
+	if (this->_autoindex == AConfigurable::UNDEFINED ) { this->_autoindex = server.getAutoindex(); }
+	if (this->_index.size() == 0) { this->_index = server.getIndex(); }
+	if (this->_clientMaxBodySize == -1) { this->_clientMaxBodySize = server.getClientMaxBodySize(); }
+	if (this->_cgi_extensions.size() == 0) { this->_cgi_extensions = server.getCgiExtensions(); }
+	if (this->_return.empty() == true) { this->_return = server.getReturn(); }
+	if (this->_errorPages.size() == 0) { this->_errorPages = server.getErrorPages(); }
+}

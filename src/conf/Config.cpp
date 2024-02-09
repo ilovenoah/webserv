@@ -71,6 +71,7 @@ Server Config::_createServerInstance(std::fstream &file) {
 		if ((server.*(iter->second))(line, file) == false) { throw std::runtime_error(SYNTAX_ERROR); }
 	}
 	if (bracketFlag == false) { throw std::runtime_error(SYNTAX_ERROR); }
+	server.fillLocationDirectives();
 	return server;
 }
 

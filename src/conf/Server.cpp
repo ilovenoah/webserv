@@ -123,3 +123,9 @@ bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 const std::map<std::string, Location> &Server::getLocations() const {
 	return this->_locations;
 }
+
+void Server::fillLocationDirectives() {
+	for (std::map<std::string, Location>::iterator iter = this->_locations.begin(); iter != this->_locations.end() ; ++iter) {
+		iter->second.fillLocationDirectives(*this);
+	}
+}
