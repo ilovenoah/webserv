@@ -17,13 +17,14 @@ bool AConfigurable::setAllowMethods(std::string const &attribute, std::fstream &
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.peek() == EOF) { return false; }
 	this->_allowMethods.clear();
 	while (ss.peek() != EOF) {
 		elem.clear();
 		ss >> elem;
+		if (elem.empty() == true) { return false; }
 		if (elem != "GET" && elem != "POST" && elem != "DELETE") { return false; }
 		this->_allowMethods.push_back(elem);
+		ss >>  std::ws;
 	}
 	return true;
 }
@@ -36,9 +37,10 @@ bool AConfigurable::setAutoIndex(std::string const &attribute, std::fstream &fil
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.peek() == EOF) { return false; }
 	elem.clear();
 	ss >> elem;
+	ss >> std::ws;
+	if (elem.empty() == true) { return false; }
 	if (ss.peek() != EOF) { return false; }
 	if (elem == "on") {
 		this->_autoindex = true;
@@ -59,11 +61,12 @@ bool AConfigurable::setIndex(std::string const &attribute, std::fstream &file) {
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.peek() == EOF) { return false; }
 	while (ss.peek() != EOF) {
 		elem.clear();
 		ss >> elem;
+		if (elem.empty() == true) { return false; }
 		this->_index.push_back(elem);
+		ss >> std::ws;
 	}
 	return true;
 }
@@ -77,12 +80,13 @@ bool AConfigurable::setClientMaxBodySize(std::string const &attribute, std::fstr
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.peek() == EOF) { return false; }
 	elem.clear();
 	ss >> elem;
+	ss >> std::ws;
 	if (ss.peek() != EOF) { return false; }
+	if (elem.empty() == true) { return false; }
 	this->_clientMaxBodySize = utils::decStrToSizeT(elem);
-	if (this->_clientMaxBodySize > INT_MAX) { return false; }
+	if (this->_clientMaxBodySize > INT_MAX) { throw std::runtime_error(INVALID_CLIENTMAXBODYSIZE); }
 	return true;
 }
 
@@ -95,16 +99,17 @@ bool AConfigurable::setCgiExtensions(std::string const &attribute, std::fstream 
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.peek() == EOF) { return false; }
 	this->_cgi_extensions.clear();
 	while (ss.peek() != EOF) {
 		elem.clear();
 		ss >> elem;
+		if (elem.empty() == true) { return false; }
 		if (elem[0] != '.') { return false; };
         for (size_t i = 1; i < elem.length(); ++i) {
             if (!std::isalnum(elem[i])) { return false; }
         }
 		this->_cgi_extensions.push_back(elem);
+		ss >> std::ws;
 	}
 	return true;
 }
@@ -118,9 +123,10 @@ bool AConfigurable::setReturn(std::string const &attribute, std::fstream &file) 
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.peek() == EOF) { return false; }
 	elem.clear();
 	ss >> elem;
+	ss >> std::ws;
+	if (elem.empty() == true) { return false; }
 	if (ss.peek() != EOF) { return false; }
 	ss.str("");
 	ss.clear();
@@ -146,13 +152,15 @@ bool AConfigurable::setErrorPages(std::string const &attribute, std::fstream &fi
 	std::string elem;
 	std::vector<std::string> statusCodes;
 	ss >> elem;
-	if (ss.peek() == EOF) { return false; }
 	elem.clear();
-	while (ss.peek() != EOF) {
+	while (true) {
 		ss >> elem;
+		if (elem.empty() == true) { return false; }
 		if (isStatusCode(elem) == false) { break; }
 		statusCodes.push_back(elem);
+		elem.clear();
 	}
+	ss >> std::ws;
 	if (ss.peek() != EOF) { return false; }
 	if (statusCodes.size() == 0) { return false; }
 	for (std::vector<std::string>::iterator iter = statusCodes.begin(); iter != statusCodes.end(); ++iter) {

@@ -84,9 +84,10 @@ bool Config::load() {
 			std::stringstream ss(line);
 			std::string elem;
 			ss >> elem;
-			char bracket;
+			char bracket('\0');
 			ss >> bracket;
-			if (ss.fail() == true || ss.peek() != EOF) {
+			ss >> std::ws;
+			if (bracket != '{' || ss.peek() != EOF) {
 				throw std::runtime_error(SYNTAX_ERROR);	
 			}
 			if (elem.compare("server") == 0 && bracket == '{') {

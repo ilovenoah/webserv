@@ -5,15 +5,18 @@ bool Location::setLocationPath(std::string const &attribute) {
 	std::string elem;
 
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	// if (ss.eof() == true) { return false; }
 	elem.clear();
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	ss >> std::ws;
+	if (elem.empty() == true) { return false; }
 	this->_path = elem;
 	elem.clear();
 	ss >> elem;
-	if (ss.eof() == false) { return false; }
+	ss >> std::ws;
+	if (elem.empty() == true) { return false; }
 	if (elem.compare("{") != 0) { return false; }
+	if (ss.peek() != EOF) { return false; }
 	return true;
 }
 
