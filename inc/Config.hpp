@@ -1,12 +1,6 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#define SYNTAX_ERROR "Syntax error in config file"
-#define INVALID_PORT "Invalid port number"
-#define INVALID_ITEM "Invalid item in config file"
-#define DUPULICATE_SERVER "Duplicate server name"
-#define NO_SERVER "No server found in config file"
-
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -14,6 +8,7 @@
 #include <sys/stat.h>
 #include "Server.hpp"
 #include "utils.hpp"
+#include "errormsg.hpp"
 
 class Server;
 

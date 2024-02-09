@@ -8,6 +8,7 @@
 #include <sstream>
 #include <limits.h>
 #include "utils.hpp"
+#include "errormsg.hpp"
 
 #define ONEMEGA 1000000
 
