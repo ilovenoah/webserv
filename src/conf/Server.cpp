@@ -25,10 +25,10 @@ bool Server::setServername(std::string const &attribute, std::fstream &file) {
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	if (ss.peek() == EOF) { return false; }
 	elem.clear();
 	ss >> elem;
-	if (ss.eof() == false) { return false; }
+	if (ss.peek() != EOF) { return false; }
 	this->_servername = elem;
 	return true;
 }
@@ -46,15 +46,15 @@ bool Server::setListen(std::string const &attribute, std::fstream &file) {
 	std::string ipAddr;
 	std::string port;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	if (ss.peek() == EOF) { return false; }
 	elem.clear();
 	ss >> elem;
-	if (ss.eof() == false) { return false; }
+	if (ss.peek() != EOF) { return false; }
 	ss.str("");
 	ss.clear();
 	ss << elem;
 	std::getline(ss, ipAddr, ':');
-	if (ss.eof() == true) {
+	if (ss.peek() == EOF) {
 		this->_port = ipAddr;
 		if (isPortOutOfRange(port) == true) { return false; }
 		return true;
@@ -83,10 +83,10 @@ bool Server::setRoot(std::string const &attribute, std::fstream &file) {
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	if (ss.peek() == EOF) { return false; }
 	elem.clear();
 	ss >> elem;
-	if (ss.eof() == false) { return false; }
+	if (ss.peek() != EOF) { return false; }
 	this->_root = elem;
 	return true;
 }

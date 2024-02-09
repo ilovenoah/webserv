@@ -17,9 +17,9 @@ bool AConfigurable::setAllowMethods(std::string const &attribute, std::fstream &
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	if (ss.peek() == EOF) { return false; }
 	this->_allowMethods.clear();
-	while (ss.eof() == false) {
+	while (ss.peek() != EOF) {
 		elem.clear();
 		ss >> elem;
 		if (elem != "GET" && elem != "POST" && elem != "DELETE") { return false; }
@@ -36,10 +36,10 @@ bool AConfigurable::setAutoIndex(std::string const &attribute, std::fstream &fil
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	if (ss.peek() == EOF) { return false; }
 	elem.clear();
 	ss >> elem;
-	if (ss.eof() == false) { return false; }
+	if (ss.peek() != EOF) { return false; }
 	if (elem == "on") {
 		this->_autoindex = true;
 	} else if (elem == "off") {
@@ -59,8 +59,8 @@ bool AConfigurable::setIndex(std::string const &attribute, std::fstream &file) {
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
-	while (ss.eof() == false) {
+	if (ss.peek() == EOF) { return false; }
+	while (ss.peek() != EOF) {
 		elem.clear();
 		ss >> elem;
 		this->_index.push_back(elem);
@@ -77,10 +77,10 @@ bool AConfigurable::setClientMaxBodySize(std::string const &attribute, std::fstr
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	if (ss.peek() == EOF) { return false; }
 	elem.clear();
 	ss >> elem;
-	if (ss.eof() == false) { return false; }
+	if (ss.peek() != EOF) { return false; }
 	this->_clientMaxBodySize = utils::decStrToSizeT(elem);
 	return true;
 }
@@ -94,9 +94,9 @@ bool AConfigurable::setCgiExtensions(std::string const &attribute, std::fstream 
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	if (ss.peek() == EOF) { return false; }
 	this->_cgi_extensions.clear();
-	while (ss.eof() == false) {
+	while (ss.peek() != EOF) {
 		elem.clear();
 		ss >> elem;
 		if (elem[0] != '.') { return false; };
@@ -117,10 +117,10 @@ bool AConfigurable::setReturn(std::string const &attribute, std::fstream &file) 
 	std::stringstream ss(attribute);
 	std::string elem;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	if (ss.peek() == EOF) { return false; }
 	elem.clear();
 	ss >> elem;
-	if (ss.eof() == false) { return false; }
+	if (ss.peek() != EOF) { return false; }
 	ss.str("");
 	ss.clear();
 	ss << elem;
@@ -145,14 +145,14 @@ bool AConfigurable::setErrorPages(std::string const &attribute, std::fstream &fi
 	std::string elem;
 	std::vector<std::string> statusCodes;
 	ss >> elem;
-	if (ss.eof() == true) { return false; }
+	if (ss.peek() == EOF) { return false; }
 	elem.clear();
-	while (ss.eof() == false) {
+	while (ss.peek() != EOF) {
 		ss >> elem;
 		if (isStatusCode(elem) == false) { break; }
 		statusCodes.push_back(elem);
 	}
-	if (ss.eof() == false) { return false; }
+	if (ss.peek() != EOF) { return false; }
 	if (statusCodes.size() == 0) { return false; }
 	for (std::vector<std::string>::iterator iter = statusCodes.begin(); iter != statusCodes.end(); ++iter) {
 		this->_errorPages.insert(std::pair<std::string, std::string>(*iter, elem));

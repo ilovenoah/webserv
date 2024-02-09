@@ -78,7 +78,7 @@ bool Config::load() {
 		ss >> elem;
 		char bracket;
 		ss >> bracket;
-		if (ss.fail() || !ss.eof()) {
+			if (ss.fail() == true || ss.peek() != EOF) {
 			// error handling	
 		}
 		if (elem.compare("server") == 0 && bracket == '{') {
