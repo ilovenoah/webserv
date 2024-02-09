@@ -8,11 +8,12 @@
 #include "env.hpp"
 
 namespace utils {
-void putSysError(char const *msg);
-std::size_t decStrToSizeT(std::string &str);
-std::size_t hexStrToSizeT(std::string &str);
-bool findCRLF(std::stringstream &stream);
-bool shouldIgnoreLine(std::string const &line);
+    void putSysError(char const *msg);
+    std::size_t decStrToSizeT(std::string &str);
+    std::size_t hexStrToSizeT(std::string &str);
+    bool findCRLF(std::stringstream &stream);
+    bool shouldIgnoreLine(std::string const &line);
+    bool rmCR(std::string &line);
 }  // namespace utils
 
 #endif
