@@ -57,7 +57,7 @@ Server Config::_createServerInstance(std::fstream &file) {
 	while (std::getline(file, line)) {
 		Config::lineCount++;
 		if (utils::shouldIgnoreLine(line)) { continue; }
-		if (utils::rmCR(line) == false) { throw std::runtime_error(SYNTAX_ERROR); }
+		utils::rmCR(line);
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
@@ -81,7 +81,7 @@ bool Config::load() {
 		while (std::getline(this->_file, line)) {
 			Config::lineCount++;
 			if (utils::shouldIgnoreLine(line)) { continue; }
-			if (utils::rmCR(line) == false) { throw std::runtime_error(SYNTAX_ERROR); }
+			utils::rmCR(line);
 			std::stringstream ss(line);
 			std::string elem;
 			ss >> elem;

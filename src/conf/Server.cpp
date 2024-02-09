@@ -104,7 +104,7 @@ bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 	while (std::getline(file, line)) {
 		Config::lineCount++;
 		if (utils::shouldIgnoreLine(line)) { continue; }
-		if (utils::rmCR(line) == false) { throw std::runtime_error(SYNTAX_ERROR); }
+		utils::rmCR(line);
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
