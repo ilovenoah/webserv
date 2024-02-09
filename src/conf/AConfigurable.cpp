@@ -8,7 +8,7 @@ static std::vector<std::string> initAllowedMethods() {
     return methods;
 }
 
-AConfigurable::AConfigurable() : _allowMethods(initAllowedMethods()), _autoindex(false), _clientMaxBodySize(ONEMEGA) {}
+AConfigurable::AConfigurable() : _allowMethods(initAllowedMethods()), _autoindex(AConfigurable::FALSE), _clientMaxBodySize(ONEMEGA) {}
 
 AConfigurable::~AConfigurable() {}
 
@@ -43,16 +43,16 @@ bool AConfigurable::setAutoIndex(std::string const &attribute, std::fstream &fil
 	if (elem.empty() == true) { return false; }
 	if (ss.peek() != EOF) { return false; }
 	if (elem == "on") {
-		this->_autoindex = true;
+		this->_autoindex = AConfigurable::TRUE;
 	} else if (elem == "off") {
-		this->_autoindex = false;
+		this->_autoindex = AConfigurable::FALSE;
 	} else {
 		return false;
 	}
 	return true;
 }
 
-const bool &AConfigurable::getAutoindex() const {
+const AConfigurable::IsAutoIndexed &AConfigurable::getAutoindex() const {
 	return this->_autoindex;
 }
 
