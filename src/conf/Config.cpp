@@ -122,7 +122,7 @@ bool Config::load() {
 					this->_servers.insert(std::pair<std::string, std::map<std::string, Server> >(server.getListen(), svmap));
 				} else {
 					if (smiter->second.count(server.getServername()) > 0) {
-						throw std::runtime_error(DUPULICATE_SERVER);
+						throw std::runtime_error(DUPLICATE_SERVER);
 					}
 					smiter->second.insert(std::pair<std::string, Server>(server.getServername(), server));
 				}
