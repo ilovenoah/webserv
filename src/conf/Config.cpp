@@ -225,6 +225,10 @@ const Server *Config::getDefaultServer() const {
 	return this->_defautServer;
 }
 
+const std::map<std::string, Server> &Config::getServers() const {
+	return this->_servers;
+}
+
 // int main(int argc, char *argv[]) {
 // 	Config test;
 

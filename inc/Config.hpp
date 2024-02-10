@@ -35,6 +35,7 @@ class Config {
 		bool load();
 		void printServers() const;
 		const Server *getDefaultServer() const;
+		const std::map<std::string, Server> &getServers() const;
 };
 
 #endif
