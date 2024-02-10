@@ -17,6 +17,7 @@ static bool startUpServerSockets(std::map<int, ServerSocket> &ssmap, Config &con
 
 int main(int argc, char *argv[]) {
 	Config conf;
+	std::map<int, ServerSocket> ssmap;
 	if (argc != 2) {
 		std::cerr << "Usage: ./webserv config/filepath" << std::endl;
 		return 1;
@@ -25,9 +26,6 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	if (conf.load() == false) {
-		return 1;
-	}
-	if (conf.close() == false) {
 		return 1;
 	}
 	conf.printServers();

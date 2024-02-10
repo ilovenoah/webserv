@@ -6,6 +6,9 @@
 
 #include "CaseInsensitiveCompare.hpp"
 #include "ClientSocket.hpp"
+#include "Result.hpp"
+#include "Error.hpp"
+#include "Ok.hpp"
 
 class Request {
 	public:
@@ -31,6 +34,7 @@ class Request {
 		std::string const &getPath() const;
 		void setHttpVersion(std::string const &httpVersion);
 		std::string const &getHttpVersion() const;
+		Result<std::string, bool> getHeaderValue(std::string const &key) const;
 		std::string const &getBody() const;
 		ClientSocket::csphase load(std::stringstream &buffer);
 		std::string getEntireData() const;
