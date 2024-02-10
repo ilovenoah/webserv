@@ -157,7 +157,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
 				csmap.find(iter->first);
 			if (rqiter != rqmap.end() && csiter != csmap.end()) {
 				ClientSocket::csphase nextcsphase =
-					iter->second.load(config, rqiter->second);
+					iter->second.load(config, rqiter->second, csiter->second->getServerSocket()->getIpaddress(),  csiter->second->getServerSocket()->getPort());
 				csiter->second->setPhase(nextcsphase);
 			}
 		}
