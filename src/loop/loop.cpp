@@ -1,14 +1,5 @@
 #include "loop.hpp"
 
-// static std::string convertIPAddress(in_addr_t address) {
-//     std::ostringstream oss;
-//     oss << (address & 0xFF) << '.'               // 最下位のバイト
-//         << ((address >> 8) & 0xFF) << '.'        // さらに次のバイト
-//         << ((address >> 16) & 0xFF) << '.'       // 次のバイト
-//         << ((address >> 24) & 0xFF);             // 最上位のバイト
-//     return oss.str();
-// }
-
 static bool setRevents(std::map<int, ServerSocket> &ssmap,
 					   std::map<int, ClientSocket *> &csmap) {
 	std::vector<struct pollfd> pollfds;

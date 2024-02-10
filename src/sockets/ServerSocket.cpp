@@ -88,8 +88,3 @@ const std::string &ServerSocket::getIpaddress() const {
 const std::string &ServerSocket::getPort() const {
 	return this->_port;
 }
-
-// int main() {
-// 	ServerSocket ss("8.8.8.8", "8080");
-// 	ss.init();
-// }

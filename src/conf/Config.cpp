@@ -126,8 +126,6 @@ bool Config::load() {
 				} else {
 					smiter->second.insert(std::pair<std::string, Server>(server.getServername(), server));
 				}
-				// this->_servers.insert(std::pair<std::string, Server>(
-				// 	server.getServername(), server));
 				if (this->_servers.size() == 1) {
 					// _defaultServer should be the highest server in the ip and port 
 					this->_defautServer = &(this->_servers[server.getListen()][server.getServername()]);
@@ -240,11 +238,3 @@ const Server *Config::getDefaultServer() const {
 const std::map<std::string, std::map<std::string, Server> > &Config::getServers() const {
 	return this->_servers;
 }
-
-// int main(int argc, char *argv[]) {
-// 	Config test;
-
-// 	test.open(argv[1]);
-// 	test.load();
-// 	test.close();
-// }
