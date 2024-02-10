@@ -148,6 +148,9 @@ bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 	if (bracketFlag == false) {
 		throw std::runtime_error(SYNTAX_ERROR);
 	}
+	if (this->_locations.count(location.getLocationPath()) > 0) {
+		throw std::runtime_error(DUPLICATE_LOCATION);
+	}
 	this->_locations.insert(
 		std::pair<std::string, Location>(location.getLocationPath(), location));
 	return true;
