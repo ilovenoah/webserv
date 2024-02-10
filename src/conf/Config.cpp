@@ -237,11 +237,7 @@ const Server *Config::getDefaultServer() const {
 	return this->_defautServer;
 }
 
-<<<<<<< HEAD
 const std::map<std::string, std::map<std::string, Server> > &Config::getServers() const {
-=======
-const std::map<std::string, Server> &Config::getServers() const {
->>>>>>> 44-feature-load-data-into-response-class-instances-referring-to-server-map-in-config-instance
 	return this->_servers;
 }
 
