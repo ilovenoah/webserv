@@ -118,10 +118,19 @@ bool Config::load() {
 				if (this->_servers.count(server.getServername()) > 0) {
 					throw std::runtime_error(DUPULICATE_SERVER);
 				}
-				this->_servers.insert(std::pair<std::string, Server>(
-					server.getServername(), server));
+				std::map<std::string, std::map<std::string, Server> >::iterator smiter = this->_servers.find(server.getListen());
+				if (smiter == this->_servers.end()) {
+					std::map<std::string, Server> svmap;
+					svmap.insert(std::pair<std::string, Server>(server.getServername(), server));
+					this->_servers.insert(std::pair<std::string, std::map<std::string, Server> >(server.getListen(), svmap));
+				} else {
+					smiter->second.insert(std::pair<std::string, Server>(server.getServername(), server));
+				}
+				// this->_servers.insert(std::pair<std::string, Server>(
+				// 	server.getServername(), server));
 				if (this->_servers.size() == 1) {
-					this->_defautServer = &(this->_servers[server.getServername()]);
+					// _defaultServer should be the highest server in the ip and port 
+					this->_defautServer = &(this->_servers[server.getListen()][server.getServername()]);
 				}
 			}
 		}
@@ -223,6 +232,10 @@ void Config::printServers() const {
 
 const Server *Config::getDefaultServer() const {
 	return this->_defautServer;
+}
+
+const std::map<std::string, std::map<std::string, Server> > &Config::getServers() const {
+	return this->_servers;
 }
 
 // int main(int argc, char *argv[]) {
