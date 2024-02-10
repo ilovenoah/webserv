@@ -115,15 +115,15 @@ bool Config::load() {
 			}
 			if (elem.compare("server") == 0 && bracket == '{') {
 				Server server = this->_createServerInstance(this->_file);
-				if (this->_servers.count(server.getServername()) > 0) {
-					throw std::runtime_error(DUPULICATE_SERVER);
-				}
 				std::map<std::string, std::map<std::string, Server> >::iterator smiter = this->_servers.find(server.getListen());
 				if (smiter == this->_servers.end()) {
 					std::map<std::string, Server> svmap;
 					svmap.insert(std::pair<std::string, Server>(server.getServername(), server));
 					this->_servers.insert(std::pair<std::string, std::map<std::string, Server> >(server.getListen(), svmap));
 				} else {
+					if (smiter->second.count(server.getServername()) > 0) {
+						throw std::runtime_error(DUPULICATE_SERVER);
+					}
 					smiter->second.insert(std::pair<std::string, Server>(server.getServername(), server));
 				}
 				if (this->_servers.size() == 1) {
