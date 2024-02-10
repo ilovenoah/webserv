@@ -43,8 +43,8 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 	return true;
 }
 
-static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo) {
-	return new (std::nothrow) ClientSocket(socketInfo.first);
+static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo, ServerSocket *serverSocket) {
+	return new (std::nothrow) ClientSocket(socketInfo.first, serverSocket);
 }
 
 static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
@@ -72,7 +72,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
 				continue;
 			}
 			ClientSocket *newCs;
-			newCs = createCsocket(socketInfo);
+			newCs = createCsocket(socketInfo, &(iter->second));
 			if (newCs == NULL) {
 				utils::putSysError("new");
 				close(socketInfo.first);
