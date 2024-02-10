@@ -120,6 +120,9 @@ bool Config::load() {
 				}
 				this->_servers.insert(std::pair<std::string, Server>(
 					server.getServername(), server));
+				if (this->_servers.size() == 1) {
+					this->_defautServer = &(this->_servers[server.getServername()]);
+				}
 			}
 		}
 		if (this->_servers.size() == 0) {
@@ -135,6 +138,8 @@ bool Config::load() {
 }
 
 void Config::printServers() const {
+	std::clog << "====================================" << std::endl;
+	std::clog << "Default server name: " << this->getDefaultServer()->getServername() << std::endl;
 	for (std::map<std::string, Server>::const_iterator iter =
 			 this->_servers.begin();
 		 iter != this->_servers.end(); ++iter) {
@@ -216,7 +221,7 @@ void Config::printServers() const {
 	}
 }
 
-const Server &Config::getDefaultServer() const {
+const Server *Config::getDefaultServer() const {
 	return this->_defautServer;
 }
 
