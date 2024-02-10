@@ -18,6 +18,7 @@ class Config {
 	private:
 		std::fstream _file;
 		std::map<std::string, Server> _servers;
+		Server &_defautServer;
 		Server _createServerInstance(std::fstream &file);
 		static std::map<std::string,
 						bool (Server::*)(const std::string &, std::fstream &)>
@@ -26,12 +27,14 @@ class Config {
 						bool (Server::*)(const std::string &, std::fstream &)>
 		initSetterMap();
 
+
 	public:
 		static std::size_t lineCount;
 		bool open(char const *path);
 		bool close();
 		bool load();
 		void printServers() const;
+		const Server &getDefaultServer() const;
 };
 
 #endif

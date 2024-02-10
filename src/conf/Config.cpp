@@ -216,6 +216,10 @@ void Config::printServers() const {
 	}
 }
 
+const Server &Config::getDefaultServer() const {
+	return this->_defautServer;
+}
+
 // int main(int argc, char *argv[]) {
 // 	Config test;
 
