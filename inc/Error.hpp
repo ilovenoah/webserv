@@ -1,17 +1,28 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
-#include "env.hpp"
+#include "Result.hpp"
 
-class GenericException : public std::exception {
+template <typename E>
+class Error {
 	private:
-		std::string errorMessage;
+		Error() {}
+
+		E e;
 
 	public:
-		GenericException(const std::string &message);
-		~GenericException() throw();
-
-		const char *what() const throw();
+		Error(E const &_e) : e(_e) {}
+		Error(Error const &sourceError) { *this = sourceError; }
+		Error &operator=(Error const &sourceError) {
+				if (this != &sourceError) {
+						e = sourceError.e;
+				}
+				return *this;
+		}
+		~Error() {}
+		template <typename T, typename V>
+		operator Result<T, V>() const {
+				return Result<T, V>(e);
+		}
 };
-
 #endif
