@@ -2,41 +2,22 @@
 
 Response::Response() : _httpVersion("HTTP/1.1"), _server(NULL), _location(NULL) {}
 
-ClientSocket::csphase Response::load(Config &config,
-									 Request const &request, std::string const &ipAddr, std::string const &port) {
-	Server server;
+void Response::setServerPointer(Config &config, Request const &request, std::string const &ipAddr, std::string const &port) {
 	std::string listen(ipAddr + ":" + port);
 	Result<std::string, bool> res(request.getHeaderValue("Host"));
 	if (res.isError() == true) {
-		server = *(config.getDefaultServer(listen).getOk());
+		this->_server = config.getDefaultServer(listen).getOk();
 	}
 	else {
 		std::string hostName(res.getOk());
-		std::map<std::string, std::map<std::string, Server> >::const_iterator ipiter = config.getServers().find(listen);
-		std::map<std::string, Server>::const_iterator sviter = ipiter->second.find(hostName);
+		this->_server = config.getServerPointer(listen, hostName);
+	}
+}
 
-		if (sviter == ipiter->second.end()) { server = *(config.getDefaultServer(listen).getOk()); }
-		else { server = sviter->second; }
-	}
-	{
-		std::clog << "<< Routing result >>" << std::endl;
-		std::clog << "Server name: " << server.getServername() << std::endl;
-	}
-	std::string path = request.getPath();
-	std::map<std::string, Location> locations = server.getLocations();
-	if (locations.size() != 0) {
-		while (path.find_last_of('/') != std::string::npos) {
-			std::map<std::string, Location>::const_iterator lciter = locations.find(path);
-			if (lciter == locations.end()) {
-				path = path.substr(0, path.find_last_of('/'));
-				std::clog << "path: " << path << std::endl;
-			} else {
-				std::clog << "Location path: " << lciter->first << std::endl;
-				break ;
-			}
-		}
-	}
-
+void Response::setLocationPointer(const std::string &path) {
+	if (this->_server == NULL) { return ; }
+	this->_location = this->_server->getLocationPointer(path);
+}
 	(void)config;
 	(void)request;
 	this->_httpVersion = "HTTP/1.1";
