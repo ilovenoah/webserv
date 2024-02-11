@@ -167,3 +167,16 @@ void Server::fillLocationDirectives() {
 		iter->second.fillLocationDirectives(*this);
 	}
 }
+
+Location *Server::getLocationPointer(const std::string &originalPath) {
+	std::string path(originalPath);
+	if (this->_locations.size() == 0) { return NULL; } 
+	while (path.find_last_of('/') != std::string::npos) {
+		std::map<std::string, Location>::iterator lciter = this->_locations.find(path);
+		if (lciter != this->_locations.end()) { return &(lciter->second); }
+		else {
+			path = path.substr(0, path.find_last_of('/'));	
+		}
+	}
+	return NULL;
+}
