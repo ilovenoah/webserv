@@ -175,7 +175,10 @@ Location *Server::getLocationPointer(const std::string &originalPath) {
 		std::map<std::string, Location>::iterator lciter = this->_locations.find(path);
 		if (lciter != this->_locations.end()) { return &(lciter->second); }
 		else {
-			path = path.substr(0, path.find_last_of('/'));	
+			if (path.compare("/") == 0) { break ; }
+			std::size_t pos = path.find_last_of('/');
+			if (pos == 0) { path = "/"; }
+			else { path.erase(pos); }
 		}
 	}
 	return NULL;
