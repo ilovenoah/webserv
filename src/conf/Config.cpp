@@ -228,8 +228,10 @@ void Config::printServers() const {
 	}
 }
 
-const Server *Config::getDefaultServer() const {
-	return this->_defautServer;
+const Result<Server*, bool>  Config::getDefaultServer(const std::string &listen) const {
+	std::map<std::string, Server*>::const_iterator sviter = this->_defaultServers.find(listen);
+	if (sviter == this->_defaultServers.end()) { return Error<bool>(false); }
+	return Ok<Server*>(sviter->second);
 }
 
 const std::map<std::string, std::map<std::string, Server> > &Config::getServers() const {

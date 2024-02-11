@@ -10,6 +10,9 @@
 
 #include "Server.hpp"
 #include "errormsg.hpp"
+#include "Result.hpp"
+#include "Ok.hpp"
+#include "Error.hpp"
 #include "utils.hpp"
 
 class Server;
@@ -18,6 +21,7 @@ class Config {
 	private:
 		std::fstream _file;
 		std::map<std::string, std::map<std::string, Server> > _servers;
+		std::map<std::string, Server*> _defaultServers;
 		Server *_defautServer;
 		Server _createServerInstance(std::fstream &file);
 		static std::map<std::string,
@@ -34,7 +38,7 @@ class Config {
 		bool close();
 		bool load();
 		void printServers() const;
-		const Server *getDefaultServer() const;
+		const Result<Server*, bool>  Config::getDefaultServer(const std::string &listen) const;
 		const std::map<std::string, std::map<std::string, Server> > &getServers() const;
 };
 
