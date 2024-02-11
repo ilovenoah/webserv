@@ -22,7 +22,6 @@ class Config {
 		std::fstream _file;
 		std::map<std::string, std::map<std::string, Server> > _servers;
 		std::map<std::string, Server*> _defaultServers;
-		Server *_defautServer;
 		Server _createServerInstance(std::fstream &file);
 		static std::map<std::string,
 						bool (Server::*)(const std::string &, std::fstream &)>
@@ -38,7 +37,7 @@ class Config {
 		bool close();
 		bool load();
 		void printServers() const;
-		const Result<Server*, bool>  Config::getDefaultServer(const std::string &listen) const;
+		const Result<Server*, bool>  getDefaultServer(const std::string &listen) const;
 		const std::map<std::string, std::map<std::string, Server> > &getServers() const;
 };
 

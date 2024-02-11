@@ -120,7 +120,7 @@ bool Config::load() {
 					std::map<std::string, Server> svmap;
 					svmap.insert(std::pair<std::string, Server>(server.getServername(), server));
 					this->_servers.insert(std::pair<std::string, std::map<std::string, Server> >(server.getListen(), svmap));
-					this->_defautServer = &(this->_servers[server.getListen()].begin()->second);
+					this->_defaultServers.insert(std::pair<std::string, Server*>(server.getListen(), &(this->_servers[server.getListen()].begin()->second)));
 				} else {
 					if (smiter->second.count(server.getServername()) > 0) {
 						throw std::runtime_error(DUPLICATE_SERVER);
