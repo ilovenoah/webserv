@@ -39,6 +39,7 @@ class Config {
 		void printServers() const;
 		const Result<Server*, bool>  getDefaultServer(const std::string &listen) const;
 		const std::map<std::string, std::map<std::string, Server> > &getServers() const;
+		Server *getServerPointer(const std::string &listen, const std::string &hostName);
 };
 
 #endif

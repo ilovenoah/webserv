@@ -237,3 +237,11 @@ const Result<Server*, bool>  Config::getDefaultServer(const std::string &listen)
 const std::map<std::string, std::map<std::string, Server> > &Config::getServers() const {
 	return this->_servers;
 }
+
+Server *Config::getServerPointer(const std::string &listen, const std::string &hostName) {
+	std::map<std::string, std::map<std::string, Server> >::iterator ipiter = this->_servers.find(listen);
+	std::map<std::string, Server>::iterator sviter = ipiter->second.find(hostName);
+
+	if (sviter == ipiter->second.end()) { return this->_defaultServers.find(listen)->second; }
+	return &(sviter->second);
+}
