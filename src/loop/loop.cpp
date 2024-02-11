@@ -139,6 +139,14 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			if (rsiter == rsmap.end() &&
 				iter->second.getReqphase() == Request::RQFIN) {
 				rsmap.insert(std::pair<int, Response>(iter->first, Response()));
+				std::map<int, Response>::iterator rsiter = rsmap.find(iter->first);
+				std::map<int, Request>::iterator rqiter = rqmap.find(iter->first);
+				std::map<int, ClientSocket *>::iterator csiter = csmap.find(iter->first);
+				rsiter->second.setServerPointer(config, rqiter->second, csiter->second->getServerSocket()->getIpaddress(),  csiter->second->getServerSocket()->getPort());
+				rsiter->second.setLocationPointer(rqiter->second.getPath());
+#if defined(_DEBUG)
+rsiter->second.printConfigInfo();
+#endif
 			}
 		}
 		for (std::map<int, Response>::iterator iter = rsmap.begin();
@@ -148,7 +156,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 				csmap.find(iter->first);
 			if (rqiter != rqmap.end() && csiter != csmap.end()) {
 				ClientSocket::csphase nextcsphase =
-					iter->second.load(config, rqiter->second, csiter->second->getServerSocket()->getIpaddress(),  csiter->second->getServerSocket()->getPort());
+					iter->second.load(config, rqiter->second);
 				csiter->second->setPhase(nextcsphase);
 			}
 		}
