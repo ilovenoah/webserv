@@ -142,11 +142,11 @@ bool Config::load() {
 }
 
 void Config::printServers() const {
-	// std::clog << "====================================" << std::endl;
-	// std::clog << "Default server name: " << this->getDefaultServer()->getServername() << std::endl;
 	for (std::map<std::string, std::map<std::string, Server> >::const_iterator iter =
 			 this->_servers.begin();
 		 iter != this->_servers.end(); ++iter) {
+		std::clog << "====================================" << std::endl;
+		std::clog << "Default server name: " << this->getDefaultServer()->getServername() << std::endl;
 		for (std::map<std::string, Server>::const_iterator iter2 = iter->second.begin(); iter2 != iter->second.end(); ++iter2) {
 
 			std::clog << "====================================" << std::endl;
