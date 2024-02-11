@@ -48,7 +48,7 @@ static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
 	return cs.getPhase();
 }
 
-bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
+bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 	std::map<int, ClientSocket *> csmap;
 	std::map<int, Request> rqmap;
 	std::map<int, Response> rsmap;
