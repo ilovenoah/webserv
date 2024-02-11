@@ -5,6 +5,8 @@
 
 #include "ClientSocket.hpp"
 #include "Config.hpp"
+#include "Server.hpp"
+#include "Location.hpp"
 #include "Request.hpp"
 
 class Response {
@@ -17,6 +19,8 @@ class Response {
 		std::string _statusMsg;
 		std::map<std::string, std::string, CaseInsensitiveCompare> _headers;
 		std::string _body;
+		Server *_server;
+		Location *_location;
 
 	public:
 		Response();
