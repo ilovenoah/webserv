@@ -22,6 +22,21 @@ ClientSocket::csphase Response::load(Config const &config,
 		std::clog << "<< Routing result >>" << std::endl;
 		std::clog << "Server name: " << server.getServername() << std::endl;
 	}
+	std::string path = request.getPath();
+	std::map<std::string, Location> locations = server.getLocations();
+	if (locations.size() != 0) {
+		while (path.find_last_of('/') != std::string::npos) {
+			std::map<std::string, Location>::const_iterator lciter = locations.find(path);
+			if (lciter == locations.end()) {
+				path = path.substr(0, path.find_last_of('/'));
+				std::clog << "path: " << path << std::endl;
+			} else {
+				std::clog << "Location path: " << lciter->first << std::endl;
+				break ;
+			}
+		}
+	}
+
 	(void)config;
 	(void)request;
 	this->_httpVersion = "HTTP/1.1";
