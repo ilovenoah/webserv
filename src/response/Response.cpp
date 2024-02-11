@@ -1,6 +1,6 @@
 #include "Response.hpp"
 
-Response::Response() : _httpVersion("HTTP/1.1") {}
+Response::Response() : _httpVersion("HTTP/1.1"), _server(NULL), _location(NULL) {}
 
 ClientSocket::csphase Response::load(Config const &config,
 									 Request const &request, std::string const &ipAddr, std::string const &port) {
