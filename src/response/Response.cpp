@@ -4,18 +4,19 @@ Response::Response() : _httpVersion("HTTP/1.1") {}
 
 ClientSocket::csphase Response::load(Config const &config,
 									 Request const &request, std::string const &ipAddr, std::string const &port) {
-	(void)ipAddr;
-	(void)port;
 	Server server;
+	std::string listen(ipAddr + ":" + port);
 	Result<std::string, bool> res(request.getHeaderValue("Host"));
 	if (res.isError() == true) {
-		server = *(config.getDefaultServer());
+		server = *(config.getDefaultServer(listen).getOk());
 	}
 	else {
 		std::string hostName(res.getOk());
-		// std::map<std::string, Server>::const_iterator fiter = config.getServers().find(hostName);
-		// if (fiter == config.getServers().end()) { server = *(config.getDefaultServer()); }
-		// else { server = fiter->second; }
+		std::map<std::string, std::map<std::string, Server> >::const_iterator ipiter = config.getServers().find(listen);
+		std::map<std::string, Server>::const_iterator sviter = ipiter->second.find(hostName);
+
+		if (sviter == ipiter->second.end()) { server = *(config.getDefaultServer(listen).getOk()); }
+		else { server = sviter->second; }
 	}
 	{
 		std::clog << "<< Routing result >>" << std::endl;
