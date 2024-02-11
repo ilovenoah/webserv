@@ -29,6 +29,8 @@ class ServerSocket {
 		void setRevents(short revents);
 		std::pair<int, struct sockaddr_in> tryAccept();
 		int getFd() const;
+		const std::string &getIpaddress() const;
+		const std::string &getPort() const;
 };
 
 #endif

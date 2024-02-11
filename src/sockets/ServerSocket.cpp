@@ -82,7 +82,9 @@ std::pair<int, struct sockaddr_in> ServerSocket::tryAccept() {
 
 int ServerSocket::getFd() const { return this->_fd; }
 
-// int main() {
-// 	ServerSocket ss("8.8.8.8", "8080");
-// 	ss.init();
-// }
+const std::string &ServerSocket::getIpaddress() const {
+	return this->_ipaddress;
+}
+const std::string &ServerSocket::getPort() const {
+	return this->_port;
+}

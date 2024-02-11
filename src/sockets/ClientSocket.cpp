@@ -1,12 +1,13 @@
 #include "ClientSocket.hpp"
 
-ClientSocket::ClientSocket() {}
+ClientSocket::ClientSocket() : _serverSocket(NULL) {}
 
-ClientSocket::ClientSocket(int const fd)
+ClientSocket::ClientSocket(int const fd, ServerSocket *serverSocket)
 	: _fd(fd),
 	  _revents(0),
 	  _phase(ClientSocket::RECV),
-	  _lastSendTimestamp(std::time(NULL)) {}
+	  _lastSendTimestamp(std::time(NULL)),
+	  _serverSocket(serverSocket) {}
 
 int ClientSocket::getFd() const { return this->_fd; }
 
@@ -73,4 +74,8 @@ std::time_t ClientSocket::getLastSendTimestamp() const {
 
 void ClientSocket::setLastSendTimestamp(std::time_t const lastSendTimestamp) {
 	this->_lastSendTimestamp = lastSendTimestamp;
+}
+
+ServerSocket *ClientSocket::getServerSocket() const {
+	return this->_serverSocket;
 }

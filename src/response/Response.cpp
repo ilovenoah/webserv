@@ -3,7 +3,24 @@
 Response::Response() : _httpVersion("HTTP/1.1") {}
 
 ClientSocket::csphase Response::load(Config const &config,
-									 Request const &request) {
+									 Request const &request, std::string const &ipAddr, std::string const &port) {
+	(void)ipAddr;
+	(void)port;
+	Server server;
+	Result<std::string, bool> res(request.getHeaderValue("Host"));
+	if (res.isError() == true) {
+		server = *(config.getDefaultServer());
+	}
+	else {
+		std::string hostName(res.getOk());
+		// std::map<std::string, Server>::const_iterator fiter = config.getServers().find(hostName);
+		// if (fiter == config.getServers().end()) { server = *(config.getDefaultServer()); }
+		// else { server = fiter->second; }
+	}
+	{
+		std::clog << "<< Routing result >>" << std::endl;
+		std::clog << "Server name: " << server.getServername() << std::endl;
+	}
 	(void)config;
 	(void)request;
 	this->_httpVersion = "HTTP/1.1";

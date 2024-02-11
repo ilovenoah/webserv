@@ -7,6 +7,7 @@
 
 #include <ctime>
 
+#include "ServerSocket.hpp"
 #include "utils.hpp"
 
 #define BUFFERSIZE 4096
@@ -20,11 +21,12 @@ class ClientSocket {
 		short _revents;
 		ClientSocket::csphase _phase;
 		std::time_t _lastSendTimestamp;
+		ServerSocket *_serverSocket;
 
 	public:
 		std::stringstream buffer;
 		ClientSocket();
-		ClientSocket(int const fd);
+		ClientSocket(int const fd, ServerSocket *serverSocket);
 		int getFd() const;
 		void setRevents(short revents);
 		short getRevents() const;
@@ -36,6 +38,7 @@ class ClientSocket {
 		std::time_t getLastSendTimestamp() const;
 		void setLastSendTimestamp(std::time_t const lastSendTimestamp);
 		bool findCRLF();
+		ServerSocket *getServerSocket() const;
 };
 
 #endif

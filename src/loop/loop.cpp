@@ -1,14 +1,5 @@
 #include "loop.hpp"
 
-// static std::string convertIPAddress(in_addr_t address) {
-//     std::ostringstream oss;
-//     oss << (address & 0xFF) << '.'               // 最下位のバイト
-//         << ((address >> 8) & 0xFF) << '.'        // さらに次のバイト
-//         << ((address >> 16) & 0xFF) << '.'       // 次のバイト
-//         << ((address >> 24) & 0xFF);             // 最上位のバイト
-//     return oss.str();
-// }
-
 static bool setRevents(std::map<int, ServerSocket> &ssmap,
 					   std::map<int, ClientSocket *> &csmap) {
 	std::vector<struct pollfd> pollfds;
@@ -43,8 +34,8 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 	return true;
 }
 
-static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo) {
-	return new (std::nothrow) ClientSocket(socketInfo.first);
+static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo, ServerSocket *serverSocket) {
+	return new (std::nothrow) ClientSocket(socketInfo.first, serverSocket);
 }
 
 static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
@@ -72,7 +63,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
 				continue;
 			}
 			ClientSocket *newCs;
-			newCs = createCsocket(socketInfo);
+			newCs = createCsocket(socketInfo, &(iter->second));
 			if (newCs == NULL) {
 				utils::putSysError("new");
 				close(socketInfo.first);
@@ -157,7 +148,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config const &config) {
 				csmap.find(iter->first);
 			if (rqiter != rqmap.end() && csiter != csmap.end()) {
 				ClientSocket::csphase nextcsphase =
-					iter->second.load(config, rqiter->second);
+					iter->second.load(config, rqiter->second, csiter->second->getServerSocket()->getIpaddress(),  csiter->second->getServerSocket()->getPort());
 				csiter->second->setPhase(nextcsphase);
 			}
 		}
