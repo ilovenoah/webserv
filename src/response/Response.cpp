@@ -2,7 +2,7 @@
 
 Response::Response() : _httpVersion("HTTP/1.1"), _server(NULL), _location(NULL) {}
 
-ClientSocket::csphase Response::load(Config const &config,
+ClientSocket::csphase Response::load(Config &config,
 									 Request const &request, std::string const &ipAddr, std::string const &port) {
 	Server server;
 	std::string listen(ipAddr + ":" + port);

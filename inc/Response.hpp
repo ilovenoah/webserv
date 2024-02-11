@@ -24,7 +24,7 @@ class Response {
 
 	public:
 		Response();
-		ClientSocket::csphase load(Config const &config,
+		ClientSocket::csphase load(Config &config,
 								   Request const &request, std::string const &ipAddr, std::string const &port);
 		std::string getEntireData() const;
 };
