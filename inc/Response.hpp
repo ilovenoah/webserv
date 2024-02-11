@@ -27,6 +27,7 @@ class Response {
 		void setServerPointer(Config &config, Request const &request, std::string const &ipAddr, std::string const &port);
 		void setLocationPointer(const std::string &path);
 		void printConfigInfo() const;
+		ClientSocket::csphase load(Config &config,  Request const &request);
 		std::string getEntireData() const;
 };
 

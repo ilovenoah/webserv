@@ -28,6 +28,7 @@ void Response::printConfigInfo() const {
 	std::clog << "============================================" << std::endl;
 }
 
+ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	(void)config;
 	(void)request;
 	this->_httpVersion = "HTTP/1.1";
