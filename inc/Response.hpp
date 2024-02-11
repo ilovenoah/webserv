@@ -26,6 +26,7 @@ class Response {
 		Response();
 		void setServerPointer(Config &config, Request const &request, std::string const &ipAddr, std::string const &port);
 		void setLocationPointer(const std::string &path);
+		void printConfigInfo() const;
 		std::string getEntireData() const;
 };
 

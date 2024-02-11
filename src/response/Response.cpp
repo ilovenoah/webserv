@@ -18,6 +18,16 @@ void Response::setLocationPointer(const std::string &path) {
 	if (this->_server == NULL) { return ; }
 	this->_location = this->_server->getLocationPointer(path);
 }
+
+void Response::printConfigInfo() const {
+	std::clog << "============== Routing result ==============" << std::endl;
+	std::clog << "Server name: " << this->_server->getServername() << std::endl;
+	if (this->_location != NULL) {
+		std::clog << "Location path: " << this->_location->getLocationPath() << std::endl;
+	}
+	std::clog << "============================================" << std::endl;
+}
+
 	(void)config;
 	(void)request;
 	this->_httpVersion = "HTTP/1.1";
