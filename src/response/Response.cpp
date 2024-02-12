@@ -39,7 +39,7 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::string localRelativePath(this->_server->getRoot() + request.getPath());
 
 	if (request.getMethod() == "GET") {
-		Result<bool, std::string> res = utils::isDirectory(localRelativePath);
+		Result<bool, std::string> res = utils::isDirectory(localRelativePath, R_OK);
 		if (res.isError()) {
 			//error handling
 		}

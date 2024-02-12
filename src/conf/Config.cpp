@@ -26,7 +26,7 @@ std::map<std::string, bool (Server::*)(std::string const &, std::fstream &)>
 
 bool Config::open(char const *path) {
 
-	Result<bool, std::string> res = utils::isDirectory(path);
+	Result<bool, std::string> res = utils::isDirectory(path, R_OK);
 	if (res.isError() == true) {
 		return false;
 	} 
