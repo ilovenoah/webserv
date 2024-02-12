@@ -102,6 +102,19 @@ bool Server::setRoot(std::string const &attribute, std::fstream &file) {
 	if (ss.peek() != EOF) {
 		return false;
 	}
+	Result<bool, std::string> res = utils::isDirectory(elem);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
 	this->_root = elem;
 	return true;
 }
