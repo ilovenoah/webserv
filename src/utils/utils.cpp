@@ -82,6 +82,10 @@ bool isNumber(std::string const &str) {
 Result<bool, std::string> isDirectory(std::string const &path) {
 	struct stat statbuf;
 
+	if (access(path.c_str(), F_OK) == -1) {
+		utils::putSysError("access");
+		return Error<std::string>(std::strerror(errno));
+	}
 	if (stat(path.c_str(), &statbuf) != 0) {
 		utils::putSysError("stat");
 		return Error<std::string>(std::strerror(errno));

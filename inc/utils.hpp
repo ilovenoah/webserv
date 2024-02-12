@@ -9,6 +9,8 @@
 #include "Ok.hpp"
 #include "Error.hpp"
 #include "Result.hpp"
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "env.hpp"
 
