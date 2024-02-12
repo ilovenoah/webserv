@@ -29,12 +29,11 @@ class AConfigurable {
 		std::string _return;
 		std::map<std::string, std::string> _errorPages;
 		std::string _uploadPass;
-		std::string _aliasDirective;
 
 	public:
 		AConfigurable();
 		virtual ~AConfigurable() = 0;
-		bool setRoot(std::string const &attribute, std::fstream &file);
+		virtual bool setRoot(std::string const &attribute, std::fstream &file);
 		const std::string &getRoot() const;
 		bool setAllowMethods(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getAllowMethods() const;
@@ -53,8 +52,6 @@ class AConfigurable {
 		const std::map<std::string, std::string> &getErrorPages() const;
 		bool setUploadPass(std::string const &attribute, std::fstream &file);
 		const std::string &getUploadPass() const;
-		bool setAliasDirective(std::string const &attribute, std::fstream &file);
-		const std::string &getAliasDirective() const;
 };
 
 #endif
