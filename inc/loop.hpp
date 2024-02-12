@@ -14,6 +14,6 @@
 #include "ServerSocket.hpp"
 #include "utils.hpp"
 
-bool loop(std::map<int, ServerSocket> &ssmap, Config const &config);
+bool loop(std::map<int, ServerSocket> &ssmap, Config &config);
 
 #endif

@@ -21,6 +21,9 @@ bool Location::setLocationPath(std::string const &attribute) {
 	if (elem.empty() == true) {
 		return false;
 	}
+	if (elem[elem.length() - 1] == '/' && elem.length() > 1) {
+		elem.erase(elem.length() - 1);
+	}
 	this->_path = elem;
 	elem.clear();
 	ss >> elem;

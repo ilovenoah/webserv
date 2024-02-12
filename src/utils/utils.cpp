@@ -23,6 +23,15 @@ std::size_t hexStrToSizeT(std::string &str) {
 	return dig;
 }
 
+std::string sizeTtoString(std::size_t num) {
+	std::stringstream ss;
+	std::string str;
+
+	ss << num;
+	ss >> str;
+	return str;
+}
+
 bool findCRLF(std::stringstream &stream) {
 	std::streampos originalPos = stream.tellg();
 	std::string remainingContent((std::istreambuf_iterator<char>(stream)),

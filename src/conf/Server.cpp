@@ -148,6 +148,9 @@ bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 	if (bracketFlag == false) {
 		throw std::runtime_error(SYNTAX_ERROR);
 	}
+	if (this->_locations.count(location.getLocationPath()) > 0) {
+		throw std::runtime_error(DUPLICATE_LOCATION);
+	}
 	this->_locations.insert(
 		std::pair<std::string, Location>(location.getLocationPath(), location));
 	return true;
@@ -163,4 +166,20 @@ void Server::fillLocationDirectives() {
 		 iter != this->_locations.end(); ++iter) {
 		iter->second.fillLocationDirectives(*this);
 	}
+}
+
+Location *Server::getLocationPointer(const std::string &originalPath) {
+	std::string path(originalPath);
+	if (this->_locations.size() == 0) { return NULL; } 
+	while (path.find_last_of('/') != std::string::npos) {
+		std::map<std::string, Location>::iterator lciter = this->_locations.find(path);
+		if (lciter != this->_locations.end()) { return &(lciter->second); }
+		else {
+			if (path.compare("/") == 0) { break ; }
+			std::size_t pos = path.find_last_of('/');
+			if (pos == 0) { path = "/"; }
+			else { path.erase(pos); }
+		}
+	}
+	return NULL;
 }

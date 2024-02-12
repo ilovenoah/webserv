@@ -115,11 +115,18 @@ bool Config::load() {
 			}
 			if (elem.compare("server") == 0 && bracket == '{') {
 				Server server = this->_createServerInstance(this->_file);
-				if (this->_servers.count(server.getServername()) > 0) {
-					throw std::runtime_error(DUPULICATE_SERVER);
+				std::map<std::string, std::map<std::string, Server> >::iterator smiter = this->_servers.find(server.getListen());
+				if (smiter == this->_servers.end()) {
+					std::map<std::string, Server> svmap;
+					svmap.insert(std::pair<std::string, Server>(server.getServername(), server));
+					this->_servers.insert(std::pair<std::string, std::map<std::string, Server> >(server.getListen(), svmap));
+					this->_defaultServers.insert(std::pair<std::string, Server*>(server.getListen(), &(this->_servers[server.getListen()].begin()->second)));
+				} else {
+					if (smiter->second.count(server.getServername()) > 0) {
+						throw std::runtime_error(DUPLICATE_SERVER);
+					}
+					smiter->second.insert(std::pair<std::string, Server>(server.getServername(), server));
 				}
-				this->_servers.insert(std::pair<std::string, Server>(
-					server.getServername(), server));
 			}
 		}
 		if (this->_servers.size() == 0) {
@@ -135,91 +142,106 @@ bool Config::load() {
 }
 
 void Config::printServers() const {
-	for (std::map<std::string, Server>::const_iterator iter =
+	for (std::map<std::string, std::map<std::string, Server> >::const_iterator iter =
 			 this->_servers.begin();
 		 iter != this->_servers.end(); ++iter) {
 		std::clog << "====================================" << std::endl;
-		std::clog << "Server name: " << iter->second.getServername()
-				  << std::endl;
-		std::clog << "Listen: " << iter->second.getListen() << std::endl;
-		std::clog << "Root: " << iter->second.getRoot() << std::endl;
-		std::clog << "Allow methods: ";
-		for (std::vector<std::string>::const_iterator iter2 =
-				 iter->second.getAllowMethods().begin();
-			 iter2 != iter->second.getAllowMethods().end(); ++iter2) {
-			std::clog << *iter2 << " ";
-		}
-		std::clog << std::endl;
-		std::clog << "Index: ";
-		for (std::vector<std::string>::const_iterator iter2 =
-				 iter->second.getIndex().begin();
-			 iter2 != iter->second.getIndex().end(); ++iter2) {
-			std::clog << *iter2 << " ";
-		}
-		std::clog << std::endl;
-		std::clog << "Autoindex: " << iter->second.getAutoindex() << std::endl;
-		std::clog << "Client max body size: "
-				  << iter->second.getClientMaxBodySize() << std::endl;
-		std::clog << "Cgi extensions: ";
-		for (std::vector<std::string>::const_iterator iter2 =
-				 iter->second.getCgiExtensions().begin();
-			 iter2 != iter->second.getCgiExtensions().end(); ++iter2) {
-			std::clog << *iter2 << " ";
-		}
-		std::clog << std::endl;
-		std::clog << "Return: " << iter->second.getReturn() << std::endl;
-		for (std::map<std::string, std::string>::const_iterator iter2 =
-				 iter->second.getErrorPages().begin();
-			 iter2 != iter->second.getErrorPages().end(); ++iter2) {
-			std::clog << "Error page: [" << iter2->first << "] "
-					  << iter2->second << std::endl;
-		}
-		for (std::map<std::string, Location>::const_iterator iter2 =
-				 iter->second.getLocations().begin();
-			 iter2 != iter->second.getLocations().end(); ++iter2) {
-			std::clog << "Location: " << iter2->second.getLocationPath()
-					  << std::endl;
-			std::clog << "	Allow methods: ";
+		std::clog << "Default server name: " << this->getDefaultServer(iter->first).getOk()->getServername() << std::endl;
+		for (std::map<std::string, Server>::const_iterator iter2 = iter->second.begin(); iter2 != iter->second.end(); ++iter2) {
+
+			std::clog << "====================================" << std::endl;
+			std::clog << "Server name: " << iter2->second.getServername()
+					<< std::endl;
+			std::clog << "Listen: " << iter2->second.getListen() << std::endl;
+			std::clog << "Root: " << iter2->second.getRoot() << std::endl;
+			std::clog << "Allow methods: ";
 			for (std::vector<std::string>::const_iterator iter3 =
-					 iter2->second.getAllowMethods().begin();
-				 iter3 != iter2->second.getAllowMethods().end(); ++iter3) {
+					iter2->second.getAllowMethods().begin();
+				iter3 != iter2->second.getAllowMethods().end(); ++iter3) {
 				std::clog << *iter3 << " ";
 			}
 			std::clog << std::endl;
-			std::clog << "	Index: ";
+			std::clog << "Index: ";
 			for (std::vector<std::string>::const_iterator iter3 =
-					 iter2->second.getIndex().begin();
-				 iter3 != iter2->second.getIndex().end(); ++iter3) {
+					iter2->second.getIndex().begin();
+				iter3 != iter2->second.getIndex().end(); ++iter3) {
 				std::clog << *iter3 << " ";
 			}
 			std::clog << std::endl;
-			std::clog << "	Autoindex: " << iter2->second.getAutoindex()
-					  << std::endl;
-			std::clog << "	Client max body size: "
-					  << iter2->second.getClientMaxBodySize() << std::endl;
-			std::clog << "	Cgi extensions: ";
+			std::clog << "Autoindex: " << iter2->second.getAutoindex() << std::endl;
+			std::clog << "Client max body size: "
+					<< iter2->second.getClientMaxBodySize() << std::endl;
+			std::clog << "Cgi extensions: ";
 			for (std::vector<std::string>::const_iterator iter3 =
-					 iter2->second.getCgiExtensions().begin();
-				 iter3 != iter2->second.getCgiExtensions().end(); ++iter3) {
+					iter2->second.getCgiExtensions().begin();
+				iter3 != iter2->second.getCgiExtensions().end(); ++iter3) {
 				std::clog << *iter3 << " ";
 			}
 			std::clog << std::endl;
-			std::clog << "	Return: " << iter2->second.getReturn() << std::endl;
+			std::clog << "Return: " << iter2->second.getReturn() << std::endl;
 			for (std::map<std::string, std::string>::const_iterator iter3 =
-					 iter2->second.getErrorPages().begin();
-				 iter3 != iter2->second.getErrorPages().end(); ++iter3) {
-				std::clog << "	Error page: [" << iter3->first << "] "
-						  << iter3->second << std::endl;
+					iter2->second.getErrorPages().begin();
+				iter3 != iter2->second.getErrorPages().end(); ++iter3) {
+				std::clog << "Error page: [" << iter3->first << "] "
+						<< iter3->second << std::endl;
 			}
+			for (std::map<std::string, Location>::const_iterator iter3 =
+					iter2->second.getLocations().begin();
+				iter3 != iter2->second.getLocations().end(); ++iter3) {
+				std::clog << "Location: " << iter3->second.getLocationPath()
+						<< std::endl;
+				std::clog << "	Allow methods: ";
+				for (std::vector<std::string>::const_iterator iter4 =
+						iter3->second.getAllowMethods().begin();
+					iter4 != iter3->second.getAllowMethods().end(); ++iter4) {
+					std::clog << *iter4 << " ";
+				}
+				std::clog << std::endl;
+				std::clog << "	Index: ";
+				for (std::vector<std::string>::const_iterator iter4 =
+						iter3->second.getIndex().begin();
+					iter4 != iter3->second.getIndex().end(); ++iter4) {
+					std::clog << *iter4 << " ";
+				}
+				std::clog << std::endl;
+				std::clog << "	Autoindex: " << iter3->second.getAutoindex()
+						<< std::endl;
+				std::clog << "	Client max body size: "
+						<< iter3->second.getClientMaxBodySize() << std::endl;
+				std::clog << "	Cgi extensions: ";
+				for (std::vector<std::string>::const_iterator iter4 =
+						iter3->second.getCgiExtensions().begin();
+					iter4 != iter3->second.getCgiExtensions().end(); ++iter4) {
+					std::clog << *iter4 << " ";
+				}
+				std::clog << std::endl;
+				std::clog << "	Return: " << iter3->second.getReturn() << std::endl;
+				for (std::map<std::string, std::string>::const_iterator iter4 =
+						iter3->second.getErrorPages().begin();
+					iter4 != iter3->second.getErrorPages().end(); ++iter4) {
+					std::clog << "	Error page: [" << iter4->first << "] "
+							<< iter4->second << std::endl;
+				}
+			}
+			std::clog << "====================================" << std::endl;
 		}
-		std::clog << "====================================" << std::endl;
 	}
 }
 
-// int main(int argc, char *argv[]) {
-// 	Config test;
+const Result<Server*, bool>  Config::getDefaultServer(const std::string &listen) const {
+	std::map<std::string, Server*>::const_iterator sviter = this->_defaultServers.find(listen);
+	if (sviter == this->_defaultServers.end()) { return Error<bool>(false); }
+	return Ok<Server*>(sviter->second);
+}
 
-// 	test.open(argv[1]);
-// 	test.load();
-// 	test.close();
-// }
+const std::map<std::string, std::map<std::string, Server> > &Config::getServers() const {
+	return this->_servers;
+}
+
+Server *Config::getServerPointer(const std::string &listen, const std::string &hostName) {
+	std::map<std::string, std::map<std::string, Server> >::iterator ipiter = this->_servers.find(listen);
+	std::map<std::string, Server>::iterator sviter = ipiter->second.find(hostName);
+
+	if (sviter == ipiter->second.end()) { return this->_defaultServers.find(listen)->second; }
+	return &(sviter->second);
+}
