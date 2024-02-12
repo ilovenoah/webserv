@@ -9,7 +9,8 @@ static std::vector<std::string> initAllowedMethods() {
 }
 
 AConfigurable::AConfigurable()
-	: _allowMethods(initAllowedMethods()),
+	: _root("./"),
+	  _allowMethods(initAllowedMethods()),
 	  _autoindex(AConfigurable::FALSE),
 	  _clientMaxBodySize(ONEMEGA) {}
 
