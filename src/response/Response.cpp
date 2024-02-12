@@ -36,7 +36,7 @@ void Response::printConfigInfo() const {
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	(void)config;
 	(void)request;
-	std::string localRelativePath("." + this->_server->getRoot() +request.getPath());
+	std::string localRelativePath(this->_server->getRoot() + request.getPath());
 
 	if (request.getMethod() == "GET") {
 		Result<bool, std::string> res = utils::isDirectory(localRelativePath);
