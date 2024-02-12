@@ -78,4 +78,17 @@ bool isNumber(std::string const &str) {
 	}
 	return true;
 }
+
+Result<bool, std::string> isDirectory(std::string const &path) {
+	struct stat statbuf;
+
+	if (stat(path.c_str(), &statbuf) != 0) {
+		utils::putSysError("stat");
+		return Error<std::string>(std::strerror(errno));
+	}
+	if (S_ISDIR(statbuf.st_mode) == true) {
+		return Ok<bool>(true);
+	}
+	return Ok<bool>(false);
+}
 }  // namespace utils

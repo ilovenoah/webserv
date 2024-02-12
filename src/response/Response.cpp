@@ -36,17 +36,15 @@ void Response::printConfigInfo() const {
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	(void)config;
 	(void)request;
-	std::string localRelativePath("." + request.getPath());
+	std::string localRelativePath("." + this->_server->getRoot() +request.getPath());
 
 	if (request.getMethod() == "GET") {
-		struct stat statbuf;
-
-		if (stat(localRelativePath.c_str(), &statbuf) != 0) {
-			utils::putSysError("stat");
-			// error handling
+		Result<bool, std::string> res = utils::isDirectory(localRelativePath);
+		if (res.isError()) {
+			//error handling
 		}
-		if (S_ISDIR(statbuf.st_mode) == true) {
-			// error handling
+		if (res.getOk() == true) {
+			//directory listingへ
 		}
 		std::ifstream fs(localRelativePath.c_str(), std::ifstream::binary);
 		if (fs.fail() == true) {

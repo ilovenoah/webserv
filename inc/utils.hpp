@@ -1,9 +1,14 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include <sys/stat.h>
 #include <sys/errno.h>
+#include <errno.h>
 
 #include <iostream>
+#include "Ok.hpp"
+#include "Error.hpp"
+#include "Result.hpp"
 
 #include "env.hpp"
 
@@ -16,6 +21,7 @@ bool findCRLF(std::stringstream &stream);
 bool shouldIgnoreLine(std::string const &line);
 bool rmCR(std::string &line);
 bool isNumber(std::string const &str);
+Result<bool, std::string> isDirectory(std::string const &path);
 }  // namespace utils
 
 #endif

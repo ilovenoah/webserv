@@ -9,6 +9,8 @@
 #include "Location.hpp"
 #include "Request.hpp"
 #include "Server.hpp"
+#include "utils.hpp"
+#include "Result.hpp"
 
 class Response {
 		// public:

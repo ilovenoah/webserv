@@ -24,15 +24,12 @@ std::map<std::string, bool (Server::*)(std::string const &, std::fstream &)>
 	Config::_setterMap = initSetterMap();
 
 bool Config::open(char const *path) {
-	struct stat statbuf;
 
-	if (stat(path, &statbuf) != 0) {
-		utils::putSysError("stat");
+	Result<bool, std::string> res = utils::isDirectory(path);
+	if (res.isError() == true) {
 		return false;
-	}
-	if (S_ISDIR(statbuf.st_mode) == true) {
-		std::cerr << RED << "Webserv: Error: a file path is directory." << RESET
-				  << std::endl;
+	} 
+	if (res.getOk() == true) {
 		return false;
 	}
 	this->_file.open(path, std::ios::in);
