@@ -34,7 +34,8 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 	return true;
 }
 
-static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo, ServerSocket *serverSocket) {
+static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo,
+								   ServerSocket *serverSocket) {
 	return new (std::nothrow) ClientSocket(socketInfo.first, serverSocket);
 }
 
@@ -139,13 +140,19 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			if (rsiter == rsmap.end() &&
 				iter->second.getReqphase() == Request::RQFIN) {
 				rsmap.insert(std::pair<int, Response>(iter->first, Response()));
-				std::map<int, Response>::iterator rsiter = rsmap.find(iter->first);
-				std::map<int, Request>::iterator rqiter = rqmap.find(iter->first);
-				std::map<int, ClientSocket *>::iterator csiter = csmap.find(iter->first);
-				rsiter->second.setServerPointer(config, rqiter->second, csiter->second->getServerSocket()->getIpaddress(),  csiter->second->getServerSocket()->getPort());
+				std::map<int, Response>::iterator rsiter =
+					rsmap.find(iter->first);
+				std::map<int, Request>::iterator rqiter =
+					rqmap.find(iter->first);
+				std::map<int, ClientSocket *>::iterator csiter =
+					csmap.find(iter->first);
+				rsiter->second.setServerPointer(
+					config, rqiter->second,
+					csiter->second->getServerSocket()->getIpaddress(),
+					csiter->second->getServerSocket()->getPort());
 				rsiter->second.setLocationPointer(rqiter->second.getPath());
 #if defined(_DEBUG)
-rsiter->second.printConfigInfo();
+				rsiter->second.printConfigInfo();
 #endif
 			}
 		}

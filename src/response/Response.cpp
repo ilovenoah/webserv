@@ -1,21 +1,25 @@
 #include "Response.hpp"
 
-Response::Response() : _httpVersion("HTTP/1.1"), _server(NULL), _location(NULL) {}
+Response::Response()
+	: _httpVersion("HTTP/1.1"), _server(NULL), _location(NULL) {}
 
-void Response::setServerPointer(Config &config, Request const &request, std::string const &ipAddr, std::string const &port) {
+void Response::setServerPointer(Config &config, Request const &request,
+								std::string const &ipAddr,
+								std::string const &port) {
 	std::string listen(ipAddr + ":" + port);
 	Result<std::string, bool> res(request.getHeaderValue("Host"));
 	if (res.isError() == true) {
 		this->_server = config.getDefaultServer(listen).getOk();
-	}
-	else {
+	} else {
 		std::string hostName(res.getOk());
 		this->_server = config.getServerPointer(listen, hostName);
 	}
 }
 
 void Response::setLocationPointer(const std::string &path) {
-	if (this->_server == NULL) { return ; }
+	if (this->_server == NULL) {
+		return;
+	}
 	this->_location = this->_server->getLocationPointer(path);
 }
 
@@ -23,7 +27,8 @@ void Response::printConfigInfo() const {
 	std::clog << "============== Routing result ==============" << std::endl;
 	std::clog << "Server name: " << this->_server->getServername() << std::endl;
 	if (this->_location != NULL) {
-		std::clog << "Location path: " << this->_location->getLocationPath() << std::endl;
+		std::clog << "Location path: " << this->_location->getLocationPath()
+				  << std::endl;
 	}
 	std::clog << "============================================" << std::endl;
 }
@@ -38,10 +43,10 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 
 		if (stat(localRelativePath.c_str(), &statbuf) != 0) {
 			utils::putSysError("stat");
-			//error handling
+			// error handling
 		}
 		if (S_ISDIR(statbuf.st_mode) == true) {
-			//error handling
+			// error handling
 		}
 		std::ifstream fs(localRelativePath.c_str(), std::ifstream::binary);
 		if (fs.fail() == true) {
@@ -55,14 +60,14 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 		std::memset(buf, 0, length);
 		fs.readsome(buf, length);
 		if (fs.fail()) {
-			//error handling
+			// error handling
 		}
 		this->_body.append(buf, length);
 		this->_httpVersion = "HTTP/1.1";
 		this->_status = "200";
 		this->_statusMsg = "Ok";
-		this->_headers.insert(
-			std::pair<std::string, std::string>("Content-Length", utils::sizeTtoString(this->_body.size())));
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Content-Length", utils::sizeTtoString(this->_body.size())));
 	}
 	return ClientSocket::SEND;
 }

@@ -6,9 +6,9 @@
 
 #include "CaseInsensitiveCompare.hpp"
 #include "ClientSocket.hpp"
-#include "Result.hpp"
 #include "Error.hpp"
 #include "Ok.hpp"
+#include "Result.hpp"
 
 class Request {
 	public:

@@ -1,16 +1,22 @@
 #include "main.hpp"
 
-static bool startUpServerSockets(std::map<int, ServerSocket> &ssmap, Config &config) {
-	std::map<std::string, std::map<std::string, Server> > servers(config.getServers());
-	for (std::map<std::string, std::map<std::string, Server> >::const_iterator iter = servers.begin(); iter != servers.end(); ++iter) {
+static bool startUpServerSockets(std::map<int, ServerSocket> &ssmap,
+								 Config &config) {
+	std::map<std::string, std::map<std::string, Server> > servers(
+		config.getServers());
+	for (std::map<std::string, std::map<std::string, Server> >::const_iterator
+			 iter = servers.begin();
+		 iter != servers.end(); ++iter) {
 		std::string ipAddr;
 		std::string port;
 		std::stringstream ss(iter->first);
-		
+
 		std::getline(ss, ipAddr, ':');
 		std::getline(ss, port);
 		ServerSocket svs(ipAddr, port);
-		if (svs.init() == false) { return false; }
+		if (svs.init() == false) {
+			return false;
+		}
 		std::cout << "Start up server: " << ipAddr << ":" << port << std::endl;
 		ssmap.insert(std::pair<int, ServerSocket>(svs.getFd(), svs));
 	}
