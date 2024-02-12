@@ -20,6 +20,7 @@ class AConfigurable {
 
 	private:
 	protected:
+		std::string _root;
 		std::vector<std::string> _allowMethods;
 		IsAutoIndexed _autoindex;
 		std::vector<std::string> _index;
@@ -33,6 +34,8 @@ class AConfigurable {
 	public:
 		AConfigurable();
 		virtual ~AConfigurable() = 0;
+		bool setRoot(std::string const &attribute, std::fstream &file);
+		const std::string &getRoot() const;
 		bool setAllowMethods(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getAllowMethods() const;
 		bool setAutoIndex(std::string const &attribute, std::fstream &file);

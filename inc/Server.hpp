@@ -20,7 +20,6 @@ class Server : public AConfigurable {
 		std::string _servername;
 		std::string _ipAddr;
 		std::string _port;
-		std::string _root;
 		std::map<std::string, Location> _locations;
 		static std::map<std::string,
 						bool (Location::*)(const std::string &, std::fstream &)>
@@ -37,8 +36,6 @@ class Server : public AConfigurable {
 		std::string getListen() const;
 		const std::string &getIpaddr() const;
 		const std::string &getPort() const;
-		bool setRoot(std::string const &attribute, std::fstream &file);
-		const std::string &getRoot() const;
 		bool setLocations(std::string const &attribute, std::fstream &file);
 		const std::map<std::string, Location> &getLocations() const;
 		void fillLocationDirectives();

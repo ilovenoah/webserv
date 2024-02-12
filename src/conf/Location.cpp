@@ -70,4 +70,7 @@ void Location::fillLocationDirectives(Server const &server) {
 	if (this->_aliasDirective.empty() == true) {
 		this->_aliasDirective = server.getAliasDirective();
 	}
+	if (this->_root.empty() == true) {
+		this->_root = server.getRoot();
+	}
 }

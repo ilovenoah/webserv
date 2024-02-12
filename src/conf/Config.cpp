@@ -204,6 +204,7 @@ void Config::printServers() const {
 				 iter3 != iter2->second.getLocations().end(); ++iter3) {
 				std::clog << "Location: " << iter3->second.getLocationPath()
 						  << std::endl;
+				std::clog << "	Root: " << iter3->second.getRoot() << std::endl;
 				std::clog << "	upload_pass: " << iter3->second.getUploadPass()
 						  << std::endl;
 				std::clog << "	alias: " << iter3->second.getAliasDirective() << std::endl;

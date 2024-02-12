@@ -5,6 +5,7 @@ Server::initSetterMap() {
 	std::map<std::string,
 			 bool (Location::*)(const std::string &, std::fstream &)>
 		srvSetterMap;
+	srvSetterMap["root"] = &Location::setRoot;
 	srvSetterMap["allow_methods"] = &Location::setAllowMethods;
 	srvSetterMap["autoindex"] = &Location::setAutoIndex;
 	srvSetterMap["index"] = &Location::setIndex;
@@ -90,38 +91,6 @@ std::string Server::getListen() const {
 const std::string &Server::getIpaddr() const { return this->_ipAddr; }
 
 const std::string &Server::getPort() const { return this->_port; }
-
-bool Server::setRoot(std::string const &attribute, std::fstream &file) {
-	(void)file;
-	std::stringstream ss(attribute);
-	std::string elem;
-	ss >> elem;
-	if (ss.peek() == EOF) {
-		return false;
-	}
-	elem.clear();
-	ss >> elem;
-	if (ss.peek() != EOF) {
-		return false;
-	}
-	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
-	if (res.isError() == true) {
-		return false;
-	}
-	if (res.getOk() == false) {
-		return false;
-	}
-	if (elem[0] != '/' && elem.find("./") != 0) {
-		elem = "./" + elem;
-	}
-	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
-		elem.erase(elem.length() - 1);
-	}
-	this->_root = elem;
-	return true;
-}
-
-const std::string &Server::getRoot() const { return this->_root; }
 
 bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 	std::string line;
