@@ -31,12 +31,39 @@ void Response::printConfigInfo() const {
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	(void)config;
 	(void)request;
-	this->_httpVersion = "HTTP/1.1";
-	this->_status = "200";
-	this->_statusMsg = "Ok";
-	this->_headers.insert(
-		std::pair<std::string, std::string>("Content-Length", "11"));
-	this->_body = "Helloworld!";
+	std::string localRelativePath("." + request.getPath());
+
+	if (request.getMethod() == "GET") {
+		struct stat statbuf;
+
+		if (stat(localRelativePath.c_str(), &statbuf) != 0) {
+			utils::putSysError("stat");
+			//error handling
+		}
+		if (S_ISDIR(statbuf.st_mode) == true) {
+			//error handling
+		}
+		std::ifstream fs(localRelativePath.c_str(), std::ifstream::binary);
+		if (fs.fail() == true) {
+			// error handling
+		}
+		fs.seekg(0, fs.end);
+		std::size_t length = fs.tellg();
+		fs.seekg(0, fs.beg);
+
+		char buf[length];
+		std::memset(buf, 0, length);
+		fs.readsome(buf, length);
+		if (fs.fail()) {
+			//error handling
+		}
+		this->_body.append(buf, length);
+		this->_httpVersion = "HTTP/1.1";
+		this->_status = "200";
+		this->_statusMsg = "Ok";
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Content-Length", utils::sizeTtoString(this->_body.size())));
+	}
 	return ClientSocket::SEND;
 }
 
