@@ -15,6 +15,38 @@ AConfigurable::AConfigurable()
 
 AConfigurable::~AConfigurable() {}
 
+bool AConfigurable::setRoot(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	ss >> elem;
+	if (ss.peek() == EOF) {
+		return false;
+	}
+	elem.clear();
+	ss >> elem;
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_root = elem;
+	return true;
+}
+
+const std::string &AConfigurable::getRoot() const { return this->_root; }
+
 bool AConfigurable::setAllowMethods(std::string const &attribute,
 									std::fstream &file) {
 	(void)file;
@@ -226,3 +258,72 @@ const std::map<std::string, std::string> &AConfigurable::getErrorPages() const {
 }
 
 const std::string &AConfigurable::getReturn() const { return this->_return; }
+
+
+bool AConfigurable::setUploadPass(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	ss >> elem;
+	if (ss.peek() == EOF) {
+		return false;
+	}
+	elem.clear();
+	ss >> elem;
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_uploadPass = elem;
+	return true;
+}
+
+const std::string &AConfigurable::getUploadPass() const {
+	return this->_uploadPass;
+}
+
+bool AConfigurable::setAliasDirective(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	ss >> elem;
+	if (ss.peek() == EOF) {
+		return false;
+	}
+	elem.clear();
+	ss >> elem;
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_aliasDirective = elem;
+	return true;
+}
+
+const std::string &AConfigurable::getAliasDirective() const {
+	return this->_aliasDirective;
+}

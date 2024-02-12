@@ -64,4 +64,13 @@ void Location::fillLocationDirectives(Server const &server) {
 	if (this->_errorPages.size() == 0) {
 		this->_errorPages = server.getErrorPages();
 	}
+	if (this->_uploadPass.empty() == true) {
+		this->_uploadPass = server.getUploadPass();
+	}
+	if (this->_aliasDirective.empty() == true) {
+		this->_aliasDirective = server.getAliasDirective();
+	}
+	if (this->_root.empty() == true) {
+		this->_root = server.getRoot();
+	}
 }

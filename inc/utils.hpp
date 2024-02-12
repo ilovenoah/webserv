@@ -23,7 +23,7 @@ bool findCRLF(std::stringstream &stream);
 bool shouldIgnoreLine(std::string const &line);
 bool rmCR(std::string &line);
 bool isNumber(std::string const &str);
-Result<bool, std::string> isDirectory(std::string const &path);
+Result<bool, std::string> isDirectory(std::string const &path, int mode);
 }  // namespace utils
 
 #endif

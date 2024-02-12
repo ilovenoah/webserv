@@ -79,10 +79,10 @@ bool isNumber(std::string const &str) {
 	return true;
 }
 
-Result<bool, std::string> isDirectory(std::string const &path) {
+Result<bool, std::string> isDirectory(std::string const &path, int mode) {
 	struct stat statbuf;
 
-	if (access(path.c_str(), F_OK) == -1) {
+	if (access(path.c_str(), mode) == -1) {
 		utils::putSysError("access");
 		return Error<std::string>(std::strerror(errno));
 	}
