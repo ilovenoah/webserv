@@ -12,6 +12,7 @@ Server::initSetterMap() {
 	srvSetterMap["cgi_extensions"] = &Location::setCgiExtensions;
 	srvSetterMap["return"] = &Location::setReturn;
 	srvSetterMap["error_page"] = &Location::setErrorPages;
+	srvSetterMap["upload_pass"] = &Location::setUploadPass;
 	return srvSetterMap;
 }
 

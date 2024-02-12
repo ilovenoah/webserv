@@ -17,6 +17,7 @@ Config::initSetterMap() {
 	srvSetterMap["return"] = &Server::setReturn;
 	srvSetterMap["error_page"] = &Server::setErrorPages;
 	srvSetterMap["location"] = &Server::setLocations;
+	srvSetterMap["upload_pass"] = &Server::setUploadPass;
 	return srvSetterMap;
 }
 
@@ -163,6 +164,7 @@ void Config::printServers() const {
 					  << std::endl;
 			std::clog << "Listen: " << iter2->second.getListen() << std::endl;
 			std::clog << "Root: " << iter2->second.getRoot() << std::endl;
+			std::clog << "upload_pass: " << iter2->second.getUploadPass() << std::endl;
 			std::clog << "Allow methods: ";
 			for (std::vector<std::string>::const_iterator iter3 =
 					 iter2->second.getAllowMethods().begin();
@@ -199,6 +201,8 @@ void Config::printServers() const {
 					 iter2->second.getLocations().begin();
 				 iter3 != iter2->second.getLocations().end(); ++iter3) {
 				std::clog << "Location: " << iter3->second.getLocationPath()
+						  << std::endl;
+				std::clog << "	upload_pass: " << iter3->second.getUploadPass()
 						  << std::endl;
 				std::clog << "	Allow methods: ";
 				for (std::vector<std::string>::const_iterator iter4 =
