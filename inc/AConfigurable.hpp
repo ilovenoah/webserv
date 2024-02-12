@@ -28,6 +28,7 @@ class AConfigurable {
 		std::string _return;
 		std::map<std::string, std::string> _errorPages;
 		std::string _uploadPass;
+		std::string _aliasDirective;
 
 	public:
 		AConfigurable();
@@ -49,6 +50,8 @@ class AConfigurable {
 		const std::map<std::string, std::string> &getErrorPages() const;
 		bool setUploadPass(std::string const &attribute, std::fstream &file);
 		const std::string &getUploadPass() const;
+		bool setAliasDirective(std::string const &attribute, std::fstream &file);
+		const std::string &getAliasDirective() const;
 };
 
 #endif

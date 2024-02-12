@@ -67,4 +67,7 @@ void Location::fillLocationDirectives(Server const &server) {
 	if (this->_uploadPass.empty() == true) {
 		this->_uploadPass = server.getUploadPass();
 	}
+	if (this->_aliasDirective.empty() == true) {
+		this->_aliasDirective = server.getAliasDirective();
+	}
 }
