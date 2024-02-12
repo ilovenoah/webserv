@@ -42,6 +42,76 @@ bool Location::setLocationPath(std::string const &attribute) {
 
 const std::string &Location::getLocationPath() const { return this->_path; }
 
+bool Location::setRoot(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	if (this->_aliasDirective.empty() == false) {
+		return false;
+	}
+	ss >> elem;
+	if (ss.peek() == EOF) {
+		return false;
+	}
+	elem.clear();
+	ss >> elem;
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_root = elem;
+	return true;
+}
+
+bool Location::setAliasDirective(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	if (this->_root.empty() == false) {
+		return false;
+	}
+	ss >> elem;
+	if (ss.peek() == EOF) {
+		return false;
+	}
+	elem.clear();
+	ss >> elem;
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_aliasDirective = elem;
+	return true;
+}
+
+const std::string &Location::getAliasDirective() const {
+	return this->_aliasDirective;
+}
+
 void Location::fillLocationDirectives(Server const &server) {
 	if (this->_allowMethods.size() == 0) {
 		this->_allowMethods = server.getAllowMethods();
@@ -67,10 +137,7 @@ void Location::fillLocationDirectives(Server const &server) {
 	if (this->_uploadPass.empty() == true) {
 		this->_uploadPass = server.getUploadPass();
 	}
-	if (this->_aliasDirective.empty() == true) {
-		this->_aliasDirective = server.getAliasDirective();
-	}
-	if (this->_root.empty() == true) {
+	if (this->_root.empty() == true && this->_aliasDirective.empty() == true) {
 		this->_root = server.getRoot();
 	}
 }
