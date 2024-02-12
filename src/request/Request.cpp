@@ -33,9 +33,13 @@ std::string const &Request::getHttpVersion() const {
 	return this->_httpVersion;
 }
 
-Result<std::string, bool> Request::getHeaderValue(std::string const &key) const {
-	std::map<std::string, std::string>::const_iterator iter = this->_header.find(key);
-	if (iter == this->_header.end()) { return Error<bool>(false); }
+Result<std::string, bool> Request::getHeaderValue(
+	std::string const &key) const {
+	std::map<std::string, std::string>::const_iterator iter =
+		this->_header.find(key);
+	if (iter == this->_header.end()) {
+		return Error<bool>(false);
+	}
 	return Ok<std::string>(iter->second);
 }
 

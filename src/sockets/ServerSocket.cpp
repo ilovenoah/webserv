@@ -85,6 +85,4 @@ int ServerSocket::getFd() const { return this->_fd; }
 const std::string &ServerSocket::getIpaddress() const {
 	return this->_ipaddress;
 }
-const std::string &ServerSocket::getPort() const {
-	return this->_port;
-}
+const std::string &ServerSocket::getPort() const { return this->_port; }

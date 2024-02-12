@@ -6,9 +6,9 @@
 
 #include "ClientSocket.hpp"
 #include "Config.hpp"
-#include "Server.hpp"
 #include "Location.hpp"
 #include "Request.hpp"
+#include "Server.hpp"
 
 class Response {
 		// public:
@@ -25,10 +25,12 @@ class Response {
 
 	public:
 		Response();
-		void setServerPointer(Config &config, Request const &request, std::string const &ipAddr, std::string const &port);
+		void setServerPointer(Config &config, Request const &request,
+							  std::string const &ipAddr,
+							  std::string const &port);
 		void setLocationPointer(const std::string &path);
 		void printConfigInfo() const;
-		ClientSocket::csphase load(Config &config,  Request const &request);
+		ClientSocket::csphase load(Config &config, Request const &request);
 		std::string getEntireData() const;
 };
 
