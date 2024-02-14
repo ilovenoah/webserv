@@ -35,6 +35,10 @@ class Response {
 							  std::string const &ipAddr,
 							  std::string const &port);
 		void setLocationPointer(const std::string &path);
+		void setHttpVersion(std::string const &httpVersion);
+		void setStatus(std::string const &status);
+		void setStatusMsg(std::string const &statusMsg);
+		void setBody(std::string const &body);
 		void printConfigInfo() const;
 		ClientSocket::csphase load(Config &config, Request const &request);
 		std::string getEntireData() const;

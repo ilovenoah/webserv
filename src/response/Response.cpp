@@ -35,6 +35,22 @@ void Response::setLocationPointer(const std::string &path) {
 	this->_location = this->_server->getLocationPointer(path);
 }
 
+void Response::setHttpVersion(std::string const &httpVersion) {
+	this->_httpVersion = httpVersion;
+}
+
+void Response::setStatus(std::string const &status) {
+	this->_status = status;
+}
+
+void Response::setStatusMsg(std::string const &statusMsg) {
+	this->_statusMsg = statusMsg;
+}
+
+void Response::setBody(std::string const &body) {
+	this->_body = body;
+}
+
 void Response::printConfigInfo() const {
 	std::clog << "============== Routing result ==============" << std::endl;
 	std::clog << "Server name: " << this->_server->getServername() << std::endl;
