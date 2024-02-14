@@ -61,6 +61,73 @@ void Response::printConfigInfo() const {
 	std::clog << "============================================" << std::endl;
 }
 
+void Response::_setErrorResponse(const std::string &status) {
+	std::string errorPagePath;
+	std::string root;
+	std::string localRelativePath;
+	std::fstream fs;
+	std::size_t length;
+
+	if (this->_location != NULL) {
+		std::map<std::string, std::string>::const_iterator iter = this->_location->getErrorPages().find(status);
+		if (iter != this->_location->getErrorPages().end()) {
+			errorPagePath = iter->second;
+		}
+	}
+	if (errorPagePath.empty() == true) {
+		std::map<std::string, std::string>::const_iterator iter = this->_server->getErrorPages().find(status);
+		if (iter != this->_server->getErrorPages().end()) {
+			errorPagePath = iter->second;
+		} else {
+			this->_httpVersion = "HTTP/1.1";
+			this->_status = status;
+			this->_statusMsg = this->_errorStatusMap.find(status)->second.first;
+			this->_body = this->_errorStatusMap.find(status)->second.second;
+			this->_headers.insert(std::pair<std::string, std::string>(
+				"Content-Length", utils::sizeTtoString(this->_body.size())));
+			return ;
+		}
+	}
+	if (this->_location->getRoot().empty() == false) {
+		root = this->_location->getRoot();
+	} else {
+		root = this->_server->getRoot();
+	}
+	localRelativePath = root + errorPagePath;
+	fs.open(localRelativePath.c_str());
+	if (fs.fail() == true) {
+		this->_httpVersion = "HTTP/1.1";
+		this->_status = "500";
+		this->_statusMsg = this->_errorStatusMap.find("500")->second.first;
+		this->_body = this->_errorStatusMap.find("500")->second.second;
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Content-Length", utils::sizeTtoString(this->_body.size())));
+		return ;
+	} else {
+		fs.seekg(0, fs.end);
+		length = fs.tellg();
+		fs.seekg(0, fs.beg);
+		char buf[length];
+		std::memset(buf, 0, length);
+		fs.readsome(buf, length);
+		if (fs.fail()) {
+			this->_httpVersion = "HTTP/1.1";
+			this->_status = "500";
+			this->_statusMsg = this->_errorStatusMap.find("500")->second.first;
+			this->_body = this->_errorStatusMap.find("500")->second.second;
+			this->_headers.insert(std::pair<std::string, std::string>(
+				"Content-Length", utils::sizeTtoString(this->_body.size())));
+			return ;
+		}
+		this->_body.append(buf, length);
+		this->_httpVersion = "HTTP/1.1";
+		this->_status = status;
+		this->_statusMsg = this->_errorStatusMap.find(status)->second.first;
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Content-Length", utils::sizeTtoString(this->_body.size())));
+	}
+}
+
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	(void)config;
 	(void)request;
