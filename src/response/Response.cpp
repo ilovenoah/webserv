@@ -2,7 +2,7 @@
 
 std::map<std::string, std::pair<std::string, std::string> > Response::_initErrorStatusMap() {
 	std::map<std::string, std::pair<std::string, std::string> >  errorStatusMap;
-
+// use macro for body
 	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("400", std::pair<std::string, std::string>("Bad Request", "Bad Request")));
 	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("403", std::pair<std::string, std::string>("Forbidden", "Forbidden")));
 	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("404", std::pair<std::string, std::string>("Not Found", "Not Found")));
