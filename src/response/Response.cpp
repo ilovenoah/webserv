@@ -131,29 +131,38 @@ void Response::_setErrorResponse(const std::string &status) {
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	(void)config;
 	(void)request;
-	std::string localRelativePath(this->_server->getRoot() + request.getPath());
+	std::string localRelativePath;
+	std::ifstream fs;
+	std::size_t length(0);
 
+	if (this->_location == NULL) {
+		localRelativePath = this->_server->getRoot() + request.getPath();
+	} else {
+		localRelativePath = this->_server->getRoot() +this->_location->getLocationPath() + request.getPath();
+	}
 	if (request.getMethod() == "GET") {
 		Result<bool, std::string> res = utils::isDirectory(localRelativePath, R_OK);
 		if (res.isError()) {
-			//error handling
+			this->_setErrorResponse("500");
+			return ClientSocket::SEND;
 		}
 		if (res.getOk() == true) {
 			//directory listingへ
 		}
-		std::ifstream fs(localRelativePath.c_str(), std::ifstream::binary);
+		fs.open(localRelativePath.c_str(), std::ifstream::binary);
 		if (fs.fail() == true) {
-			// error handling
+			this->_setErrorResponse("404");
+			return ClientSocket::SEND;
 		}
 		fs.seekg(0, fs.end);
-		std::size_t length = fs.tellg();
+		length = fs.tellg();
 		fs.seekg(0, fs.beg);
-
 		char buf[length];
 		std::memset(buf, 0, length);
 		fs.readsome(buf, length);
 		if (fs.fail()) {
-			// error handling
+			this->_setErrorResponse("500");
+			return ClientSocket::SEND;
 		}
 		this->_body.append(buf, length);
 		this->_httpVersion = "HTTP/1.1";
