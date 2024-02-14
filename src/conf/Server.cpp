@@ -22,7 +22,9 @@ std::map<std::string, bool (Location::*)(std::string const &, std::fstream &)>
 	Server::_setterMap = initSetterMap();
 
 Server::Server()
-	: AConfigurable(), _servername(""), _ipAddr("0.0.0.0"), _port("8000") {}
+	: AConfigurable(), _servername(""), _ipAddr("0.0.0.0"), _port("8000") {
+		this->_root = "./";
+	}
 
 const std::string &Server::getServername() const { return this->_servername; }
 
