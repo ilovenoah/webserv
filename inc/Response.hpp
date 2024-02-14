@@ -13,9 +13,6 @@
 #include "Result.hpp"
 
 class Response {
-		// public:
-		// 	enum rsphase {
-		// 	};
 	private:
 		std::string _httpVersion;
 		std::string _status;
@@ -43,5 +40,4 @@ class Response {
 		ClientSocket::csphase load(Config &config, Request const &request);
 		std::string getEntireData() const;
 };
-
 #endif
