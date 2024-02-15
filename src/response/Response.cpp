@@ -88,7 +88,7 @@ void Response::_setErrorResponse(const std::string &status) {
 			return ;
 		}
 	}
-	if (this->_location->getRoot().empty() == false) {
+	if (this->_location != NULL && this->_location->getRoot().empty() == false) {
 		root = this->_location->getRoot();
 	} else {
 		root = this->_server->getRoot();
@@ -194,14 +194,14 @@ static std::string const removeLocationFromString(std::string const &path, std::
 }
 
 void Response::setActPath(std::string const &path) {
-	if (this->_location->getAliasDirective().empty() == false) {
+	if (this->_location == NULL) {
+		this->_actPath = this->_server->getRoot() + path;
+	} else if (this->_location->getAliasDirective().empty() == false) {
 		this->_actPath = this->_location->getAliasDirective() + removeLocationFromString(path, this->_location->getLocationPath());
-	} else {
-		if (this->_location->getRoot().empty() == true) {
+	} else if (this->_location->getRoot().empty() == true) {
 			this->_actPath = this->_server->getRoot() + path;
 		} else {
 			this->_actPath = this->_location->getRoot() + path;
-		}
 	}
 }
 
