@@ -128,10 +128,51 @@ void Response::_setErrorResponse(const std::string &status) {
 	}
 }
 
+bool Response::_setIndexPage() {
+	std::vector<std::string> index;
+	std::ifstream fs;
+	std::size_t length;
+	std::string path;
+	if (this->_location != NULL) {
+		index = this->_location->getIndex();
+	} else {
+		index = this->_server->getIndex();
+	}
+	for (std::vector<std::string>::iterator iter = index.begin(); iter != index.end(); ++iter) {
+		path = this->_actPath + *iter;
+		if (utils::isAccess(path, R_OK) == true) {
+			fs.open(path.c_str(), std::ifstream::binary);
+			if (fs.fail()) {
+				this->_setErrorResponse("500");
+				return true;
+			}
+			fs.seekg(0, fs.end);
+			length = fs.tellg();
+			fs.seekg(0, fs.beg);
+			char buf[length];
+			std::memset(buf, 0, length);
+			fs.readsome(buf, length);
+			if (fs.fail()) {
+				this->_setErrorResponse("500");
+				return true;
+			}
+			this->_body.append(buf, length);
+			this->_httpVersion = "HTTP/1.1";
+			this->_status = "200";
+			this->_statusMsg = "Ok";
+			this->_headers.insert(std::pair<std::string, std::string>(
+				"Content-Length", utils::sizeTtoString(this->_body.size())));
+			return true;
+		}
+	}
+	return false;
+}
+
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::ifstream fs;
 	std::size_t length(0);
 
+	(void)config;
 	if (request.getMethod() == "GET") {
 		if (utils::isAccess(this->_actPath, R_OK) == false) {
 			this->_setErrorResponse("404");
@@ -143,7 +184,12 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 			return ClientSocket::SEND;
 		}
 		if (res.getOk() == true) {
-			//directory listingへ
+			if (request.getPath().compare("/") == 0 || request.getPath().compare(this->_location->getLocationPath() + "/") == 0) {
+				if (this->_setIndexPage() == true) { return ClientSocket::SEND; }
+			}
+			// if (this->_setDirectoryListingPage() == true) { return ClientSocket::SEND; }
+			this->_setErrorResponse("404");
+			return ClientSocket::SEND;
 		}
 		fs.open(this->_actPath.c_str(), std::ifstream::binary);
 		if (fs.fail() == true) {
@@ -199,11 +245,11 @@ void Response::setActPath(std::string const &path) {
 	} else if (this->_location->getAliasDirective().empty() == false) {
 		this->_actPath = this->_location->getAliasDirective() + removeLocationFromString(path, this->_location->getLocationPath());
 	} else if (this->_location->getRoot().empty() == true) {
-			this->_actPath = this->_server->getRoot() + path;
-		} else {
+		this->_actPath = this->_server->getRoot() + path;
+	} else {
 			this->_actPath = this->_location->getRoot() + path;
+		}
 	}
-}
 
 std::string const &Response::getActPath() const {
 	return this->_actPath;

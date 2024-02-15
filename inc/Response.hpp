@@ -26,6 +26,7 @@ class Response {
 		static std::map<std::string, std::pair<std::string, std::string> > _initErrorStatusMap();
 
 		void _setErrorResponse(const std::string &status);
+		bool _setIndexPage();
 
 	public:
 		Response();
