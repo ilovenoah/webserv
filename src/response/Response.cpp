@@ -129,8 +129,6 @@ void Response::_setErrorResponse(const std::string &status) {
 }
 
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
-	(void)config;
-	(void)request;
 	std::ifstream fs;
 	std::size_t length(0);
 
