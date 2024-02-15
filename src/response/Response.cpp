@@ -73,8 +73,7 @@ void Response::_setErrorResponse(const std::string &status) {
 		if (iter != this->_location->getErrorPages().end()) {
 			errorPagePath = iter->second;
 		}
-	}
-	if (errorPagePath.empty() == true) {
+	} else {
 		std::map<std::string, std::string>::const_iterator iter = this->_server->getErrorPages().find(status);
 		if (iter != this->_server->getErrorPages().end()) {
 			errorPagePath = iter->second;
@@ -131,15 +130,9 @@ void Response::_setErrorResponse(const std::string &status) {
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	(void)config;
 	(void)request;
-	std::string localRelativePath;
 	std::ifstream fs;
 	std::size_t length(0);
 
-	if (this->_location == NULL) {
-		localRelativePath = this->_server->getRoot() + request.getPath();
-	} else {
-		localRelativePath = this->_server->getRoot() +this->_location->getLocationPath() + request.getPath();
-	}
 	if (request.getMethod() == "GET") {
 		if (utils::isAccess(this->_actPath, R_OK) == false) {
 			this->_setErrorResponse("404");
