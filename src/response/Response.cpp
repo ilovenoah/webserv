@@ -141,7 +141,11 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 		localRelativePath = this->_server->getRoot() +this->_location->getLocationPath() + request.getPath();
 	}
 	if (request.getMethod() == "GET") {
-		Result<bool, std::string> res = utils::isDirectory(localRelativePath, R_OK);
+		if (utils::isAccess(localRelativePath, R_OK) == false) {
+			this->_setErrorResponse("404");
+			return ClientSocket::SEND;
+		}
+		Result<bool, std::string> res = utils::isDirectory(localRelativePath);
 		if (res.isError()) {
 			this->_setErrorResponse("500");
 			return ClientSocket::SEND;

@@ -58,7 +58,8 @@ bool Location::setRoot(std::string const &attribute, std::fstream &file) {
 	if (ss.peek() != EOF) {
 		return false;
 	}
-	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
+	//isAccess
+	Result<bool, std::string> res = utils::isDirectory(elem);
 	if (res.isError() == true) {
 		return false;
 	}
@@ -91,7 +92,8 @@ bool Location::setAliasDirective(std::string const &attribute, std::fstream &fil
 	if (ss.peek() != EOF) {
 		return false;
 	}
-	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
+	//isAccess
+	Result<bool, std::string> res = utils::isDirectory(elem);
 	if (res.isError() == true) {
 		return false;
 	}
@@ -139,5 +141,8 @@ void Location::fillLocationDirectives(Server const &server) {
 	}
 	if (this->_root.empty() == true && this->_aliasDirective.empty() == true) {
 		this->_root = server.getRoot();
+	}
+	for (std::map<std::string, std::string>::const_iterator iter = server.getErrorPages().begin(); iter != server.getErrorPages().end(); ++iter) {
+		this->_errorPages.insert(std::pair<std::string, std::string>(iter->first, iter->second));
 	}
 }

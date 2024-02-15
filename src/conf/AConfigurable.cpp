@@ -28,7 +28,8 @@ bool AConfigurable::setRoot(std::string const &attribute, std::fstream &file) {
 	if (ss.peek() != EOF) {
 		return false;
 	}
-	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
+	// isAccess
+	Result<bool, std::string> res = utils::isDirectory(elem);
 	if (res.isError() == true) {
 		return false;
 	}
@@ -273,7 +274,8 @@ bool AConfigurable::setUploadPass(std::string const &attribute, std::fstream &fi
 	if (ss.peek() != EOF) {
 		return false;
 	}
-	Result<bool, std::string> res = utils::isDirectory(elem, W_OK);
+	//isAccess
+	Result<bool, std::string> res = utils::isDirectory(elem);
 	if (res.isError() == true) {
 		return false;
 	}

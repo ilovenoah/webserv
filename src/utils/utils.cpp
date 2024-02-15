@@ -79,13 +79,9 @@ bool isNumber(std::string const &str) {
 	return true;
 }
 
-Result<bool, std::string> isDirectory(std::string const &path, int mode) {
+Result<bool, std::string> isDirectory(std::string const &path) {
 	struct stat statbuf;
 
-	if (access(path.c_str(), mode) == -1) {
-		utils::putSysError("access");
-		return Error<std::string>(std::strerror(errno));
-	}
 	if (stat(path.c_str(), &statbuf) != 0) {
 		utils::putSysError("stat");
 		return Error<std::string>(std::strerror(errno));
@@ -94,5 +90,12 @@ Result<bool, std::string> isDirectory(std::string const &path, int mode) {
 		return Ok<bool>(true);
 	}
 	return Ok<bool>(false);
+}
+
+bool isAccess(std::string const &path, int mode) {
+	if (access(path.c_str(), mode) == -1) {
+		return false;
+	}
+	return true;
 }
 }  // namespace utils
