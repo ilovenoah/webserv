@@ -2,7 +2,6 @@
 
 std::map<std::string, std::pair<std::string, std::string> > Response::_initErrorStatusMap() {
 	std::map<std::string, std::pair<std::string, std::string> >  errorStatusMap;
-// use macro for body
 	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("400", std::pair<std::string, std::string>("Bad Request", "Bad Request")));
 	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("403", std::pair<std::string, std::string>("Forbidden", "Forbidden")));
 	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("404", std::pair<std::string, std::string>("Not Found", "Not Found")));
@@ -168,6 +167,43 @@ bool Response::_setIndexPage() {
 	return false;
 }
 
+bool Response::_setDirectoryListingPage(const std::string &path) {
+	std::string title("<html>\n<head><title>Index of " + path + "</title></head>\n<body>\n");
+	std::string head("<h1>Index of " + path + "</h1><hr><pre>\n<a href=\"../\">../</a>\n");
+	std::string aTagStart("<a href=\"");
+	std::string aTagEnd("</a>");
+	std::string data(title + head);
+
+	DIR *dirp;
+	struct dirent *dp;
+	dirp = opendir(this->_actPath.c_str());
+	if (dirp == NULL) {
+		utils::putSysError("opendir");
+		return false;
+	}
+	dp = readdir(dirp);
+	while (dp != NULL) {
+		if (std::strcmp(dp->d_name, ".") == 0 || std::strcmp(dp->d_name, "..") == 0) {
+			dp = readdir(dirp);
+			continue ;
+		}
+		data.append(aTagStart + dp->d_name + "\">" + dp->d_name + aTagEnd + "\n");
+		dp = readdir(dirp);
+	}
+	if (closedir(dirp) == -1) {
+		utils::putSysError("opendir");
+		return false;
+	}
+	data.append("</pre><hr></body>\n</html>");
+	this->_body = data;
+	this->_httpVersion = "HTTP/1.1";
+	this->_status = "200";
+	this->_statusMsg = "Ok";
+	this->_headers.insert(std::pair<std::string, std::string>(
+		"Content-Length", utils::sizeTtoString(this->_body.size())));
+	return true;
+}
+
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::ifstream fs;
 	std::size_t length(0);
@@ -187,7 +223,7 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 			if (request.getPath().compare("/") == 0 || request.getPath().compare(this->_location->getLocationPath() + "/") == 0) {
 				if (this->_setIndexPage() == true) { return ClientSocket::SEND; }
 			}
-			// if (this->_setDirectoryListingPage() == true) { return ClientSocket::SEND; }
+			if (this->_setDirectoryListingPage(request.getPath()) == true) { return ClientSocket::SEND; }
 			this->_setErrorResponse("404");
 			return ClientSocket::SEND;
 		}

@@ -1,6 +1,9 @@
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
+#include <sys/types.h>
+#include <dirent.h>
+
 #include <map>
 #include <string>
 
@@ -27,6 +30,7 @@ class Response {
 
 		void _setErrorResponse(const std::string &status);
 		bool _setIndexPage();
+		bool _setDirectoryListingPage(const std::string &path);
 
 	public:
 		Response();
