@@ -21,6 +21,7 @@ class Response {
 		std::string _body;
 		Server *_server;
 		Location *_location;
+		std::string _actPath;
 		static std::map<std::string, std::pair<std::string, std::string> > _errorStatusMap;
 		static std::map<std::string, std::pair<std::string, std::string> > _initErrorStatusMap();
 
@@ -39,5 +40,7 @@ class Response {
 		void printConfigInfo() const;
 		ClientSocket::csphase load(Config &config, Request const &request);
 		std::string getEntireData() const;
+		void setActPath(std::string const &path);
+		std::string const &getActPath() const;
 };
 #endif

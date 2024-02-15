@@ -153,7 +153,7 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 		if (res.getOk() == true) {
 			//directory listingへ
 		}
-		fs.open(localRelativePath.c_str(), std::ifstream::binary);
+		fs.open(this->_actPath.c_str(), std::ifstream::binary);
 		if (fs.fail() == true) {
 			this->_setErrorResponse("404");
 			return ClientSocket::SEND;
@@ -190,4 +190,29 @@ std::string Response::getEntireData() const {
 	entireData += "\r\n";
 	entireData += this->_body;
 	return entireData;
+}
+
+static std::string const removeLocationFromString(std::string const &path, std::string const &location) {
+	std::string result = path;
+	size_t pos = result.find(location);
+	if (pos != std::string::npos) {
+		result.erase(pos, location.length());
+	}
+	return result;
+}
+
+void Response::setActPath(std::string const &path) {
+	if (this->_location->getAliasDirective().empty() == false) {
+		this->_actPath = this->_location->getAliasDirective() + removeLocationFromString(path, this->_location->getLocationPath());
+	} else {
+		if (this->_location->getRoot().empty() == true) {
+			this->_actPath = this->_server->getRoot() + path;
+		} else {
+			this->_actPath = this->_location->getRoot() + path;
+		}
+	}
+}
+
+std::string const &Response::getActPath() const {
+	return this->_actPath;
 }
