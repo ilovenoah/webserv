@@ -58,6 +58,7 @@ void Response::printConfigInfo() const {
 		std::clog << "Location path: " << this->_location->getLocationPath()
 				  << std::endl;
 	}
+	std::clog << "Actual path: " << this->_actPath << std::endl;
 	std::clog << "============================================" << std::endl;
 }
 
