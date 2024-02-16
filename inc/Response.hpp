@@ -3,6 +3,10 @@
 
 #include <sys/types.h>
 #include <dirent.h>
+#define HTTP_VERSION "HTTP/1.1"
+#define STATUS_OK "200"
+#define STATUS_CREATED "201"
+// #define STATUS_CREATED "201"
 
 #include <map>
 #include <string>
@@ -47,5 +51,7 @@ class Response {
 		std::string getEntireData() const;
 		void setActPath(std::string const &path);
 		std::string const &getActPath() const;
+		ClientSocket::csphase setEntireDataWithFile(std::string const &path, std::string const &status);
+		ClientSocket::csphase setEntireData(std::string const &status);
 };
 #endif

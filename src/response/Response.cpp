@@ -133,7 +133,6 @@ void Response::_setErrorResponse(const std::string &status) {
 bool Response::_setIndexPage() {
 	std::vector<std::string> index;
 	std::ifstream fs;
-	std::size_t length;
 	std::string path;
 	if (this->_location != NULL) {
 		index = this->_location->getIndex();
@@ -142,30 +141,8 @@ bool Response::_setIndexPage() {
 	}
 	for (std::vector<std::string>::iterator iter = index.begin(); iter != index.end(); ++iter) {
 		path = this->_actPath + *iter;
-		if (utils::isAccess(path, R_OK) == true) {
-			fs.open(path.c_str(), std::ifstream::binary);
-			if (fs.fail()) {
-				this->_setErrorResponse("500");
-				return true;
-			}
-			fs.seekg(0, fs.end);
-			length = fs.tellg();
-			fs.seekg(0, fs.beg);
-			char buf[length];
-			std::memset(buf, 0, length);
-			fs.readsome(buf, length);
-			if (fs.fail()) {
-				this->_setErrorResponse("500");
-				return true;
-			}
-			this->_body.append(buf, length);
-			this->_httpVersion = "HTTP/1.1";
-			this->_status = "200";
-			this->_statusMsg = "Ok";
-			this->_headers.insert(std::pair<std::string, std::string>(
-				"Content-Length", utils::sizeTtoString(this->_body.size())));
-			return true;
-		}
+		this->setEntireDataWithFile(path, "200");
+		return true;
 	}
 	return false;
 }
@@ -209,7 +186,6 @@ bool Response::_setDirectoryListingPage(const std::string &path) {
 
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::ifstream fs;
-	std::size_t length(0);
 
 	(void)config;
 	if (request.getMethod() == "GET") {
@@ -230,27 +206,7 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 			this->_setErrorResponse("404");
 			return ClientSocket::SEND;
 		}
-		fs.open(this->_actPath.c_str(), std::ifstream::binary);
-		if (fs.fail() == true) {
-			this->_setErrorResponse("404");
-			return ClientSocket::SEND;
-		}
-		fs.seekg(0, fs.end);
-		length = fs.tellg();
-		fs.seekg(0, fs.beg);
-		char buf[length];
-		std::memset(buf, 0, length);
-		fs.readsome(buf, length);
-		if (fs.fail()) {
-			this->_setErrorResponse("500");
-			return ClientSocket::SEND;
-		}
-		this->_body.append(buf, length);
-		this->_httpVersion = "HTTP/1.1";
-		this->_status = "200";
-		this->_statusMsg = "Ok";
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Content-Length", utils::sizeTtoString(this->_body.size())));
+		return this->setEntireDataWithFile(this->_actPath, "200");
 	} else if (request.getMethod() == "POST") {
 		std::string uploadStorePath;
 		std::string uploadPath;
@@ -279,11 +235,7 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 			this->_setErrorResponse("500");
 			return ClientSocket::SEND;
 		}
-		this->_httpVersion = "HTTP/1.1";
-		this->_status = "201";
-		this->_statusMsg = "Created";
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Content-Length", utils::sizeTtoString(this->_body.size())));
+		return this->setEntireData("201");
 	}
 	return ClientSocket::SEND;
 }
@@ -325,4 +277,45 @@ void Response::setActPath(std::string const &path) {
 
 std::string const &Response::getActPath() const {
 	return this->_actPath;
+}
+
+ClientSocket::csphase Response::setEntireDataWithFile(std::string const &path, std::string const &status) {
+	std::ifstream fs;
+	std::size_t length(0);
+
+	if (utils::isAccess(path.c_str(), R_OK) == false) {
+		this->_setErrorResponse("404");
+		return ClientSocket::SEND;
+	}
+	fs.open(path.c_str(), std::ifstream::binary);
+	if (fs.fail()) {
+		this->_setErrorResponse("500");
+		return ClientSocket::SEND;
+	}
+	fs.seekg(0, fs.end);
+	length = fs.tellg();
+	fs.seekg(0, fs.beg);
+	char buf[length];
+	std::memset(buf, 0, length);
+	fs.readsome(buf, length);
+	if (fs.fail()) {
+		this->_setErrorResponse("500");
+		return ClientSocket::SEND;
+	}
+	this->_body.append(buf, length);
+	this->_httpVersion = "HTTP/1.1";
+	this->_status = status;
+	this->_statusMsg = this->_statusMap.find(status)->first;
+	this->_headers.insert(std::pair<std::string, std::string>(
+		"Content-Length", utils::sizeTtoString(this->_body.size())));
+	return ClientSocket::SEND;
+}
+
+ClientSocket::csphase Response::setEntireData(std::string const &status) {
+	this->_httpVersion = "HTTP/1.1";
+	this->_status = status;
+	this->_statusMsg = this->_statusMap.find(status)->first;
+	this->_headers.insert(std::pair<std::string, std::string>(
+		"Content-Length", utils::sizeTtoString(this->_body.size())));
+	return ClientSocket::SEND;
 }
