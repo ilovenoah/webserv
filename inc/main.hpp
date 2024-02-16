@@ -2,12 +2,10 @@
 #define MAIN_HPP
 
 #include "Config.hpp"
-#include "CreateSocket.hpp"
 #include "Error.hpp"
-#include "HttpRequest.hpp"
 #include "Location.hpp"
-#include "Server.hpp"
-#include "ServerLoop.hpp"
+#include "ServerSocket.hpp"
 #include "env.hpp"
+#include "loop.hpp"
 
 #endif

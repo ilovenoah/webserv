@@ -1,75 +1,148 @@
 #include "Location.hpp"
 
-#include <map>
-
-std::map<std::string, void (Location::*)(const std::string &)> Location::_locSetterMap;
-
-Location::Location() {
-	_locSetterMap["location"] = &Location::setLocation;
-	_locSetterMap["allow_methods"] = &Location::setAllowMethods;
-	_locSetterMap["root"] = &Location::setRoot;
-	_locSetterMap["index"] = &Location::setIndex;
-	_locSetterMap["cgi_info"] = &Location::setCgiInfo;
+Location::Location() : AConfigurable() {
+	this->_allowMethods.clear();
+	this->_autoindex = AConfigurable::UNDEFINED;
+	this->_index.clear();
+	this->_clientMaxBodySize = -1;
+	this->_cgi_extensions.clear();
+	this->_return.clear();
+	this->_errorPages.clear();
 }
 
-Location::~Location() {
-}
+bool Location::setLocationPath(std::string const &attribute) {
+	std::stringstream ss(attribute);
+	std::string elem;
 
-Location::Location(const Location &copy) {
-	*this = copy;
-}
-
-Location &Location::operator=(const Location &copy) {
-	if (this != &copy) {
-		_location = copy._location;
-		_allowMethods = copy._allowMethods;
-		_root = copy._root;
-		_index = copy._index;
-		_cgiInfo = copy._cgiInfo;
+	ss >> elem;
+	elem.clear();
+	ss >> elem;
+	ss >> std::ws;
+	if (elem.empty() == true) {
+		return false;
 	}
-	return *this;
+	if (elem[elem.length() - 1] == '/' && elem.length() > 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_path = elem;
+	elem.clear();
+	ss >> elem;
+	ss >> std::ws;
+	if (elem.empty() == true) {
+		return false;
+	}
+	if (elem.compare("{") != 0) {
+		return false;
+	}
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	return true;
 }
 
-void Location::setLocation(const std::string &values) {
-	_location = values;
+const std::string &Location::getLocationPath() const { return this->_path; }
+
+bool Location::setRoot(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	if (this->_aliasDirective.empty() == false) {
+		return false;
+	}
+	ss >> elem;
+	if (ss.peek() == EOF) {
+		return false;
+	}
+	elem.clear();
+	ss >> elem;
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	//isAccess
+	Result<bool, std::string> res = utils::isDirectory(elem);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_root = elem;
+	return true;
 }
 
-void Location::setAllowMethods(const std::string &values) {
-	_allowMethods = values;
+bool Location::setAliasDirective(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	if (this->_root.empty() == false) {
+		return false;
+	}
+	ss >> elem;
+	if (ss.peek() == EOF) {
+		return false;
+	}
+	elem.clear();
+	ss >> elem;
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	//isAccess
+	Result<bool, std::string> res = utils::isDirectory(elem);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_aliasDirective = elem;
+	return true;
 }
 
-void Location::setRoot(const std::string &values) {
-	_root = values;
+const std::string &Location::getAliasDirective() const {
+	return this->_aliasDirective;
 }
 
-void Location::setIndex(const std::string &values) {
-	_index = values;
-}
-
-void Location::setCgiInfo(const std::string &values) {
-	_cgiInfo = values;
-}
-
-const std::string &Location::getLocation() const {
-	return _location;
-}
-
-const std::string &Location::getAllowMethods() const {
-	return _allowMethods;
-}
-
-const std::string &Location::getRoot() const {
-	return _root;
-}
-
-const std::string &Location::getIndex() const {
-	return _index;
-}
-
-const std::string &Location::getCgiInfo() const {
-	return _cgiInfo;
-}
-
-void Location::execSetterMap(std::string &keys, std::string &value) {
-	(this->*_locSetterMap[keys])(value);
+void Location::fillLocationDirectives(Server const &server) {
+	if (this->_allowMethods.size() == 0) {
+		this->_allowMethods = server.getAllowMethods();
+	}
+	if (this->_autoindex == AConfigurable::UNDEFINED) {
+		this->_autoindex = server.getAutoindex();
+	}
+	if (this->_index.size() == 0) {
+		this->_index = server.getIndex();
+	}
+	if (this->_clientMaxBodySize == -1) {
+		this->_clientMaxBodySize = server.getClientMaxBodySize();
+	}
+	if (this->_cgi_extensions.size() == 0) {
+		this->_cgi_extensions = server.getCgiExtensions();
+	}
+	if (this->_return.empty() == true) {
+		this->_return = server.getReturn();
+	}
+	if (this->_errorPages.size() == 0) {
+		this->_errorPages = server.getErrorPages();
+	}
+	if (this->_uploadPass.empty() == true) {
+		this->_uploadPass = server.getUploadPass();
+	}
+	if (this->_root.empty() == true && this->_aliasDirective.empty() == true) {
+		this->_root = server.getRoot();
+	}
+	for (std::map<std::string, std::string>::const_iterator iter = server.getErrorPages().begin(); iter != server.getErrorPages().end(); ++iter) {
+		this->_errorPages.insert(std::pair<std::string, std::string>(iter->first, iter->second));
+	}
 }
