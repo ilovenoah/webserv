@@ -28,7 +28,7 @@ class AConfigurable {
 		std::vector<std::string> _cgi_extensions;
 		std::string _return;
 		std::map<std::string, std::string> _errorPages;
-		std::string _uploadPass;
+		std::string _uploadStore;
 
 	public:
 		AConfigurable();
@@ -50,8 +50,8 @@ class AConfigurable {
 		bool setErrorPages(std::string const &attribute, std::fstream &file);
 		const std::string &getReturn() const;
 		const std::map<std::string, std::string> &getErrorPages() const;
-		bool setUploadPass(std::string const &attribute, std::fstream &file);
-		const std::string &getUploadPass() const;
+		bool setuploadStore(std::string const &attribute, std::fstream &file);
+		const std::string &getuploadStore() const;
 };
 
 #endif

@@ -136,8 +136,8 @@ void Location::fillLocationDirectives(Server const &server) {
 	if (this->_errorPages.size() == 0) {
 		this->_errorPages = server.getErrorPages();
 	}
-	if (this->_uploadPass.empty() == true) {
-		this->_uploadPass = server.getUploadPass();
+	if (this->_uploadStore.empty() == true) {
+		this->_uploadStore = server.getuploadStore();
 	}
 	if (this->_root.empty() == true && this->_aliasDirective.empty() == true) {
 		this->_root = server.getRoot();

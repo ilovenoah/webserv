@@ -261,7 +261,7 @@ const std::map<std::string, std::string> &AConfigurable::getErrorPages() const {
 const std::string &AConfigurable::getReturn() const { return this->_return; }
 
 
-bool AConfigurable::setUploadPass(std::string const &attribute, std::fstream &file) {
+bool AConfigurable::setuploadStore(std::string const &attribute, std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
 	std::string elem;
@@ -288,10 +288,10 @@ bool AConfigurable::setUploadPass(std::string const &attribute, std::fstream &fi
 	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
 		elem.erase(elem.length() - 1);
 	}
-	this->_uploadPass = elem;
+	this->_uploadStore = elem;
 	return true;
 }
 
-const std::string &AConfigurable::getUploadPass() const {
-	return this->_uploadPass;
+const std::string &AConfigurable::getuploadStore() const {
+	return this->_uploadStore;
 }
