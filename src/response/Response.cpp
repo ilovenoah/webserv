@@ -248,6 +248,39 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 		this->_statusMsg = "Ok";
 		this->_headers.insert(std::pair<std::string, std::string>(
 			"Content-Length", utils::sizeTtoString(this->_body.size())));
+	} else if (request.getMethod() == "POST") {
+		std::string uploadStorePath;
+		std::string uploadPath;
+		if (this->_location != NULL) {
+			uploadStorePath = this->_location->getuploadStore() + "/";
+		} else {
+			uploadStorePath = this->_server->getuploadStore() + "/";
+		}
+		if (utils::isAccess(uploadStorePath, R_OK) == false) {
+			this->_setErrorResponse("500");
+			return ClientSocket::SEND;
+		}
+		std::time_t ts(std::time(NULL));
+		uploadPath = uploadStorePath + utils::sizeTtoString(ts);
+		while (utils::isAccess(uploadPath, F_OK) == true) {
+			ts = std::time(NULL);
+			uploadPath = uploadStorePath + utils::sizeTtoString(ts);
+		}
+		std::ofstream ofs(uploadPath.c_str());
+		if (ofs.fail() == true) {
+			this->_setErrorResponse("500");
+			return ClientSocket::SEND;
+		}
+		ofs.write(request.getBody().c_str(), request.getBody().size());
+		if (ofs.fail() == true) {
+			this->_setErrorResponse("500");
+			return ClientSocket::SEND;
+		}
+		this->_httpVersion = "HTTP/1.1";
+		this->_status = "201";
+		this->_statusMsg = "Created";
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Content-Length", utils::sizeTtoString(this->_body.size())));
 	}
 	return ClientSocket::SEND;
 }
