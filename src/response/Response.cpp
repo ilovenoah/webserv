@@ -1,15 +1,18 @@
 #include "Response.hpp"
 
-std::map<std::string, std::pair<std::string, std::string> > Response::_initErrorStatusMap() {
-	std::map<std::string, std::pair<std::string, std::string> >  errorStatusMap;
-	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("400", std::pair<std::string, std::string>("Bad Request", "Bad Request")));
-	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("403", std::pair<std::string, std::string>("Forbidden", "Forbidden")));
-	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("404", std::pair<std::string, std::string>("Not Found", "Not Found")));
-	errorStatusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("500", std::pair<std::string, std::string>("Internal Server Error", "Internal Server Error")));
-	return errorStatusMap;
+
+std::map<std::string, std::pair<std::string, std::string> > Response::_initstatusMap() {
+	std::map<std::string, std::pair<std::string, std::string> >  statusMap;
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("200", std::pair<std::string, std::string>("Ok", "")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("201", std::pair<std::string, std::string>("Created", "")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("400", std::pair<std::string, std::string>("Bad Request", "Bad Request")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("403", std::pair<std::string, std::string>("Forbidden", "Forbidden")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("404", std::pair<std::string, std::string>("Not Found", "Not Found")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("500", std::pair<std::string, std::string>("Internal Server Error", "Internal Server Error")));
+	return statusMap;
 }
 
-std::map<std::string, std::pair<std::string, std::string> > Response::_errorStatusMap = _initErrorStatusMap();
+std::map<std::string, std::pair<std::string, std::string> > Response::_statusMap = _initstatusMap();
 
 Response::Response()
 	: _httpVersion("HTTP/1.1"), _server(NULL), _location(NULL) {}
@@ -80,8 +83,8 @@ void Response::_setErrorResponse(const std::string &status) {
 		} else {
 			this->_httpVersion = "HTTP/1.1";
 			this->_status = status;
-			this->_statusMsg = this->_errorStatusMap.find(status)->second.first;
-			this->_body = this->_errorStatusMap.find(status)->second.second;
+			this->_statusMsg = this->_statusMap.find(status)->second.first;
+			this->_body = this->_statusMap.find(status)->second.second;
 			this->_headers.insert(std::pair<std::string, std::string>(
 				"Content-Length", utils::sizeTtoString(this->_body.size())));
 			return ;
@@ -97,8 +100,8 @@ void Response::_setErrorResponse(const std::string &status) {
 	if (fs.fail() == true) {
 		this->_httpVersion = "HTTP/1.1";
 		this->_status = "500";
-		this->_statusMsg = this->_errorStatusMap.find("500")->second.first;
-		this->_body = this->_errorStatusMap.find("500")->second.second;
+		this->_statusMsg = this->_statusMap.find("500")->second.first;
+		this->_body = this->_statusMap.find("500")->second.second;
 		this->_headers.insert(std::pair<std::string, std::string>(
 			"Content-Length", utils::sizeTtoString(this->_body.size())));
 		return ;
@@ -112,8 +115,8 @@ void Response::_setErrorResponse(const std::string &status) {
 		if (fs.fail()) {
 			this->_httpVersion = "HTTP/1.1";
 			this->_status = "500";
-			this->_statusMsg = this->_errorStatusMap.find("500")->second.first;
-			this->_body = this->_errorStatusMap.find("500")->second.second;
+			this->_statusMsg = this->_statusMap.find("500")->second.first;
+			this->_body = this->_statusMap.find("500")->second.second;
 			this->_headers.insert(std::pair<std::string, std::string>(
 				"Content-Length", utils::sizeTtoString(this->_body.size())));
 			return ;
@@ -121,7 +124,7 @@ void Response::_setErrorResponse(const std::string &status) {
 		this->_body.append(buf, length);
 		this->_httpVersion = "HTTP/1.1";
 		this->_status = status;
-		this->_statusMsg = this->_errorStatusMap.find(status)->second.first;
+		this->_statusMsg = this->_statusMap.find(status)->second.first;
 		this->_headers.insert(std::pair<std::string, std::string>(
 			"Content-Length", utils::sizeTtoString(this->_body.size())));
 	}

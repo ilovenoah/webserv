@@ -25,8 +25,8 @@ class Response {
 		Server *_server;
 		Location *_location;
 		std::string _actPath;
-		static std::map<std::string, std::pair<std::string, std::string> > _errorStatusMap;
-		static std::map<std::string, std::pair<std::string, std::string> > _initErrorStatusMap();
+		static std::map<std::string, std::pair<std::string, std::string> > _statusMap;
+		static std::map<std::string, std::pair<std::string, std::string> > _initstatusMap();
 
 		void _setErrorResponse(const std::string &status);
 		bool _setIndexPage();
