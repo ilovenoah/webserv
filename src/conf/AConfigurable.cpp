@@ -15,6 +15,46 @@ AConfigurable::AConfigurable()
 
 AConfigurable::~AConfigurable() {}
 
+bool AConfigurable::setRoot(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	ss >> elem;
+	if (ss.peek() == EOF) {
+		return false;
+	}
+	elem.clear();
+	ss >> elem;
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	// isAccess
+	Result<bool, std::string> res = utils::isDirectory(elem);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_root = elem;
+	return true;
+}
+
+const std::string &AConfigurable::getRoot() const { return this->_root; }
+
+bool AConfigurable::isAllowedMethod(const std::string &method) const {
+	for (std::vector<std::string>::const_iterator iter = this->_allowMethods.begin(); iter != this->_allowMethods.end(); ++iter) {
+		if (iter->compare(method) == 0) { return true; }
+	}
+	return false;
+}
+
 bool AConfigurable::setAllowMethods(std::string const &attribute,
 									std::fstream &file) {
 	(void)file;
@@ -226,3 +266,39 @@ const std::map<std::string, std::string> &AConfigurable::getErrorPages() const {
 }
 
 const std::string &AConfigurable::getReturn() const { return this->_return; }
+
+
+bool AConfigurable::setuploadStore(std::string const &attribute, std::fstream &file) {
+	(void)file;
+	std::stringstream ss(attribute);
+	std::string elem;
+	ss >> elem;
+	if (ss.peek() == EOF) {
+		return false;
+	}
+	elem.clear();
+	ss >> elem;
+	if (ss.peek() != EOF) {
+		return false;
+	}
+	//isAccess
+	Result<bool, std::string> res = utils::isDirectory(elem);
+	if (res.isError() == true) {
+		return false;
+	}
+	if (res.getOk() == false) {
+		return false;
+	}
+	if (elem[0] != '/' && elem.find("./") != 0) {
+		elem = "./" + elem;
+	}
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+		elem.erase(elem.length() - 1);
+	}
+	this->_uploadStore = elem;
+	return true;
+}
+
+const std::string &AConfigurable::getuploadStore() const {
+	return this->_uploadStore;
+}

@@ -5,6 +5,7 @@ Server::initSetterMap() {
 	std::map<std::string,
 			 bool (Location::*)(const std::string &, std::fstream &)>
 		srvSetterMap;
+	srvSetterMap["root"] = &Location::setRoot;
 	srvSetterMap["allow_methods"] = &Location::setAllowMethods;
 	srvSetterMap["autoindex"] = &Location::setAutoIndex;
 	srvSetterMap["index"] = &Location::setIndex;
@@ -12,6 +13,8 @@ Server::initSetterMap() {
 	srvSetterMap["cgi_extensions"] = &Location::setCgiExtensions;
 	srvSetterMap["return"] = &Location::setReturn;
 	srvSetterMap["error_page"] = &Location::setErrorPages;
+	srvSetterMap["upload_store"] = &Location::setuploadStore;
+	srvSetterMap["alias"] = &Location::setAliasDirective;
 	return srvSetterMap;
 }
 
@@ -19,7 +22,9 @@ std::map<std::string, bool (Location::*)(std::string const &, std::fstream &)>
 	Server::_setterMap = initSetterMap();
 
 Server::Server()
-	: AConfigurable(), _servername(""), _ipAddr("0.0.0.0"), _port("8000") {}
+	: AConfigurable(), _servername(""), _ipAddr("0.0.0.0"), _port("8000") {
+		this->_root = "./";
+	}
 
 const std::string &Server::getServername() const { return this->_servername; }
 
@@ -88,25 +93,6 @@ std::string Server::getListen() const {
 const std::string &Server::getIpaddr() const { return this->_ipAddr; }
 
 const std::string &Server::getPort() const { return this->_port; }
-
-bool Server::setRoot(std::string const &attribute, std::fstream &file) {
-	(void)file;
-	std::stringstream ss(attribute);
-	std::string elem;
-	ss >> elem;
-	if (ss.peek() == EOF) {
-		return false;
-	}
-	elem.clear();
-	ss >> elem;
-	if (ss.peek() != EOF) {
-		return false;
-	}
-	this->_root = elem;
-	return true;
-}
-
-const std::string &Server::getRoot() const { return this->_root; }
 
 bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 	std::string line;

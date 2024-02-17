@@ -20,6 +20,7 @@ class AConfigurable {
 
 	private:
 	protected:
+		std::string _root;
 		std::vector<std::string> _allowMethods;
 		IsAutoIndexed _autoindex;
 		std::vector<std::string> _index;
@@ -27,12 +28,16 @@ class AConfigurable {
 		std::vector<std::string> _cgi_extensions;
 		std::string _return;
 		std::map<std::string, std::string> _errorPages;
+		std::string _uploadStore;
 
 	public:
 		AConfigurable();
 		virtual ~AConfigurable() = 0;
+		virtual bool setRoot(std::string const &attribute, std::fstream &file);
+		const std::string &getRoot() const;
 		bool setAllowMethods(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getAllowMethods() const;
+		bool isAllowedMethod(const std::string &method) const;
 		bool setAutoIndex(std::string const &attribute, std::fstream &file);
 		const IsAutoIndexed &getAutoindex() const;
 		bool setIndex(std::string const &attribute, std::fstream &file);
@@ -46,6 +51,8 @@ class AConfigurable {
 		bool setErrorPages(std::string const &attribute, std::fstream &file);
 		const std::string &getReturn() const;
 		const std::map<std::string, std::string> &getErrorPages() const;
+		bool setuploadStore(std::string const &attribute, std::fstream &file);
+		const std::string &getuploadStore() const;
 };
 
 #endif

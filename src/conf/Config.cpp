@@ -17,6 +17,7 @@ Config::initSetterMap() {
 	srvSetterMap["return"] = &Server::setReturn;
 	srvSetterMap["error_page"] = &Server::setErrorPages;
 	srvSetterMap["location"] = &Server::setLocations;
+	srvSetterMap["upload_store"] = &Server::setuploadStore;
 	return srvSetterMap;
 }
 
@@ -24,15 +25,13 @@ std::map<std::string, bool (Server::*)(std::string const &, std::fstream &)>
 	Config::_setterMap = initSetterMap();
 
 bool Config::open(char const *path) {
-	struct stat statbuf;
 
-	if (stat(path, &statbuf) != 0) {
-		utils::putSysError("stat");
+	//isAccess
+	Result<bool, std::string> res = utils::isDirectory(path);
+	if (res.isError() == true) {
 		return false;
-	}
-	if (S_ISDIR(statbuf.st_mode) == true) {
-		std::cerr << RED << "Webserv: Error: a file path is directory." << RESET
-				  << std::endl;
+	} 
+	if (res.getOk() == true) {
 		return false;
 	}
 	this->_file.open(path, std::ios::in);
@@ -166,6 +165,7 @@ void Config::printServers() const {
 					  << std::endl;
 			std::clog << "Listen: " << iter2->second.getListen() << std::endl;
 			std::clog << "Root: " << iter2->second.getRoot() << std::endl;
+			std::clog << "upload_store: " << iter2->second.getuploadStore() << std::endl;
 			std::clog << "Allow methods: ";
 			for (std::vector<std::string>::const_iterator iter3 =
 					 iter2->second.getAllowMethods().begin();
@@ -203,6 +203,10 @@ void Config::printServers() const {
 				 iter3 != iter2->second.getLocations().end(); ++iter3) {
 				std::clog << "Location: " << iter3->second.getLocationPath()
 						  << std::endl;
+				std::clog << "	Root: " << iter3->second.getRoot() << std::endl;
+				std::clog << "	upload_store: " << iter3->second.getuploadStore()
+						  << std::endl;
+				std::clog << "	alias: " << iter3->second.getAliasDirective() << std::endl;
 				std::clog << "	Allow methods: ";
 				for (std::vector<std::string>::const_iterator iter4 =
 						 iter3->second.getAllowMethods().begin();

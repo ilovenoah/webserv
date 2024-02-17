@@ -78,4 +78,37 @@ bool isNumber(std::string const &str) {
 	}
 	return true;
 }
+
+Result<bool, std::string> isDirectory(std::string const &path) {
+	struct stat statbuf;
+
+	if (stat(path.c_str(), &statbuf) != 0) {
+		utils::putSysError("stat");
+		return Error<std::string>(std::strerror(errno));
+	}
+	if (S_ISDIR(statbuf.st_mode) == true) {
+		return Ok<bool>(true);
+	}
+	return Ok<bool>(false);
+}
+
+bool isAccess(std::string const &path, int mode) {
+	if (access(path.c_str(), mode) == -1) {
+		return false;
+	}
+	return true;
+}
+
+std::string getRandomStr(const std::size_t len) {
+	static const char alphanum[] = \
+		"0123456789" \
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+		"abcdefghijklmnopqrstuvwxyz";
+	std::string randomStr;
+	randomStr.reserve(len);
+	for (std::size_t i = 0; i < len; ++i) {
+		randomStr += alphanum[std::rand() % (sizeof(alphanum) - 1)];
+	}
+	return randomStr;
+}
 }  // namespace utils

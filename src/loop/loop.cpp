@@ -151,6 +151,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 					csiter->second->getServerSocket()->getIpaddress(),
 					csiter->second->getServerSocket()->getPort());
 				rsiter->second.setLocationPointer(rqiter->second.getPath());
+				rsiter->second.setActPath(rqiter->second.getPath());
 #if defined(_DEBUG)
 				rsiter->second.printConfigInfo();
 #endif
