@@ -25,6 +25,7 @@ bool rmCR(std::string &line);
 bool isNumber(std::string const &str);
 Result<bool, std::string> isDirectory(std::string const &path);
 bool isAccess(std::string const &path, int mode);
+std::string getRandomStr(const std::size_t len);
 }  // namespace utils
 
 #endif

@@ -98,4 +98,17 @@ bool isAccess(std::string const &path, int mode) {
 	}
 	return true;
 }
+
+std::string getRandomStr(const std::size_t len) {
+	static const char alphanum[] = \
+		"0123456789" \
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+		"abcdefghijklmnopqrstuvwxyz";
+	std::string randomStr;
+	randomStr.reserve(len);
+	for (std::size_t i = 0; i < len; ++i) {
+		randomStr += alphanum[std::rand() % (sizeof(alphanum) - 1)];
+	}
+	return randomStr;
+}
 }  // namespace utils
