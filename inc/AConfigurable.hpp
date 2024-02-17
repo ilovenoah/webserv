@@ -37,6 +37,7 @@ class AConfigurable {
 		const std::string &getRoot() const;
 		bool setAllowMethods(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getAllowMethods() const;
+		bool isAllowedMethod(const std::string &method) const;
 		bool setAutoIndex(std::string const &attribute, std::fstream &file);
 		const IsAutoIndexed &getAutoindex() const;
 		bool setIndex(std::string const &attribute, std::fstream &file);

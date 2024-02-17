@@ -48,6 +48,13 @@ bool AConfigurable::setRoot(std::string const &attribute, std::fstream &file) {
 
 const std::string &AConfigurable::getRoot() const { return this->_root; }
 
+bool AConfigurable::isAllowedMethod(const std::string &method) const {
+	for (std::vector<std::string>::const_iterator iter = this->_allowMethods.begin(); iter != this->_allowMethods.end(); ++iter) {
+		if (iter->compare(method) == 0) { return true; }
+	}
+	return false;
+}
+
 bool AConfigurable::setAllowMethods(std::string const &attribute,
 									std::fstream &file) {
 	(void)file;
