@@ -35,6 +35,9 @@ class Response {
 		void _setErrorResponse(const std::string &status);
 		bool _setIndexPage();
 		bool _setDirectoryListingPage(const std::string &path);
+		ClientSocket::csphase _setGetResponse(const Request &request);
+		ClientSocket::csphase _setPostResponse(const Request &request);
+		ClientSocket::csphase _setDeleteResponse(const Request &request);
 
 	public:
 		Response();

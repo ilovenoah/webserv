@@ -195,73 +195,84 @@ bool Response::_setDirectoryListingPage(const std::string &path) {
 	return true;
 }
 
+ClientSocket::csphase Response::_setGetResponse(const Request &request) {
+	if (utils::isAccess(this->_actPath, R_OK) == false) {
+		this->_setErrorResponse("404");
+		return ClientSocket::SEND;
+	}
+	Result<bool, std::string> res = utils::isDirectory(this->_actPath);
+	if (res.isError()) {
+		this->_setErrorResponse("500");
+		return ClientSocket::SEND;
+	}
+	if (res.getOk() == true) {
+		if (request.getPath().compare("/") == 0 || request.getPath().compare(this->_location->getLocationPath() + "/") == 0) {
+			if (this->_setIndexPage() == true) { return ClientSocket::SEND; }
+		}
+		if (this->_setDirectoryListingPage(request.getPath()) == true) { return ClientSocket::SEND; }
+		this->_setErrorResponse("404");
+		return ClientSocket::SEND;
+	}
+	return this->setEntireDataWithFile(this->_actPath, "200");
+}
+
+ClientSocket::csphase Response::_setPostResponse(const Request &request) {
+	std::string uploadStorePath;
+	std::string uploadPath;
+	if (this->_location != NULL) {
+		uploadStorePath = this->_location->getuploadStore() + "/";
+	} else {
+		uploadStorePath = this->_server->getuploadStore() + "/";
+	}
+	if (utils::isAccess(uploadStorePath, W_OK) == false) {
+		this->_setErrorResponse("403");
+		return ClientSocket::SEND;
+	}
+	uploadPath = uploadStorePath + utils::getRandomStr(12);
+	while (utils::isAccess(uploadPath, F_OK) == true) {
+		uploadPath = uploadStorePath + utils::getRandomStr(12);
+	}
+	std::ofstream ofs(uploadPath.c_str());
+	if (ofs.fail() == true) {
+		this->_setErrorResponse("500");
+		return ClientSocket::SEND;
+	}
+	ofs.write(request.getBody().c_str(), request.getBody().size());
+	if (ofs.fail() == true) {
+		this->_setErrorResponse("500");
+		return ClientSocket::SEND;
+	}
+	return this->setEntireData("201");
+}
+
+ClientSocket::csphase Response::_setDeleteResponse(const Request &request) {
+	(void)request;
+	if (utils::isAccess(this->_actPath, F_OK) == false) {
+		this->_setErrorResponse("404");
+		return ClientSocket::SEND;
+	}
+	std::string dirpath = getDirPath(this->_actPath);
+	if (utils::isAccess(dirpath, W_OK) == false) {
+		this->_setErrorResponse("403");
+		return ClientSocket::SEND;
+	}
+	if (unlink(this->_actPath.c_str()) == -1) {
+		this->_setErrorResponse("500");
+		return ClientSocket::SEND;
+	}
+	return setEntireData("204");
+}
+
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::ifstream fs;
 
 	(void)config;
 	if (request.getMethod() == "GET") {
-		if (utils::isAccess(this->_actPath, R_OK) == false) {
-			this->_setErrorResponse("404");
-			return ClientSocket::SEND;
-		}
-		Result<bool, std::string> res = utils::isDirectory(this->_actPath);
-		if (res.isError()) {
-			this->_setErrorResponse("500");
-			return ClientSocket::SEND;
-		}
-		if (res.getOk() == true) {
-			if (request.getPath().compare("/") == 0 || request.getPath().compare(this->_location->getLocationPath() + "/") == 0) {
-				if (this->_setIndexPage() == true) { return ClientSocket::SEND; }
-			}
-			if (this->_setDirectoryListingPage(request.getPath()) == true) { return ClientSocket::SEND; }
-			this->_setErrorResponse("404");
-			return ClientSocket::SEND;
-		}
-		return this->setEntireDataWithFile(this->_actPath, "200");
+		return this->_setGetResponse(request);
 	} else if (request.getMethod() == "POST") {
-		std::string uploadStorePath;
-		std::string uploadPath;
-		if (this->_location != NULL) {
-			uploadStorePath = this->_location->getuploadStore() + "/";
-		} else {
-			uploadStorePath = this->_server->getuploadStore() + "/";
-		}
-		if (utils::isAccess(uploadStorePath, W_OK) == false) {
-			this->_setErrorResponse("403");
-			return ClientSocket::SEND;
-		}
-		std::time_t ts(std::time(NULL));
-		uploadPath = uploadStorePath + utils::sizeTtoString(ts);
-		while (utils::isAccess(uploadPath, F_OK) == true) {
-			ts = std::time(NULL);
-			uploadPath = uploadStorePath + utils::sizeTtoString(ts);
-		}
-		std::ofstream ofs(uploadPath.c_str());
-		if (ofs.fail() == true) {
-			this->_setErrorResponse("500");
-			return ClientSocket::SEND;
-		}
-		ofs.write(request.getBody().c_str(), request.getBody().size());
-		if (ofs.fail() == true) {
-			this->_setErrorResponse("500");
-			return ClientSocket::SEND;
-		}
-		return this->setEntireData("201");
+		return this->_setPostResponse(request);
 	} else if (request.getMethod() == "DELETE") {
-		if (utils::isAccess(this->_actPath, F_OK) == false) {
-			this->_setErrorResponse("404");
-			return ClientSocket::SEND;
-		}
-		std::string dirpath = getDirPath(this->_actPath);
-		if (utils::isAccess(dirpath, W_OK) == false) {
-			this->_setErrorResponse("403");
-			return ClientSocket::SEND;
-		}
-		if (unlink(this->_actPath.c_str()) == -1) {
-			this->_setErrorResponse("500");
-			return ClientSocket::SEND;
-		}
-		return setEntireData("204");
+		return this->_setDeleteResponse(request);
 	}
 	return ClientSocket::SEND;
 }
