@@ -131,6 +131,16 @@ void Response::_setErrorResponse(const std::string &status) {
 	}
 }
 
+static std::string getDirPath(const std::string &path) {
+	std::string dirPath;
+	std::size_t pos;
+	if (path.compare("/") == 0 || path.compare("./") == 0) { return path; }
+	pos = path.find_last_of('/');
+	if (pos == std::string::npos) { return path; }
+	dirPath = path.substr(0, pos + 1);
+	return dirPath;
+}
+
 bool Response::_setIndexPage() {
 	std::vector<std::string> index;
 	std::ifstream fs;
@@ -216,8 +226,8 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 		} else {
 			uploadStorePath = this->_server->getuploadStore() + "/";
 		}
-		if (utils::isAccess(uploadStorePath, R_OK) == false) {
-			this->_setErrorResponse("500");
+		if (utils::isAccess(uploadStorePath, W_OK) == false) {
+			this->_setErrorResponse("403");
 			return ClientSocket::SEND;
 		}
 		std::time_t ts(std::time(NULL));
@@ -237,6 +247,21 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 			return ClientSocket::SEND;
 		}
 		return this->setEntireData("201");
+	} else if (request.getMethod() == "DELETE") {
+		if (utils::isAccess(this->_actPath, F_OK) == false) {
+			this->_setErrorResponse("404");
+			return ClientSocket::SEND;
+		}
+		std::string dirpath = getDirPath(this->_actPath);
+		if (utils::isAccess(dirpath, W_OK) == false) {
+			this->_setErrorResponse("403");
+			return ClientSocket::SEND;
+		}
+		if (unlink(this->_actPath.c_str()) == -1) {
+			this->_setErrorResponse("500");
+			return ClientSocket::SEND;
+		}
+		return setEntireData("204");
 	}
 	return ClientSocket::SEND;
 }
