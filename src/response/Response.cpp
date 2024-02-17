@@ -1,22 +1,50 @@
 #include "Response.hpp"
 
-
-std::map<std::string, std::pair<std::string, std::string> > Response::_initstatusMap() {
-	std::map<std::string, std::pair<std::string, std::string> >  statusMap;
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("200", std::pair<std::string, std::string>("Ok", "Ok")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("201", std::pair<std::string, std::string>("Created", "Created")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("204", std::pair<std::string, std::string>("No Content", "No Content")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("302", std::pair<std::string, std::string>("Found", "Found")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("307", std::pair<std::string, std::string>("Temporary Redirect", "Temporary Redirect")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("400", std::pair<std::string, std::string>("Bad Request", "Bad Request")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("403", std::pair<std::string, std::string>("Forbidden", "Forbidden")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("404", std::pair<std::string, std::string>("Not Found", "Not Found")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("405", std::pair<std::string, std::string>("Method Not Allowed", "Method Not Allowed")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("500", std::pair<std::string, std::string>("Internal Server Error", "Internal Server Error")));
+std::map<std::string, std::pair<std::string, std::string> >
+Response::_initstatusMap() {
+	std::map<std::string, std::pair<std::string, std::string> > statusMap;
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"200", std::pair<std::string, std::string>("Ok", "Ok")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"201", std::pair<std::string, std::string>("Created", "Created")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"204",
+			std::pair<std::string, std::string>("No Content", "No Content")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"302", std::pair<std::string, std::string>("Found", "Found")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"307", std::pair<std::string, std::string>("Temporary Redirect",
+													   "Temporary Redirect")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"400",
+			std::pair<std::string, std::string>("Bad Request", "Bad Request")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"403",
+			std::pair<std::string, std::string>("Forbidden", "Forbidden")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"404",
+			std::pair<std::string, std::string>("Not Found", "Not Found")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"405", std::pair<std::string, std::string>("Method Not Allowed",
+													   "Method Not Allowed")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
+			"500", std::pair<std::string, std::string>(
+					   "Internal Server Error", "Internal Server Error")));
 	return statusMap;
 }
 
-std::map<std::string, std::pair<std::string, std::string> > Response::_statusMap = _initstatusMap();
+std::map<std::string, std::pair<std::string, std::string> >
+	Response::_statusMap = _initstatusMap();
 
 Response::Response()
 	: _httpVersion("HTTP/1.1"), _server(NULL), _location(NULL) {}
@@ -45,17 +73,13 @@ void Response::setHttpVersion(std::string const &httpVersion) {
 	this->_httpVersion = httpVersion;
 }
 
-void Response::setStatus(std::string const &status) {
-	this->_status = status;
-}
+void Response::setStatus(std::string const &status) { this->_status = status; }
 
 void Response::setStatusMsg(std::string const &statusMsg) {
 	this->_statusMsg = statusMsg;
 }
 
-void Response::setBody(std::string const &body) {
-	this->_body = body;
-}
+void Response::setBody(std::string const &body) { this->_body = body; }
 
 void Response::printConfigInfo() const {
 	std::clog << "============== Routing result ==============" << std::endl;
@@ -76,12 +100,14 @@ void Response::_setErrorResponse(const std::string &status) {
 	std::size_t length;
 
 	if (this->_location != NULL) {
-		std::map<std::string, std::string>::const_iterator iter = this->_location->getErrorPages().find(status);
+		std::map<std::string, std::string>::const_iterator iter =
+			this->_location->getErrorPages().find(status);
 		if (iter != this->_location->getErrorPages().end()) {
 			errorPagePath = iter->second;
 		}
 	} else {
-		std::map<std::string, std::string>::const_iterator iter = this->_server->getErrorPages().find(status);
+		std::map<std::string, std::string>::const_iterator iter =
+			this->_server->getErrorPages().find(status);
 		if (iter != this->_server->getErrorPages().end()) {
 			errorPagePath = iter->second;
 		} else {
@@ -91,10 +117,11 @@ void Response::_setErrorResponse(const std::string &status) {
 			this->_body = this->_statusMap.find(status)->second.second;
 			this->_headers.insert(std::pair<std::string, std::string>(
 				"Content-Length", utils::sizeTtoString(this->_body.size())));
-			return ;
+			return;
 		}
 	}
-	if (this->_location != NULL && this->_location->getRoot().empty() == false) {
+	if (this->_location != NULL &&
+		this->_location->getRoot().empty() == false) {
 		root = this->_location->getRoot();
 	} else {
 		root = this->_server->getRoot();
@@ -108,7 +135,7 @@ void Response::_setErrorResponse(const std::string &status) {
 		this->_body = this->_statusMap.find("500")->second.second;
 		this->_headers.insert(std::pair<std::string, std::string>(
 			"Content-Length", utils::sizeTtoString(this->_body.size())));
-		return ;
+		return;
 	} else {
 		fs.seekg(0, fs.end);
 		length = fs.tellg();
@@ -123,7 +150,7 @@ void Response::_setErrorResponse(const std::string &status) {
 			this->_body = this->_statusMap.find("500")->second.second;
 			this->_headers.insert(std::pair<std::string, std::string>(
 				"Content-Length", utils::sizeTtoString(this->_body.size())));
-			return ;
+			return;
 		}
 		this->_body.append(buf, length);
 		this->_httpVersion = "HTTP/1.1";
@@ -137,9 +164,13 @@ void Response::_setErrorResponse(const std::string &status) {
 static std::string getDirPath(const std::string &path) {
 	std::string dirPath;
 	std::size_t pos;
-	if (path.compare("/") == 0 || path.compare("./") == 0) { return path; }
+	if (path.compare("/") == 0 || path.compare("./") == 0) {
+		return path;
+	}
 	pos = path.find_last_of('/');
-	if (pos == std::string::npos) { return path; }
+	if (pos == std::string::npos) {
+		return path;
+	}
 	dirPath = path.substr(0, pos + 1);
 	return dirPath;
 }
@@ -153,7 +184,8 @@ bool Response::_setIndexPage() {
 	} else {
 		index = this->_server->getIndex();
 	}
-	for (std::vector<std::string>::iterator iter = index.begin(); iter != index.end(); ++iter) {
+	for (std::vector<std::string>::iterator iter = index.begin();
+		 iter != index.end(); ++iter) {
 		path = this->_actPath + *iter;
 		this->setEntireDataWithFile(path, "200");
 		return true;
@@ -162,8 +194,10 @@ bool Response::_setIndexPage() {
 }
 
 bool Response::_setDirectoryListingPage(const std::string &path) {
-	std::string title("<html>\n<head><title>Index of " + path + "</title></head>\n<body>\n");
-	std::string head("<h1>Index of " + path + "</h1><hr><pre>\n<a href=\"../\">../</a>\n");
+	std::string title("<html>\n<head><title>Index of " + path +
+					  "</title></head>\n<body>\n");
+	std::string head("<h1>Index of " + path +
+					 "</h1><hr><pre>\n<a href=\"../\">../</a>\n");
 	std::string aTagStart("<a href=\"");
 	std::string aTagEnd("</a>");
 	std::string data(title + head);
@@ -177,11 +211,13 @@ bool Response::_setDirectoryListingPage(const std::string &path) {
 	}
 	dp = readdir(dirp);
 	while (dp != NULL) {
-		if (std::strcmp(dp->d_name, ".") == 0 || std::strcmp(dp->d_name, "..") == 0) {
+		if (std::strcmp(dp->d_name, ".") == 0 ||
+			std::strcmp(dp->d_name, "..") == 0) {
 			dp = readdir(dirp);
-			continue ;
+			continue;
 		}
-		data.append(aTagStart + dp->d_name + "\">" + dp->d_name + aTagEnd + "\n");
+		data.append(aTagStart + dp->d_name + "\">" + dp->d_name + aTagEnd +
+					"\n");
 		dp = readdir(dirp);
 	}
 	if (closedir(dirp) == -1) {
@@ -209,10 +245,16 @@ ClientSocket::csphase Response::_setGetResponse(const Request &request) {
 		return ClientSocket::SEND;
 	}
 	if (res.getOk() == true) {
-		if (request.getPath().compare("/") == 0 || request.getPath().compare(this->_location->getLocationPath() + "/") == 0) {
-			if (this->_setIndexPage() == true) { return ClientSocket::SEND; }
+		if (request.getPath().compare("/") == 0 ||
+			request.getPath().compare(this->_location->getLocationPath() +
+									  "/") == 0) {
+			if (this->_setIndexPage() == true) {
+				return ClientSocket::SEND;
+			}
 		}
-		if (this->_setDirectoryListingPage(request.getPath()) == true) { return ClientSocket::SEND; }
+		if (this->_setDirectoryListingPage(request.getPath()) == true) {
+			return ClientSocket::SEND;
+		}
 		this->_setErrorResponse("404");
 		return ClientSocket::SEND;
 	}
@@ -267,7 +309,8 @@ ClientSocket::csphase Response::_setDeleteResponse(const Request &request) {
 }
 
 bool Response::_shouldRedirect() {
-	if (this->_location != NULL && this->_location->getReturn().empty() == false) {
+	if (this->_location != NULL &&
+		this->_location->getReturn().empty() == false) {
 		return true;
 	} else if (this->_server->getReturn().empty() == false) {
 		return true;
@@ -311,7 +354,8 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::ifstream fs;
 
 	(void)config;
-	if (this->_location != NULL && this->_location->isAllowedMethod(request.getMethod()) == false) {
+	if (this->_location != NULL &&
+		this->_location->isAllowedMethod(request.getMethod()) == false) {
 		this->_setErrorResponse("405");
 		return ClientSocket::SEND;
 	} else if (this->_server->isAllowedMethod(request.getMethod()) == false) {
@@ -345,7 +389,8 @@ std::string Response::getEntireData() const {
 	return entireData;
 }
 
-static std::string const removeLocationFromString(std::string const &path, std::string const &location) {
+static std::string const removeLocationFromString(std::string const &path,
+												  std::string const &location) {
 	std::string result = path;
 	size_t pos = result.find(location);
 	if (pos != std::string::npos) {
@@ -358,19 +403,20 @@ void Response::setActPath(std::string const &path) {
 	if (this->_location == NULL) {
 		this->_actPath = this->_server->getRoot() + path;
 	} else if (this->_location->getAliasDirective().empty() == false) {
-		this->_actPath = this->_location->getAliasDirective() + removeLocationFromString(path, this->_location->getLocationPath());
+		this->_actPath =
+			this->_location->getAliasDirective() +
+			removeLocationFromString(path, this->_location->getLocationPath());
 	} else if (this->_location->getRoot().empty() == true) {
 		this->_actPath = this->_server->getRoot() + path;
 	} else {
-			this->_actPath = this->_location->getRoot() + path;
-		}
+		this->_actPath = this->_location->getRoot() + path;
 	}
-
-std::string const &Response::getActPath() const {
-	return this->_actPath;
 }
 
-ClientSocket::csphase Response::setEntireDataWithFile(std::string const &path, std::string const &status) {
+std::string const &Response::getActPath() const { return this->_actPath; }
+
+ClientSocket::csphase Response::setEntireDataWithFile(
+	std::string const &path, std::string const &status) {
 	std::ifstream fs;
 	std::size_t length(0);
 

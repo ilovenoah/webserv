@@ -1,8 +1,8 @@
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
-#include <sys/types.h>
 #include <dirent.h>
+#include <sys/types.h>
 #define HTTP_VERSION "HTTP/1.1"
 #define STATUS_OK "200"
 #define STATUS_CREATED "201"
@@ -15,9 +15,9 @@
 #include "Config.hpp"
 #include "Location.hpp"
 #include "Request.hpp"
+#include "Result.hpp"
 #include "Server.hpp"
 #include "utils.hpp"
-#include "Result.hpp"
 
 class Response {
 	private:
@@ -29,8 +29,10 @@ class Response {
 		Server *_server;
 		Location *_location;
 		std::string _actPath;
-		static std::map<std::string, std::pair<std::string, std::string> > _statusMap;
-		static std::map<std::string, std::pair<std::string, std::string> > _initstatusMap();
+		static std::map<std::string, std::pair<std::string, std::string> >
+			_statusMap;
+		static std::map<std::string, std::pair<std::string, std::string> >
+		_initstatusMap();
 
 		void _setErrorResponse(const std::string &status);
 		bool _setIndexPage();
@@ -56,7 +58,8 @@ class Response {
 		std::string getEntireData() const;
 		void setActPath(std::string const &path);
 		std::string const &getActPath() const;
-		ClientSocket::csphase setEntireDataWithFile(std::string const &path, std::string const &status);
+		ClientSocket::csphase setEntireDataWithFile(std::string const &path,
+													std::string const &status);
 		ClientSocket::csphase setEntireData(std::string const &status);
 };
 #endif
