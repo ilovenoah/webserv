@@ -83,7 +83,15 @@ void Response::setBody(std::string const &body) { this->_body = body; }
 
 void Response::printConfigInfo() const {
 	std::clog << "============== Routing result ==============" << std::endl;
-	std::clog << "Server name: " << this->_server->getServername() << std::endl;
+	std::clog
+		<< "Server name: ";
+	{
+		std::vector<std::string> defaultSeverNames = this->_server->getServernames();
+			for (std::vector<std::string>::const_iterator dsiter = defaultSeverNames.begin(); dsiter != defaultSeverNames.end(); ++dsiter) {
+				std::clog << *dsiter << " ";
+			}
+	}
+	std::clog << std::endl;
 	if (this->_location != NULL) {
 		std::clog << "Location path: " << this->_location->getLocationPath()
 				  << std::endl;

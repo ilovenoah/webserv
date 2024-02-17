@@ -22,13 +22,14 @@ std::map<std::string, bool (Location::*)(std::string const &, std::fstream &)>
 	Server::_setterMap = initSetterMap();
 
 Server::Server()
-	: AConfigurable(), _servername(""), _ipAddr("0.0.0.0"), _port("8000") {
+	: AConfigurable(), _ipAddr("0.0.0.0"), _port("8000") {
 	this->_root = "./";
+	this->_servernames.push_back("");
 }
 
-const std::string &Server::getServername() const { return this->_servername; }
+const std::vector<std::string> &Server::getServernames() const { return this->_servernames; }
 
-bool Server::setServername(std::string const &attribute, std::fstream &file) {
+bool Server::setServernames(std::string const &attribute, std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
 	std::string elem;
@@ -37,9 +38,11 @@ bool Server::setServername(std::string const &attribute, std::fstream &file) {
 		return false;
 	}
 	elem.clear();
+	this->_servernames.clear();
+	while (ss.eof() == false) {
 	ss >> elem;
-	if (ss.peek() != EOF) {
-		return false;
+		this->_servernames.push_back(elem);
+		ss >> std::ws;
 	}
 	this->_servername = elem;
 	return true;
