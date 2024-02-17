@@ -25,12 +25,11 @@ std::map<std::string, bool (Server::*)(std::string const &, std::fstream &)>
 	Config::_setterMap = initSetterMap();
 
 bool Config::open(char const *path) {
-
-	//isAccess
+	// isAccess
 	Result<bool, std::string> res = utils::isDirectory(path);
 	if (res.isError() == true) {
 		return false;
-	} 
+	}
 	if (res.getOk() == true) {
 		return false;
 	}
@@ -165,7 +164,8 @@ void Config::printServers() const {
 					  << std::endl;
 			std::clog << "Listen: " << iter2->second.getListen() << std::endl;
 			std::clog << "Root: " << iter2->second.getRoot() << std::endl;
-			std::clog << "upload_store: " << iter2->second.getuploadStore() << std::endl;
+			std::clog << "upload_store: " << iter2->second.getuploadStore()
+					  << std::endl;
 			std::clog << "Allow methods: ";
 			for (std::vector<std::string>::const_iterator iter3 =
 					 iter2->second.getAllowMethods().begin();
@@ -204,9 +204,10 @@ void Config::printServers() const {
 				std::clog << "Location: " << iter3->second.getLocationPath()
 						  << std::endl;
 				std::clog << "	Root: " << iter3->second.getRoot() << std::endl;
-				std::clog << "	upload_store: " << iter3->second.getuploadStore()
+				std::clog << "	upload_store: "
+						  << iter3->second.getuploadStore() << std::endl;
+				std::clog << "	alias: " << iter3->second.getAliasDirective()
 						  << std::endl;
-				std::clog << "	alias: " << iter3->second.getAliasDirective() << std::endl;
 				std::clog << "	Allow methods: ";
 				for (std::vector<std::string>::const_iterator iter4 =
 						 iter3->second.getAllowMethods().begin();

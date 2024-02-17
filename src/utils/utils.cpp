@@ -100,9 +100,9 @@ bool isAccess(std::string const &path, int mode) {
 }
 
 std::string getRandomStr(const std::size_t len) {
-	static const char alphanum[] = \
-		"0123456789" \
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+	static const char alphanum[] =
+		"0123456789"
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		"abcdefghijklmnopqrstuvwxyz";
 	std::string randomStr;
 	randomStr.reserve(len);
