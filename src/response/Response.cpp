@@ -450,7 +450,7 @@ ClientSocket::csphase Response::setEntireDataWithFile(
 	this->_body.append(buf, length);
 	this->_httpVersion = "HTTP/1.1";
 	this->_status = status;
-	this->_statusMsg = this->_statusMap.find(status)->first;
+	this->_statusMsg = this->_statusMap.find(status)->second.first;
 	this->_headers.insert(std::pair<std::string, std::string>(
 		"Content-Length", utils::sizeTtoString(this->_body.size())));
 	return ClientSocket::SEND;
@@ -459,7 +459,7 @@ ClientSocket::csphase Response::setEntireDataWithFile(
 ClientSocket::csphase Response::setEntireData(std::string const &status) {
 	this->_httpVersion = "HTTP/1.1";
 	this->_status = status;
-	this->_statusMsg = this->_statusMap.find(status)->first;
+	this->_statusMsg = this->_statusMap.find(status)->second.first;
 	this->_headers.insert(std::pair<std::string, std::string>(
 		"Content-Length", utils::sizeTtoString(this->_body.size())));
 	return ClientSocket::SEND;
