@@ -9,6 +9,7 @@ std::map<std::string, std::pair<std::string, std::string> > Response::_initstatu
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("400", std::pair<std::string, std::string>("Bad Request", "Bad Request")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("403", std::pair<std::string, std::string>("Forbidden", "Forbidden")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("404", std::pair<std::string, std::string>("Not Found", "Not Found")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("405", std::pair<std::string, std::string>("Method Not Allowed", "Method Not Allowed")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("500", std::pair<std::string, std::string>("Internal Server Error", "Internal Server Error")));
 	return statusMap;
 }
@@ -267,6 +268,13 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::ifstream fs;
 
 	(void)config;
+	if (this->_location != NULL && this->_location->isAllowedMethod(request.getMethod()) == false) {
+		this->_setErrorResponse("405");
+		return ClientSocket::SEND;
+	} else if (this->_server->isAllowedMethod(request.getMethod()) == false) {
+		this->_setErrorResponse("405");
+		return ClientSocket::SEND;
+	}
 	if (request.getMethod() == "GET") {
 		return this->_setGetResponse(request);
 	} else if (request.getMethod() == "POST") {
