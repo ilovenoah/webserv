@@ -15,6 +15,9 @@ Response::_initstatusMap() {
 			std::pair<std::string, std::string>("No Content", "No Content")));
 	statusMap.insert(
 		std::pair<std::string, std::pair<std::string, std::string> >(
+			"301", std::pair<std::string, std::string>("Moved Permanently", "Moved Permanently")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
 			"302", std::pair<std::string, std::string>("Found", "Found")));
 	statusMap.insert(
 		std::pair<std::string, std::pair<std::string, std::string> >(
@@ -252,10 +255,16 @@ ClientSocket::csphase Response::_setGetResponse(const Request &request) {
 		this->_setErrorResponse("500");
 		return ClientSocket::SEND;
 	}
+	if (res.getOk() == true && this->_actPath.find_last_of('/') != this->_actPath.length() - 1) {
+		this->setEntireData("301");
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Location", "http://" + this->_server->getListen() + request.getPath() + "/"));
+		return ClientSocket::SEND;
+	}
 	if (res.getOk() == true) {
 		if (request.getPath().compare("/") == 0 ||
-			request.getPath().compare(this->_location->getLocationPath() +
-									  "/") == 0) {
+			(this->_location != NULL && request.getPath().compare(this->_location->getLocationPath() +
+									  "/") == 0)) {
 			if (this->_setIndexPage() == true) {
 				return ClientSocket::SEND;
 			}
