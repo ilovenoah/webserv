@@ -38,6 +38,8 @@ class Response {
 		ClientSocket::csphase _setGetResponse(const Request &request);
 		ClientSocket::csphase _setPostResponse(const Request &request);
 		ClientSocket::csphase _setDeleteResponse(const Request &request);
+		bool _shouldRedirect();
+		ClientSocket::csphase _setRedirectResponse(const Request &request);
 
 	public:
 		Response();

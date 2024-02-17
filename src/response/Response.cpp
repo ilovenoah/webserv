@@ -6,6 +6,8 @@ std::map<std::string, std::pair<std::string, std::string> > Response::_initstatu
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("200", std::pair<std::string, std::string>("Ok", "Ok")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("201", std::pair<std::string, std::string>("Created", "Created")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("204", std::pair<std::string, std::string>("No Content", "No Content")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("302", std::pair<std::string, std::string>("Found", "Found")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("307", std::pair<std::string, std::string>("Temporary Redirect", "Temporary Redirect")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("400", std::pair<std::string, std::string>("Bad Request", "Bad Request")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("403", std::pair<std::string, std::string>("Forbidden", "Forbidden")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("404", std::pair<std::string, std::string>("Not Found", "Not Found")));
@@ -264,6 +266,47 @@ ClientSocket::csphase Response::_setDeleteResponse(const Request &request) {
 	return setEntireData("204");
 }
 
+bool Response::_shouldRedirect() {
+	if (this->_location != NULL && this->_location->getReturn().empty() == false) {
+		return true;
+	} else if (this->_server->getReturn().empty() == false) {
+		return true;
+	}
+	return false;
+}
+
+ClientSocket::csphase Response::_setRedirectResponse(Request const &request) {
+	if (this->_location != NULL) {
+		this->_httpVersion = "HTTP/1.1";
+		if (request.getMethod().compare("GET") == 0) {
+			this->_status = "302";
+			this->_statusMsg = this->_statusMap.find("302")->second.first;
+		} else {
+			this->_status = "307";
+			this->_statusMsg = this->_statusMap.find("307")->second.first;
+		}
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Content-Length", utils::sizeTtoString(this->_body.size())));
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Location", this->_location->getReturn()));
+		return ClientSocket::SEND;
+	} else {
+		if (request.getMethod().compare("GET") == 0) {
+			this->_status = "302";
+			this->_statusMsg = this->_statusMap.find("302")->second.first;
+		} else {
+			this->_status = "307";
+			this->_statusMsg = this->_statusMap.find("307")->second.first;
+		}
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Content-Length", utils::sizeTtoString(this->_body.size())));
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Location", this->_server->getReturn()));
+		return ClientSocket::SEND;
+	}
+	return ClientSocket::SEND;
+}
+
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::ifstream fs;
 
@@ -274,6 +317,9 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	} else if (this->_server->isAllowedMethod(request.getMethod()) == false) {
 		this->_setErrorResponse("405");
 		return ClientSocket::SEND;
+	}
+	if (this->_shouldRedirect() == true) {
+		return this->_setRedirectResponse(request);
 	}
 	if (request.getMethod() == "GET") {
 		return this->_setGetResponse(request);
