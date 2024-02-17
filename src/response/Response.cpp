@@ -260,7 +260,7 @@ ClientSocket::csphase Response::_setGetResponse(const Request &request) {
 				return ClientSocket::SEND;
 			}
 		}
-		if (this->_setDirectoryListingPage(request.getPath()) == true) {
+		if (this->_shouldAutoIndexed() == true && this->_setDirectoryListingPage(request.getPath()) == true) {
 			return ClientSocket::SEND;
 		}
 		this->_setErrorResponse("404");
@@ -316,7 +316,7 @@ ClientSocket::csphase Response::_setDeleteResponse(const Request &request) {
 	return setEntireData("204");
 }
 
-bool Response::_shouldRedirect() {
+bool Response::_shouldRedirect() const {
 	if (this->_location != NULL &&
 		this->_location->getReturn().empty() == false) {
 		return true;
@@ -356,6 +356,15 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request) {
 		return ClientSocket::SEND;
 	}
 	return ClientSocket::SEND;
+}
+
+bool Response::_shouldAutoIndexed() const {
+	if (this->_location != NULL && this->_location->getAutoindex() == AConfigurable::TRUE) {
+		return true;
+	} else if (this->_server->getAutoindex() == AConfigurable::TRUE) {
+		return true;
+	}
+	return false;
 }
 
 ClientSocket::csphase Response::load(Config &config, Request const &request) {

@@ -40,11 +40,10 @@ bool Server::setServernames(std::string const &attribute, std::fstream &file) {
 	elem.clear();
 	this->_servernames.clear();
 	while (ss.eof() == false) {
-	ss >> elem;
+		ss >> elem;
 		this->_servernames.push_back(elem);
 		ss >> std::ws;
 	}
-	this->_servername = elem;
 	return true;
 }
 
