@@ -15,6 +15,9 @@ Response::_initstatusMap() {
 			std::pair<std::string, std::string>("No Content", "No Content")));
 	statusMap.insert(
 		std::pair<std::string, std::pair<std::string, std::string> >(
+			"301", std::pair<std::string, std::string>("Moved Permanently", "Moved Permanently")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
 			"302", std::pair<std::string, std::string>("Found", "Found")));
 	statusMap.insert(
 		std::pair<std::string, std::pair<std::string, std::string> >(
@@ -83,7 +86,15 @@ void Response::setBody(std::string const &body) { this->_body = body; }
 
 void Response::printConfigInfo() const {
 	std::clog << "============== Routing result ==============" << std::endl;
-	std::clog << "Server name: " << this->_server->getServername() << std::endl;
+	std::clog
+		<< "Server name: ";
+	{
+		std::vector<std::string> defaultSeverNames = this->_server->getServernames();
+			for (std::vector<std::string>::const_iterator dsiter = defaultSeverNames.begin(); dsiter != defaultSeverNames.end(); ++dsiter) {
+				std::clog << *dsiter << " ";
+			}
+	}
+	std::clog << std::endl;
 	if (this->_location != NULL) {
 		std::clog << "Location path: " << this->_location->getLocationPath()
 				  << std::endl;
@@ -244,15 +255,21 @@ ClientSocket::csphase Response::_setGetResponse(const Request &request) {
 		this->_setErrorResponse("500");
 		return ClientSocket::SEND;
 	}
+	if (res.getOk() == true && this->_actPath.find_last_of('/') != this->_actPath.length() - 1) {
+		this->setEntireData("301");
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Location", "http://" + this->_server->getListen() + request.getPath() + "/"));
+		return ClientSocket::SEND;
+	}
 	if (res.getOk() == true) {
 		if (request.getPath().compare("/") == 0 ||
-			request.getPath().compare(this->_location->getLocationPath() +
-									  "/") == 0) {
+			(this->_location != NULL && request.getPath().compare(this->_location->getLocationPath() +
+									  "/") == 0)) {
 			if (this->_setIndexPage() == true) {
 				return ClientSocket::SEND;
 			}
 		}
-		if (this->_setDirectoryListingPage(request.getPath()) == true) {
+		if (this->_shouldAutoIndexed() == true && this->_setDirectoryListingPage(request.getPath()) == true) {
 			return ClientSocket::SEND;
 		}
 		this->_setErrorResponse("404");
@@ -308,7 +325,7 @@ ClientSocket::csphase Response::_setDeleteResponse(const Request &request) {
 	return setEntireData("204");
 }
 
-bool Response::_shouldRedirect() {
+bool Response::_shouldRedirect() const {
 	if (this->_location != NULL &&
 		this->_location->getReturn().empty() == false) {
 		return true;
@@ -348,6 +365,15 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request) {
 		return ClientSocket::SEND;
 	}
 	return ClientSocket::SEND;
+}
+
+bool Response::_shouldAutoIndexed() const {
+	if (this->_location != NULL && this->_location->getAutoindex() == AConfigurable::TRUE) {
+		return true;
+	} else if (this->_server->getAutoindex() == AConfigurable::TRUE) {
+		return true;
+	}
+	return false;
 }
 
 ClientSocket::csphase Response::load(Config &config, Request const &request) {
@@ -442,7 +468,7 @@ ClientSocket::csphase Response::setEntireDataWithFile(
 	this->_body.append(buf, length);
 	this->_httpVersion = "HTTP/1.1";
 	this->_status = status;
-	this->_statusMsg = this->_statusMap.find(status)->first;
+	this->_statusMsg = this->_statusMap.find(status)->second.first;
 	this->_headers.insert(std::pair<std::string, std::string>(
 		"Content-Length", utils::sizeTtoString(this->_body.size())));
 	return ClientSocket::SEND;
@@ -451,7 +477,7 @@ ClientSocket::csphase Response::setEntireDataWithFile(
 ClientSocket::csphase Response::setEntireData(std::string const &status) {
 	this->_httpVersion = "HTTP/1.1";
 	this->_status = status;
-	this->_statusMsg = this->_statusMap.find(status)->first;
+	this->_statusMsg = this->_statusMap.find(status)->second.first;
 	this->_headers.insert(std::pair<std::string, std::string>(
 		"Content-Length", utils::sizeTtoString(this->_body.size())));
 	return ClientSocket::SEND;
