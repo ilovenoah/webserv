@@ -3,8 +3,9 @@
 
 std::map<std::string, std::pair<std::string, std::string> > Response::_initstatusMap() {
 	std::map<std::string, std::pair<std::string, std::string> >  statusMap;
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("200", std::pair<std::string, std::string>("Ok", "")));
-	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("201", std::pair<std::string, std::string>("Created", "")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("200", std::pair<std::string, std::string>("Ok", "Ok")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("201", std::pair<std::string, std::string>("Created", "Created")));
+	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("204", std::pair<std::string, std::string>("No Content", "No Content")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("400", std::pair<std::string, std::string>("Bad Request", "Bad Request")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("403", std::pair<std::string, std::string>("Forbidden", "Forbidden")));
 	statusMap.insert(std::pair<std::string, std::pair<std::string, std::string> >("404", std::pair<std::string, std::string>("Not Found", "Not Found")));
