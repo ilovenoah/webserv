@@ -41,6 +41,10 @@ Response::_initstatusMap() {
 													   "Method Not Allowed")));
 	statusMap.insert(
 		std::pair<std::string, std::pair<std::string, std::string> >(
+			"413", std::pair<std::string, std::string>("Content Too Large",
+													   "Content Too Large")));
+	statusMap.insert(
+		std::pair<std::string, std::pair<std::string, std::string> >(
 			"500", std::pair<std::string, std::string>(
 					   "Internal Server Error", "Internal Server Error")));
 	return statusMap;
@@ -283,10 +287,10 @@ ClientSocket::csphase Response::_setPostResponse(const Request &request) {
 	std::string uploadPath;
 
 	if (this->_location != NULL && request.getBody().size() > (size_t)this->_location->getClientMaxBodySize()) {
-		this->_setErrorResponse("400");
+		this->_setErrorResponse("413");
 		return ClientSocket::SEND;
 	} else if (request.getBody().size() > (size_t)this->_server->getClientMaxBodySize()) { 
-		this->_setErrorResponse("400");
+		this->_setErrorResponse("413");
 		return ClientSocket::SEND;
 	}
 	if (this->_location != NULL) {
