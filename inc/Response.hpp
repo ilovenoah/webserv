@@ -40,8 +40,9 @@ class Response {
 		ClientSocket::csphase _setGetResponse(const Request &request);
 		ClientSocket::csphase _setPostResponse(const Request &request);
 		ClientSocket::csphase _setDeleteResponse(const Request &request);
-		bool _shouldRedirect();
+		bool _shouldRedirect() const;
 		ClientSocket::csphase _setRedirectResponse(const Request &request);
+		bool _shouldAutoIndexed() const;
 
 	public:
 		Response();

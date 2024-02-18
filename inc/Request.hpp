@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <limits.h>
 
 #include "CaseInsensitiveCompare.hpp"
 #include "ClientSocket.hpp"

@@ -17,7 +17,7 @@ class Location;
 
 class Server : public AConfigurable {
 	private:
-		std::string _servername;
+		std::vector<std::string> _servernames;
 		std::string _ipAddr;
 		std::string _port;
 		std::map<std::string, Location> _locations;
@@ -30,8 +30,8 @@ class Server : public AConfigurable {
 
 	public:
 		Server();
-		bool setServername(std::string const &attribute, std::fstream &file);
-		const std::string &getServername() const;
+		bool setServernames(std::string const &attribute, std::fstream &file);
+		const std::vector<std::string> &getServernames() const;
 		bool setListen(std::string const &attribute, std::fstream &file);
 		std::string getListen() const;
 		const std::string &getIpaddr() const;
