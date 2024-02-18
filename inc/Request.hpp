@@ -39,6 +39,7 @@ class Request {
 		Result<std::string, bool> getHeaderValue(std::string const &key) const;
 		std::string const &getBody() const;
 		bool shouldKeepAlive() const;
+		bool isValidRequest() const;
 		ClientSocket::csphase load(std::stringstream &buffer);
 		std::string getEntireData() const;
 };

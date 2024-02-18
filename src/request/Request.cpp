@@ -53,6 +53,13 @@ bool Request::shouldKeepAlive() const {
 	return false;
 }
 
+bool Request::isValidRequest() const {
+	if (this->_method.empty() == true || this->_path.empty() == true || this->_httpVersion.empty() == true) {
+		return false;
+	}
+	return true;
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()) {
@@ -66,8 +73,23 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			}
 			std::stringstream ss(line);
 			ss >> this->_method;
+			if (this->_method.empty() == true) {
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			ss >> this->_path;
+			if (this->_path.empty() == true) {
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			ss >> this->_httpVersion;
+			if (this->_httpVersion.empty() == true) {
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			this->_phase = Request::RQHEADER;
 			nextcsphase = ClientSocket::RECV;
 			break;
