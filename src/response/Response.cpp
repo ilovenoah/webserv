@@ -90,7 +90,8 @@ void Response::setStatusMsg(std::string const &statusMsg) {
 void Response::setBody(std::string const &body) { this->_body = body; }
 
 bool Response::isKeepAlive() const {
-	std::map<std::string, std::string>::const_iterator iter = this->_headers.find("Connection");
+	std::map<std::string, std::string>::const_iterator iter =
+		this->_headers.find("Connection");
 	if (iter == this->_headers.end()) {
 		return true;
 	}
@@ -121,7 +122,8 @@ void Response::printConfigInfo() const {
 	std::clog << "============================================" << std::endl;
 }
 
-void Response::_setErrorResponse(const std::string &status, bool shouldKeepAlive) {
+void Response::_setErrorResponse(const std::string &status,
+								 bool shouldKeepAlive) {
 	std::string errorPagePath;
 	std::string root;
 	std::string localRelativePath;
@@ -140,7 +142,9 @@ void Response::_setErrorResponse(const std::string &status, bool shouldKeepAlive
 		if (iter != this->_server->getErrorPages().end()) {
 			errorPagePath = iter->second;
 		} else {
-			this->_setEntireDataWithBody(status, this->_statusMap.find(status)->second.second, shouldKeepAlive);
+			this->_setEntireDataWithBody(
+				status, this->_statusMap.find(status)->second.second,
+				shouldKeepAlive);
 			return;
 		}
 	}
@@ -153,7 +157,9 @@ void Response::_setErrorResponse(const std::string &status, bool shouldKeepAlive
 	localRelativePath = root + errorPagePath;
 	fs.open(localRelativePath.c_str());
 	if (fs.fail() == true) {
-		this->_setEntireDataWithBody(this->_statusMap.find("500")->second.first, this->_statusMap.find("500")->second.second, false);
+		this->_setEntireDataWithBody(
+			this->_statusMap.find("500")->second.first,
+			this->_statusMap.find("500")->second.second, false);
 		return;
 	} else {
 		fs.seekg(0, fs.end);
@@ -163,7 +169,9 @@ void Response::_setErrorResponse(const std::string &status, bool shouldKeepAlive
 		std::memset(buf, 0, length);
 		fs.readsome(buf, length);
 		if (fs.fail()) {
-			this->_setEntireDataWithBody(this->_statusMap.find("500")->second.first, this->_statusMap.find("500")->second.second, false);
+			this->_setEntireDataWithBody(
+				this->_statusMap.find("500")->second.first,
+				this->_statusMap.find("500")->second.second, false);
 			return;
 		}
 		std::string body(buf, length);
@@ -203,7 +211,8 @@ bool Response::_setIndexPage(bool shouldKeepAlive) {
 	return false;
 }
 
-bool Response::_setDirectoryListingPage(const std::string &path, bool shouldKeepAlive) {
+bool Response::_setDirectoryListingPage(const std::string &path,
+										bool shouldKeepAlive) {
 	std::string title("<html>\n<head><title>Index of " + path +
 					  "</title></head>\n<body>\n");
 	std::string head("<h1>Index of " + path +
@@ -267,13 +276,15 @@ ClientSocket::csphase Response::_setGetResponse(const Request &request) {
 			}
 		}
 		if (this->_shouldAutoIndexed() == true &&
-			this->_setDirectoryListingPage(request.getPath(), request.shouldKeepAlive()) == true) {
+			this->_setDirectoryListingPage(request.getPath(),
+										   request.shouldKeepAlive()) == true) {
 			return ClientSocket::SEND;
 		}
 		this->_setErrorResponse("404", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
-	return this->setEntireDataWithFile(this->_actPath, "200", request.shouldKeepAlive());
+	return this->setEntireDataWithFile(this->_actPath, "200",
+									   request.shouldKeepAlive());
 }
 
 ClientSocket::csphase Response::_setPostResponse(const Request &request) {
@@ -344,7 +355,8 @@ bool Response::_shouldRedirect() const {
 	return false;
 }
 
-ClientSocket::csphase Response::_setRedirectResponse(Request const &request, bool shouldKeepAlive) {
+ClientSocket::csphase Response::_setRedirectResponse(Request const &request,
+													 bool shouldKeepAlive) {
 	if (this->_location != NULL) {
 		this->_httpVersion = "HTTP/1.1";
 		if (request.getMethod().compare("GET") == 0) {
@@ -362,8 +374,8 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request, boo
 			this->_headers.insert(std::pair<std::string, std::string>(
 				"Connection", "keep-alive"));
 		} else {
-			this->_headers.insert(std::pair<std::string, std::string>(
-				"Connection", "close"));
+			this->_headers.insert(
+				std::pair<std::string, std::string>("Connection", "close"));
 		}
 		return ClientSocket::SEND;
 	} else {
@@ -382,8 +394,8 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request, boo
 			this->_headers.insert(std::pair<std::string, std::string>(
 				"Connection", "keep-alive"));
 		} else {
-			this->_headers.insert(std::pair<std::string, std::string>(
-				"Connection", "close"));
+			this->_headers.insert(
+				std::pair<std::string, std::string>("Connection", "close"));
 		}
 		return ClientSocket::SEND;
 	}
@@ -469,8 +481,9 @@ void Response::setActPath(std::string const &path) {
 
 std::string const &Response::getActPath() const { return this->_actPath; }
 
-ClientSocket::csphase Response::setEntireDataWithFile(
-	std::string const &path, std::string const &status, bool shouldKeepAlive) {
+ClientSocket::csphase Response::setEntireDataWithFile(std::string const &path,
+													  std::string const &status,
+													  bool shouldKeepAlive) {
 	std::ifstream fs;
 	std::size_t length(0);
 
@@ -498,23 +511,25 @@ ClientSocket::csphase Response::setEntireDataWithFile(
 	return ClientSocket::SEND;
 }
 
-ClientSocket::csphase Response::setEntireData(std::string const &status, bool shouldKeepAlive) {
+ClientSocket::csphase Response::setEntireData(std::string const &status,
+											  bool shouldKeepAlive) {
 	this->_httpVersion = "HTTP/1.1";
 	this->_status = status;
 	this->_statusMsg = this->_statusMap.find(status)->second.first;
 	this->_headers.insert(std::pair<std::string, std::string>(
-		"Content-Length", utils::sizeTtoString(this->_body.size())));	
+		"Content-Length", utils::sizeTtoString(this->_body.size())));
 	if (shouldKeepAlive == true) {
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Connection", "keep-alive"));	
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Connection", "keep-alive"));
 	} else {
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Connection", "close"));	
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Connection", "close"));
 	}
 	return ClientSocket::SEND;
 }
 
-ClientSocket::csphase Response::_setEntireDataWithBody(std::string const &status, std::string const &body, bool shouldKeepAlive) {
+ClientSocket::csphase Response::_setEntireDataWithBody(
+	std::string const &status, std::string const &body, bool shouldKeepAlive) {
 	this->_httpVersion = "HTTP/1.1";
 	this->_status = status;
 	this->_body = body;
@@ -522,11 +537,11 @@ ClientSocket::csphase Response::_setEntireDataWithBody(std::string const &status
 	this->_headers.insert(std::pair<std::string, std::string>(
 		"Content-Length", utils::sizeTtoString(this->_body.size())));
 	if (shouldKeepAlive == true) {
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Connection", "keep-alive"));
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Connection", "keep-alive"));
 	} else {
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Connection", "close"));
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Connection", "close"));
 	}
 	return ClientSocket::SEND;
 }

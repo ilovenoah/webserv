@@ -46,15 +46,23 @@ Result<std::string, bool> Request::getHeaderValue(
 std::string const &Request::getBody() const { return this->_body; }
 
 bool Request::shouldKeepAlive() const {
-	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator iter = this->_header.find("Connection");
-	if (iter == this->_header.end()) { return true; }
-	if (iter->second.compare("close") == 0) { return false; }
-	if (iter->second.compare("keep-alive") == 0) { return true; }
+	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator
+		iter = this->_header.find("Connection");
+	if (iter == this->_header.end()) {
+		return true;
+	}
+	if (iter->second.compare("close") == 0) {
+		return false;
+	}
+	if (iter->second.compare("keep-alive") == 0) {
+		return true;
+	}
 	return false;
 }
 
 bool Request::isValidRequest() const {
-	if (this->_method.empty() == true || this->_path.empty() == true || this->_httpVersion.empty() == true) {
+	if (this->_method.empty() == true || this->_path.empty() == true ||
+		this->_httpVersion.empty() == true) {
 		return false;
 	}
 	if (this->_httpVersion.compare("HTTP/1.1") != 0) {
@@ -63,8 +71,11 @@ bool Request::isValidRequest() const {
 	if (this->_path.find("..") != std::string::npos) {
 		return false;
 	}
-	std::map<std::string, std::string>::const_iterator fiter = this->_header.find("Transfer-Encoding");
-	if (fiter != this->_header.end() && fiter->second.compare("chunked") != 0) { return false; }
+	std::map<std::string, std::string>::const_iterator fiter =
+		this->_header.find("Transfer-Encoding");
+	if (fiter != this->_header.end() && fiter->second.compare("chunked") != 0) {
+		return false;
+	}
 	return true;
 }
 
@@ -114,7 +125,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				this->_httpVersion.clear();
 				this->_phase = Request::RQFIN;
 				nextcsphase = ClientSocket::RECV;
-				break ;
+				break;
 			}
 			std::getline(ss, value);
 			this->_header.insert(
