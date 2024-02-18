@@ -423,6 +423,10 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::ifstream fs;
 
 	(void)config;
+	if (request.isValidRequest() == false) {
+		this->_setErrorResponse("400", false);
+		return ClientSocket::SEND;
+	}
 	if (this->_location != NULL &&
 		this->_location->isAllowedMethod(request.getMethod()) == false) {
 		this->_setErrorResponse("405", request.shouldKeepAlive());

@@ -57,6 +57,9 @@ bool Request::isValidRequest() const {
 	if (this->_method.empty() == true || this->_path.empty() == true || this->_httpVersion.empty() == true) {
 		return false;
 	}
+	if (this->_httpVersion.compare("HTTP/1.1") != 0) {
+		return false;
+	}
 	return true;
 }
 
@@ -73,19 +76,9 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			}
 			std::stringstream ss(line);
 			ss >> this->_method;
-			if (this->_method.empty() == true) {
-				this->_phase = Request::RQFIN;
-				nextcsphase = ClientSocket::RECV;
-				break;
-			}
 			ss >> this->_path;
-			if (this->_path.empty() == true) {
-				this->_phase = Request::RQFIN;
-				nextcsphase = ClientSocket::RECV;
-				break;
-			}
 			ss >> this->_httpVersion;
-			if (this->_httpVersion.empty() == true) {
+			if (this->isValidRequest() == false) {
 				this->_phase = Request::RQFIN;
 				nextcsphase = ClientSocket::RECV;
 				break;
