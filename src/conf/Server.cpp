@@ -21,13 +21,14 @@ Server::initSetterMap() {
 std::map<std::string, bool (Location::*)(std::string const &, std::fstream &)>
 	Server::_setterMap = initSetterMap();
 
-Server::Server()
-	: AConfigurable(), _ipAddr("0.0.0.0"), _port("8000") {
+Server::Server() : AConfigurable(), _ipAddr("0.0.0.0"), _port("8000") {
 	this->_root = "./";
 	this->_servernames.push_back("");
 }
 
-const std::vector<std::string> &Server::getServernames() const { return this->_servernames; }
+const std::vector<std::string> &Server::getServernames() const {
+	return this->_servernames;
+}
 
 bool Server::setServernames(std::string const &attribute, std::fstream &file) {
 	(void)file;

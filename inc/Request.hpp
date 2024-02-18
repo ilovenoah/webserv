@@ -1,9 +1,10 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
+#include <limits.h>
+
 #include <map>
 #include <string>
-#include <limits.h>
 
 #include "CaseInsensitiveCompare.hpp"
 #include "ClientSocket.hpp"
