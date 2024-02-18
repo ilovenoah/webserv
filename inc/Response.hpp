@@ -55,6 +55,7 @@ class Response {
 		void setStatus(std::string const &status);
 		void setStatusMsg(std::string const &statusMsg);
 		void setBody(std::string const &body);
+		bool isKeepAlive() const;
 		void printConfigInfo() const;
 		ClientSocket::csphase load(Config &config, Request const &request);
 		std::string getEntireData() const;

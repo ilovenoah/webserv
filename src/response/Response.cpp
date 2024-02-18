@@ -89,6 +89,17 @@ void Response::setStatusMsg(std::string const &statusMsg) {
 
 void Response::setBody(std::string const &body) { this->_body = body; }
 
+bool Response::isKeepAlive() const {
+	std::map<std::string, std::string>::const_iterator iter = this->_headers.find("Connection");
+	if (iter == this->_headers.end()) {
+		return true;
+	}
+	if (iter->second.compare("keep-alive") == 0) {
+		return true;
+	}
+	return false;
+}
+
 void Response::printConfigInfo() const {
 	std::clog << "============== Routing result ==============" << std::endl;
 	std::clog << "Server name: ";
