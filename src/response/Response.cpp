@@ -129,12 +129,6 @@ void Response::_setErrorResponse(const std::string &status, bool shouldKeepAlive
 		if (iter != this->_server->getErrorPages().end()) {
 			errorPagePath = iter->second;
 		} else {
-			// this->_httpVersion = "HTTP/1.1";
-			// this->_status = status;
-			// this->_statusMsg = this->_statusMap.find(status)->second.first;
-			// this->_body = this->_statusMap.find(status)->second.second;
-			// this->_headers.insert(std::pair<std::string, std::string>(
-			// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
 			this->_setEntireDataWithBody(status, this->_statusMap.find(status)->second.second, shouldKeepAlive);
 			return;
 		}
@@ -148,12 +142,6 @@ void Response::_setErrorResponse(const std::string &status, bool shouldKeepAlive
 	localRelativePath = root + errorPagePath;
 	fs.open(localRelativePath.c_str());
 	if (fs.fail() == true) {
-		// this->_httpVersion = "HTTP/1.1";
-		// this->_status = "500";
-		// this->_statusMsg = this->_statusMap.find("500")->second.first;
-		// this->_body = this->_statusMap.find("500")->second.second;
-		// this->_headers.insert(std::pair<std::string, std::string>(
-		// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
 		this->_setEntireDataWithBody(this->_statusMap.find("500")->second.first, this->_statusMap.find("500")->second.second, false);
 		return;
 	} else {
@@ -164,22 +152,10 @@ void Response::_setErrorResponse(const std::string &status, bool shouldKeepAlive
 		std::memset(buf, 0, length);
 		fs.readsome(buf, length);
 		if (fs.fail()) {
-			// this->_httpVersion = "HTTP/1.1";
-			// this->_status = "500";
-			// this->_statusMsg = this->_statusMap.find("500")->second.first;
-			// this->_body = this->_statusMap.find("500")->second.second;
-			// this->_headers.insert(std::pair<std::string, std::string>(
-			// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
 			this->_setEntireDataWithBody(this->_statusMap.find("500")->second.first, this->_statusMap.find("500")->second.second, false);
 			return;
 		}
 		std::string body(buf, length);
-		// this->_body.append(buf, length);
-		// this->_httpVersion = "HTTP/1.1";
-		// this->_status = status;
-		// this->_statusMsg = this->_statusMap.find(status)->second.first;
-		// this->_headers.insert(std::pair<std::string, std::string>(
-		// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
 		this->_setEntireDataWithBody(status, body, shouldKeepAlive);
 	}
 }
@@ -248,12 +224,6 @@ bool Response::_setDirectoryListingPage(const std::string &path, bool shouldKeep
 		return false;
 	}
 	data.append("</pre><hr></body>\n</html>");
-	// this->_body = data;
-	// this->_httpVersion = "HTTP/1.1";
-	// this->_status = "200";
-	// this->_statusMsg = "Ok";
-	// this->_headers.insert(std::pair<std::string, std::string>(
-	// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
 	this->_setEntireDataWithBody("200", data, shouldKeepAlive);
 	return true;
 }
@@ -423,6 +393,10 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	std::ifstream fs;
 
 	(void)config;
+	if (request.isValidRequest() == false) {
+		this->_setErrorResponse("400", false);
+		return ClientSocket::SEND;
+	}
 	if (this->_location != NULL &&
 		this->_location->isAllowedMethod(request.getMethod()) == false) {
 		this->_setErrorResponse("405", request.shouldKeepAlive());
@@ -509,12 +483,6 @@ ClientSocket::csphase Response::setEntireDataWithFile(
 		return ClientSocket::SEND;
 	}
 	std::string body(buf, length);
-	// this->_body.append(buf, length);
-	// this->_httpVersion = "HTTP/1.1";
-	// this->_status = status;
-	// this->_statusMsg = this->_statusMap.find(status)->second.first;
-	// this->_headers.insert(std::pair<std::string, std::string>(
-	// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
 	this->_setEntireDataWithBody(status, body, shouldKeepAlive);
 	return ClientSocket::SEND;
 }
