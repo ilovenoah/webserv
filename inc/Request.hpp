@@ -11,6 +11,7 @@
 #include "Error.hpp"
 #include "Ok.hpp"
 #include "Result.hpp"
+#include "utils.hpp"
 
 class Request {
 	public:

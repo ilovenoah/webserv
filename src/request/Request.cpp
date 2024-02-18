@@ -63,6 +63,8 @@ bool Request::isValidRequest() const {
 	if (this->_path.find("..") != std::string::npos) {
 		return false;
 	}
+	std::map<std::string, std::string>::const_iterator fiter = this->_header.find("Transfer-Encoding");
+	if (fiter != this->_header.end() && fiter->second.compare("chunked") != 0) { return false; }
 	return true;
 }
 
@@ -136,8 +138,10 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				break;
 			} else if (cliter == this->_header.end() &&
 					   teiter != this->_header.end()) {
-				// chunkedじゃなければ400でかえす
 				if (teiter->second.compare("chunked") != 0) {
+					this->_phase = Request::RQFIN;
+					nextcsphase = ClientSocket::RECV;
+					break;
 				}
 				if (utils::findCRLF(buffer) == false) {
 					this->_phase = Request::RQBODY;
