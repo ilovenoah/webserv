@@ -281,6 +281,14 @@ ClientSocket::csphase Response::_setGetResponse(const Request &request) {
 ClientSocket::csphase Response::_setPostResponse(const Request &request) {
 	std::string uploadStorePath;
 	std::string uploadPath;
+
+	if (this->_location != NULL && request.getBody().size() > (size_t)this->_location->getClientMaxBodySize()) {
+		this->_setErrorResponse("400");
+		return ClientSocket::SEND;
+	} else if (request.getBody().size() > (size_t)this->_server->getClientMaxBodySize()) { 
+		this->_setErrorResponse("400");
+		return ClientSocket::SEND;
+	}
 	if (this->_location != NULL) {
 		uploadStorePath = this->_location->getuploadStore() + "/";
 	} else {
