@@ -45,6 +45,14 @@ Result<std::string, bool> Request::getHeaderValue(
 
 std::string const &Request::getBody() const { return this->_body; }
 
+bool Request::shouldKeepAlive() const {
+	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator iter = this->_header.find("Connection");
+	if (iter == this->_header.end()) { return true; }
+	if (iter->second.compare("close") == 0) { return false; }
+	if (iter->second.compare("keep-alive") == 0) { return true; }
+	return false;
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()) {

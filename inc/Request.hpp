@@ -38,6 +38,7 @@ class Request {
 		std::string const &getHttpVersion() const;
 		Result<std::string, bool> getHeaderValue(std::string const &key) const;
 		std::string const &getBody() const;
+		bool shouldKeepAlive() const;
 		ClientSocket::csphase load(std::stringstream &buffer);
 		std::string getEntireData() const;
 };
