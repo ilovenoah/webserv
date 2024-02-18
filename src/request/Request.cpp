@@ -103,10 +103,18 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			std::string value;
 			std::stringstream spaceremover;
 			std::getline(ss, key, ':');
-			std::getline(ss, value, ':');
-			spaceremover << value;
-			value.clear();
-			spaceremover >> value;
+			ss >> std::ws;
+			if (ss.peek() == EOF) {
+				this->_method.clear();
+				this->_path.clear();
+				this->_httpVersion.clear();
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+			}
+			std::getline(ss, value);
+			// spaceremover << value;
+			// value.clear();
+			// spaceremover >> value;
 			this->_header.insert(
 				std::pair<std::string, std::string>(key, value));
 			this->_phase = Request::RQHEADER;
