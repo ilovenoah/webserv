@@ -110,7 +110,7 @@ void Response::printConfigInfo() const {
 	std::clog << "============================================" << std::endl;
 }
 
-void Response::_setErrorResponse(const std::string &status) {
+void Response::_setErrorResponse(const std::string &status, bool shouldKeepAlive) {
 	std::string errorPagePath;
 	std::string root;
 	std::string localRelativePath;
@@ -129,12 +129,13 @@ void Response::_setErrorResponse(const std::string &status) {
 		if (iter != this->_server->getErrorPages().end()) {
 			errorPagePath = iter->second;
 		} else {
-			this->_httpVersion = "HTTP/1.1";
-			this->_status = status;
-			this->_statusMsg = this->_statusMap.find(status)->second.first;
-			this->_body = this->_statusMap.find(status)->second.second;
-			this->_headers.insert(std::pair<std::string, std::string>(
-				"Content-Length", utils::sizeTtoString(this->_body.size())));
+			// this->_httpVersion = "HTTP/1.1";
+			// this->_status = status;
+			// this->_statusMsg = this->_statusMap.find(status)->second.first;
+			// this->_body = this->_statusMap.find(status)->second.second;
+			// this->_headers.insert(std::pair<std::string, std::string>(
+			// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
+			this->_setEntireDataWithBody(status, this->_statusMap.find(status)->second.second, shouldKeepAlive);
 			return;
 		}
 	}
@@ -147,12 +148,13 @@ void Response::_setErrorResponse(const std::string &status) {
 	localRelativePath = root + errorPagePath;
 	fs.open(localRelativePath.c_str());
 	if (fs.fail() == true) {
-		this->_httpVersion = "HTTP/1.1";
-		this->_status = "500";
-		this->_statusMsg = this->_statusMap.find("500")->second.first;
-		this->_body = this->_statusMap.find("500")->second.second;
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Content-Length", utils::sizeTtoString(this->_body.size())));
+		// this->_httpVersion = "HTTP/1.1";
+		// this->_status = "500";
+		// this->_statusMsg = this->_statusMap.find("500")->second.first;
+		// this->_body = this->_statusMap.find("500")->second.second;
+		// this->_headers.insert(std::pair<std::string, std::string>(
+		// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
+		this->_setEntireDataWithBody(this->_statusMap.find("500")->second.first, this->_statusMap.find("500")->second.second, false);
 		return;
 	} else {
 		fs.seekg(0, fs.end);
@@ -162,20 +164,23 @@ void Response::_setErrorResponse(const std::string &status) {
 		std::memset(buf, 0, length);
 		fs.readsome(buf, length);
 		if (fs.fail()) {
-			this->_httpVersion = "HTTP/1.1";
-			this->_status = "500";
-			this->_statusMsg = this->_statusMap.find("500")->second.first;
-			this->_body = this->_statusMap.find("500")->second.second;
-			this->_headers.insert(std::pair<std::string, std::string>(
-				"Content-Length", utils::sizeTtoString(this->_body.size())));
+			// this->_httpVersion = "HTTP/1.1";
+			// this->_status = "500";
+			// this->_statusMsg = this->_statusMap.find("500")->second.first;
+			// this->_body = this->_statusMap.find("500")->second.second;
+			// this->_headers.insert(std::pair<std::string, std::string>(
+			// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
+			this->_setEntireDataWithBody(this->_statusMap.find("500")->second.first, this->_statusMap.find("500")->second.second, false);
 			return;
 		}
-		this->_body.append(buf, length);
-		this->_httpVersion = "HTTP/1.1";
-		this->_status = status;
-		this->_statusMsg = this->_statusMap.find(status)->second.first;
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Content-Length", utils::sizeTtoString(this->_body.size())));
+		std::string body(buf, length);
+		// this->_body.append(buf, length);
+		// this->_httpVersion = "HTTP/1.1";
+		// this->_status = status;
+		// this->_statusMsg = this->_statusMap.find(status)->second.first;
+		// this->_headers.insert(std::pair<std::string, std::string>(
+		// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
+		this->_setEntireDataWithBody(status, body, shouldKeepAlive);
 	}
 }
 
@@ -193,7 +198,7 @@ static std::string getDirPath(const std::string &path) {
 	return dirPath;
 }
 
-bool Response::_setIndexPage() {
+bool Response::_setIndexPage(bool shouldKeepAlive) {
 	std::vector<std::string> index;
 	std::ifstream fs;
 	std::string path;
@@ -205,13 +210,13 @@ bool Response::_setIndexPage() {
 	for (std::vector<std::string>::iterator iter = index.begin();
 		 iter != index.end(); ++iter) {
 		path = this->_actPath + *iter;
-		this->setEntireDataWithFile(path, "200");
+		this->setEntireDataWithFile(path, "200", shouldKeepAlive);
 		return true;
 	}
 	return false;
 }
 
-bool Response::_setDirectoryListingPage(const std::string &path) {
+bool Response::_setDirectoryListingPage(const std::string &path, bool shouldKeepAlive) {
 	std::string title("<html>\n<head><title>Index of " + path +
 					  "</title></head>\n<body>\n");
 	std::string head("<h1>Index of " + path +
@@ -243,28 +248,29 @@ bool Response::_setDirectoryListingPage(const std::string &path) {
 		return false;
 	}
 	data.append("</pre><hr></body>\n</html>");
-	this->_body = data;
-	this->_httpVersion = "HTTP/1.1";
-	this->_status = "200";
-	this->_statusMsg = "Ok";
-	this->_headers.insert(std::pair<std::string, std::string>(
-		"Content-Length", utils::sizeTtoString(this->_body.size())));
+	// this->_body = data;
+	// this->_httpVersion = "HTTP/1.1";
+	// this->_status = "200";
+	// this->_statusMsg = "Ok";
+	// this->_headers.insert(std::pair<std::string, std::string>(
+	// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
+	this->_setEntireDataWithBody("200", data, shouldKeepAlive);
 	return true;
 }
 
 ClientSocket::csphase Response::_setGetResponse(const Request &request) {
 	if (utils::isAccess(this->_actPath, R_OK) == false) {
-		this->_setErrorResponse("404");
+		this->_setErrorResponse("404", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
 	Result<bool, std::string> res = utils::isDirectory(this->_actPath);
 	if (res.isError()) {
-		this->_setErrorResponse("500");
+		this->_setErrorResponse("500", false);
 		return ClientSocket::SEND;
 	}
 	if (res.getOk() == true &&
 		this->_actPath.find_last_of('/') != this->_actPath.length() - 1) {
-		this->setEntireData("301");
+		this->setEntireData("301", request.shouldKeepAlive());
 		this->_headers.insert(std::pair<std::string, std::string>(
 			"Location",
 			"http://" + this->_server->getListen() + request.getPath() + "/"));
@@ -275,18 +281,18 @@ ClientSocket::csphase Response::_setGetResponse(const Request &request) {
 			(this->_location != NULL &&
 			 request.getPath().compare(this->_location->getLocationPath() +
 									   "/") == 0)) {
-			if (this->_setIndexPage() == true) {
+			if (this->_setIndexPage(request.shouldKeepAlive()) == true) {
 				return ClientSocket::SEND;
 			}
 		}
 		if (this->_shouldAutoIndexed() == true &&
-			this->_setDirectoryListingPage(request.getPath()) == true) {
+			this->_setDirectoryListingPage(request.getPath(), request.shouldKeepAlive()) == true) {
 			return ClientSocket::SEND;
 		}
-		this->_setErrorResponse("404");
+		this->_setErrorResponse("404", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
-	return this->setEntireDataWithFile(this->_actPath, "200");
+	return this->setEntireDataWithFile(this->_actPath, "200", request.shouldKeepAlive());
 }
 
 ClientSocket::csphase Response::_setPostResponse(const Request &request) {
@@ -296,11 +302,11 @@ ClientSocket::csphase Response::_setPostResponse(const Request &request) {
 	if (this->_location != NULL &&
 		request.getBody().size() >
 			(size_t)this->_location->getClientMaxBodySize()) {
-		this->_setErrorResponse("413");
+		this->_setErrorResponse("413", false);
 		return ClientSocket::SEND;
 	} else if (request.getBody().size() >
 			   (size_t)this->_server->getClientMaxBodySize()) {
-		this->_setErrorResponse("413");
+		this->_setErrorResponse("413", false);
 		return ClientSocket::SEND;
 	}
 	if (this->_location != NULL) {
@@ -309,7 +315,7 @@ ClientSocket::csphase Response::_setPostResponse(const Request &request) {
 		uploadStorePath = this->_server->getuploadStore() + "/";
 	}
 	if (utils::isAccess(uploadStorePath, W_OK) == false) {
-		this->_setErrorResponse("403");
+		this->_setErrorResponse("403", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
 	uploadPath = uploadStorePath + utils::getRandomStr(12);
@@ -318,33 +324,33 @@ ClientSocket::csphase Response::_setPostResponse(const Request &request) {
 	}
 	std::ofstream ofs(uploadPath.c_str());
 	if (ofs.fail() == true) {
-		this->_setErrorResponse("500");
+		this->_setErrorResponse("500", false);
 		return ClientSocket::SEND;
 	}
 	ofs.write(request.getBody().c_str(), request.getBody().size());
 	if (ofs.fail() == true) {
-		this->_setErrorResponse("500");
+		this->_setErrorResponse("500", false);
 		return ClientSocket::SEND;
 	}
-	return this->setEntireData("201");
+	return this->setEntireData("201", request.shouldKeepAlive());
 }
 
 ClientSocket::csphase Response::_setDeleteResponse(const Request &request) {
 	(void)request;
 	if (utils::isAccess(this->_actPath, F_OK) == false) {
-		this->_setErrorResponse("404");
+		this->_setErrorResponse("404", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
 	std::string dirpath = getDirPath(this->_actPath);
 	if (utils::isAccess(dirpath, W_OK) == false) {
-		this->_setErrorResponse("403");
+		this->_setErrorResponse("403", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
 	if (unlink(this->_actPath.c_str()) == -1) {
-		this->_setErrorResponse("500");
+		this->_setErrorResponse("500", false);
 		return ClientSocket::SEND;
 	}
-	return setEntireData("204");
+	return setEntireData("204", request.shouldKeepAlive());
 }
 
 bool Response::_shouldRedirect() const {
@@ -357,7 +363,7 @@ bool Response::_shouldRedirect() const {
 	return false;
 }
 
-ClientSocket::csphase Response::_setRedirectResponse(Request const &request) {
+ClientSocket::csphase Response::_setRedirectResponse(Request const &request, bool shouldKeepAlive) {
 	if (this->_location != NULL) {
 		this->_httpVersion = "HTTP/1.1";
 		if (request.getMethod().compare("GET") == 0) {
@@ -371,6 +377,13 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request) {
 			"Content-Length", utils::sizeTtoString(this->_body.size())));
 		this->_headers.insert(std::pair<std::string, std::string>(
 			"Location", this->_location->getReturn()));
+		if (shouldKeepAlive == true) {
+			this->_headers.insert(std::pair<std::string, std::string>(
+				"Connection", "keep-alive"));
+		} else {
+			this->_headers.insert(std::pair<std::string, std::string>(
+				"Connection", "close"));
+		}
 		return ClientSocket::SEND;
 	} else {
 		if (request.getMethod().compare("GET") == 0) {
@@ -384,6 +397,13 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request) {
 			"Content-Length", utils::sizeTtoString(this->_body.size())));
 		this->_headers.insert(std::pair<std::string, std::string>(
 			"Location", this->_server->getReturn()));
+		if (shouldKeepAlive == true) {
+			this->_headers.insert(std::pair<std::string, std::string>(
+				"Connection", "keep-alive"));
+		} else {
+			this->_headers.insert(std::pair<std::string, std::string>(
+				"Connection", "close"));
+		}
 		return ClientSocket::SEND;
 	}
 	return ClientSocket::SEND;
@@ -405,14 +425,14 @@ ClientSocket::csphase Response::load(Config &config, Request const &request) {
 	(void)config;
 	if (this->_location != NULL &&
 		this->_location->isAllowedMethod(request.getMethod()) == false) {
-		this->_setErrorResponse("405");
+		this->_setErrorResponse("405", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	} else if (this->_server->isAllowedMethod(request.getMethod()) == false) {
-		this->_setErrorResponse("405");
+		this->_setErrorResponse("405", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
 	if (this->_shouldRedirect() == true) {
-		return this->_setRedirectResponse(request);
+		return this->_setRedirectResponse(request, request.shouldKeepAlive());
 	}
 	if (request.getMethod() == "GET") {
 		return this->_setGetResponse(request);
@@ -465,17 +485,17 @@ void Response::setActPath(std::string const &path) {
 std::string const &Response::getActPath() const { return this->_actPath; }
 
 ClientSocket::csphase Response::setEntireDataWithFile(
-	std::string const &path, std::string const &status) {
+	std::string const &path, std::string const &status, bool shouldKeepAlive) {
 	std::ifstream fs;
 	std::size_t length(0);
 
 	if (utils::isAccess(path.c_str(), R_OK) == false) {
-		this->_setErrorResponse("404");
+		this->_setErrorResponse("404", shouldKeepAlive);
 		return ClientSocket::SEND;
 	}
 	fs.open(path.c_str(), std::ifstream::binary);
 	if (fs.fail()) {
-		this->_setErrorResponse("500");
+		this->_setErrorResponse("500", shouldKeepAlive);
 		return ClientSocket::SEND;
 	}
 	fs.seekg(0, fs.end);
@@ -485,30 +505,40 @@ ClientSocket::csphase Response::setEntireDataWithFile(
 	std::memset(buf, 0, length);
 	fs.readsome(buf, length);
 	if (fs.fail()) {
-		this->_setErrorResponse("500");
+		this->_setErrorResponse("500", shouldKeepAlive);
 		return ClientSocket::SEND;
 	}
-	this->_body.append(buf, length);
-	this->_httpVersion = "HTTP/1.1";
-	this->_status = status;
-	this->_statusMsg = this->_statusMap.find(status)->second.first;
-	this->_headers.insert(std::pair<std::string, std::string>(
-		"Content-Length", utils::sizeTtoString(this->_body.size())));
+	std::string body(buf, length);
+	// this->_body.append(buf, length);
+	// this->_httpVersion = "HTTP/1.1";
+	// this->_status = status;
+	// this->_statusMsg = this->_statusMap.find(status)->second.first;
+	// this->_headers.insert(std::pair<std::string, std::string>(
+	// 	"Content-Length", utils::sizeTtoString(this->_body.size())));
+	this->_setEntireDataWithBody(status, body, shouldKeepAlive);
 	return ClientSocket::SEND;
 }
 
-ClientSocket::csphase Response::setEntireData(std::string const &status) {
+ClientSocket::csphase Response::setEntireData(std::string const &status, bool shouldKeepAlive) {
 	this->_httpVersion = "HTTP/1.1";
 	this->_status = status;
 	this->_statusMsg = this->_statusMap.find(status)->second.first;
 	this->_headers.insert(std::pair<std::string, std::string>(
 		"Content-Length", utils::sizeTtoString(this->_body.size())));	
+	if (shouldKeepAlive == true) {
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Connection", "keep-alive"));	
+	} else {
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Connection", "close"));	
+	}
 	return ClientSocket::SEND;
 }
 
-ClientSocket::csphase Response::_setEntireDataWithBody(std::string const &status, std::string const &status, bool shouldKeepAlive) {
+ClientSocket::csphase Response::_setEntireDataWithBody(std::string const &status, std::string const &body, bool shouldKeepAlive) {
 	this->_httpVersion = "HTTP/1.1";
 	this->_status = status;
+	this->_body = body;
 	this->_statusMsg = this->_statusMap.find(status)->second.first;
 	this->_headers.insert(std::pair<std::string, std::string>(
 		"Content-Length", utils::sizeTtoString(this->_body.size())));
