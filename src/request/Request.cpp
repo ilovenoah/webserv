@@ -60,6 +60,9 @@ bool Request::isValidRequest() const {
 	if (this->_httpVersion.compare("HTTP/1.1") != 0) {
 		return false;
 	}
+	if (this->_path.find("..") != std::string::npos) {
+		return false;
+	}
 	return true;
 }
 
