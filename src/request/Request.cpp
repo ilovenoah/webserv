@@ -139,6 +139,11 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				this->_body.append(buf, actReadsize);
 				std::string nl;
 				this->_chunksize -= actReadsize;
+				if (this->_body.size() > INT_MAX) {
+					this->_phase = Request::RQFIN;
+					nextcsphase = ClientSocket::RECV;
+					break;
+				}
 				this->_phase = Request::RQBODY;
 				nextcsphase = ClientSocket::RECV;
 				break;
@@ -161,6 +166,11 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				break;
 			}
 			this->_body.append(buf, actReadsize);
+			if (this->_body.size() > INT_MAX) {
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			if (this->_body.size() < contentLength) {
 				this->_phase = Request::RQBODY;
 				nextcsphase = ClientSocket::RECV;
