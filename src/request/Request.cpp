@@ -77,6 +77,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
+			utils::rmCR(line);
 			std::stringstream ss(line);
 			ss >> this->_method;
 			ss >> this->_path;
@@ -98,6 +99,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
+			utils::rmCR(line);
 			std::stringstream ss(line);
 			std::string key;
 			std::string value;
@@ -110,6 +112,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				this->_httpVersion.clear();
 				this->_phase = Request::RQFIN;
 				nextcsphase = ClientSocket::RECV;
+				break ;
 			}
 			std::getline(ss, value);
 			this->_header.insert(
