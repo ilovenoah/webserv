@@ -43,6 +43,7 @@ class Response {
 		bool _shouldRedirect() const;
 		ClientSocket::csphase _setRedirectResponse(const Request &request);
 		bool _shouldAutoIndexed() const;
+		ClientSocket::csphase _setEntireDataWithBody(std::string const &status, std::string const &body, bool shouldKeepAlive);
 
 	public:
 		Response();

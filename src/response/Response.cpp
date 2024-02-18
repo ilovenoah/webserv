@@ -502,6 +502,22 @@ ClientSocket::csphase Response::setEntireData(std::string const &status) {
 	this->_status = status;
 	this->_statusMsg = this->_statusMap.find(status)->second.first;
 	this->_headers.insert(std::pair<std::string, std::string>(
+		"Content-Length", utils::sizeTtoString(this->_body.size())));	
+	return ClientSocket::SEND;
+}
+
+ClientSocket::csphase Response::_setEntireDataWithBody(std::string const &status, std::string const &status, bool shouldKeepAlive) {
+	this->_httpVersion = "HTTP/1.1";
+	this->_status = status;
+	this->_statusMsg = this->_statusMap.find(status)->second.first;
+	this->_headers.insert(std::pair<std::string, std::string>(
 		"Content-Length", utils::sizeTtoString(this->_body.size())));
+	if (shouldKeepAlive == true) {
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Connection", "keep-alive"));
+	} else {
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Connection", "close"));
+	}
 	return ClientSocket::SEND;
 }
