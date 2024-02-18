@@ -135,26 +135,40 @@ const std::vector<std::string> &AConfigurable::getIndex() const {
 	return this->_index;
 }
 
+static ssize_t byteConverter(std::string const &elem) {
+	if (elem.empty() == true) {
+		return 1;
+	} else if (elem == "k") {
+		return 1000;
+	} else if (elem == "m") {
+		return 1000000;
+	} else {
+		return 1000000000;
+	}
+}
+
 bool AConfigurable::setClientMaxBodySize(std::string const &attribute,
 										 std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
 	std::string elem;
+	ssize_t byte;
 	ss >> elem;
 	elem.clear();
+	ss >> byte;
+	if (ss.fail()) {
+		return false;
+	}
 	ss >> elem;
 	ss >> std::ws;
 	if (ss.peek() != EOF) {
 		return false;
 	}
-	if (elem.empty() == true) {
+	if (elem.empty() == false && (elem != "k" && elem != "m" && elem != "g")) {
 		return false;
 	}
-	if (utils::isNumber(elem) == false) {
-		return false;
-	}
-	this->_clientMaxBodySize = utils::decStrToSizeT(elem);
-	if (this->_clientMaxBodySize > INT_MAX) {
+	this->_clientMaxBodySize = byte * byteConverter(elem);
+	if (this->_clientMaxBodySize > INT_MAX || this->_clientMaxBodySize < 0) {
 		throw std::runtime_error(INVALID_CLIENTMAXBODYSIZE);
 	}
 	return true;
