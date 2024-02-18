@@ -113,26 +113,32 @@ bool Config::load() {
 			}
 			if (elem.compare("server") == 0 && bracket == '{') {
 				Server server = this->_createServerInstance(this->_file);
-				for (std::vector<std::string>::const_iterator iter = server.getServernames().begin(); iter != server.getServernames().end(); ++iter) {
-					std::map<std::string, std::map<std::string, Server> >::iterator
-						smiter = this->_servers.find(server.getListen());
+				for (std::vector<std::string>::const_iterator iter =
+						 server.getServernames().begin();
+					 iter != server.getServernames().end(); ++iter) {
+					std::map<std::string,
+							 std::map<std::string, Server> >::iterator smiter =
+						this->_servers.find(server.getListen());
 					if (smiter == this->_servers.end()) {
 						std::map<std::string, Server> svmap;
-						svmap.insert(std::pair<std::string, Server>(
-							*iter, server));
+						svmap.insert(
+							std::pair<std::string, Server>(*iter, server));
 						this->_servers.insert(
-							std::pair<std::string, std::map<std::string, Server> >(
+							std::pair<std::string,
+									  std::map<std::string, Server> >(
 								server.getListen(), svmap));
-						this->_defaultServers.insert(std::pair<std::string,
-															Server *>(
-							server.getListen(),
-							&(this->_servers[server.getListen()].begin()->second)));
+						this->_defaultServers.insert(
+							std::pair<std::string, Server *>(
+								server.getListen(),
+								&(this->_servers[server.getListen()]
+									  .begin()
+									  ->second)));
 					} else {
 						if (smiter->second.count(*iter) > 0) {
 							throw std::runtime_error(DUPLICATE_SERVER);
 						}
-						smiter->second.insert(std::pair<std::string, Server>(
-							*iter, server));
+						smiter->second.insert(
+							std::pair<std::string, Server>(*iter, server));
 					}
 				}
 			}
@@ -155,26 +161,30 @@ void Config::printServers() const {
 		 iter != this->_servers.end(); ++iter) {
 		std::clog << "size of servers: " << iter->second.size() << std::endl;
 		std::clog << "====================================" << std::endl;
-		std::clog
-			<< "Default server name: ";
+		std::clog << "Default server name: ";
 		{
-			std::vector<std::string> defaultSeverNames = this->getDefaultServer(iter->first).getOk()->getServernames();
-				for (std::vector<std::string>::const_iterator dsiter = defaultSeverNames.begin(); dsiter != defaultSeverNames.end(); ++dsiter) {
-					std::clog << *dsiter << " ";
-				}
+			std::vector<std::string> defaultSeverNames =
+				this->getDefaultServer(iter->first).getOk()->getServernames();
+			for (std::vector<std::string>::const_iterator dsiter =
+					 defaultSeverNames.begin();
+				 dsiter != defaultSeverNames.end(); ++dsiter) {
+				std::clog << *dsiter << " ";
+			}
 		}
 		std::clog << std::endl;
 		for (std::map<std::string, Server>::const_iterator iter2 =
 				 iter->second.begin();
 			 iter2 != iter->second.end(); ++iter2) {
 			std::clog << "====================================" << std::endl;
-			std::clog
-				<< "Server name: ";
+			std::clog << "Server name: ";
 			{
-				std::vector<std::string> defaultSeverNames = iter2->second.getServernames();
-					for (std::vector<std::string>::const_iterator dsiter = defaultSeverNames.begin(); dsiter != defaultSeverNames.end(); ++dsiter) {
-						std::clog << *dsiter << " ";
-					}
+				std::vector<std::string> defaultSeverNames =
+					iter2->second.getServernames();
+				for (std::vector<std::string>::const_iterator dsiter =
+						 defaultSeverNames.begin();
+					 dsiter != defaultSeverNames.end(); ++dsiter) {
+					std::clog << *dsiter << " ";
+				}
 			}
 			std::clog << std::endl;
 			std::clog << "Listen: " << iter2->second.getListen() << std::endl;
