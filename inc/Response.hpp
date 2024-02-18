@@ -36,14 +36,18 @@ class Response {
 
 		void _setErrorResponse(const std::string &status, bool shouldKeepAlive);
 		bool _setIndexPage(bool shouldKeepAlive);
-		bool _setDirectoryListingPage(const std::string &path, bool shouldKeepAlive);
+		bool _setDirectoryListingPage(const std::string &path,
+									  bool shouldKeepAlive);
 		ClientSocket::csphase _setGetResponse(const Request &request);
 		ClientSocket::csphase _setPostResponse(const Request &request);
 		ClientSocket::csphase _setDeleteResponse(const Request &request);
 		bool _shouldRedirect() const;
-		ClientSocket::csphase _setRedirectResponse(const Request &request, bool shouldKeepAlive);
+		ClientSocket::csphase _setRedirectResponse(const Request &request,
+												   bool shouldKeepAlive);
 		bool _shouldAutoIndexed() const;
-		ClientSocket::csphase _setEntireDataWithBody(std::string const &status, std::string const &body, bool shouldKeepAlive);
+		ClientSocket::csphase _setEntireDataWithBody(std::string const &status,
+													 std::string const &body,
+													 bool shouldKeepAlive);
 
 	public:
 		Response();
@@ -62,7 +66,9 @@ class Response {
 		void setActPath(std::string const &path);
 		std::string const &getActPath() const;
 		ClientSocket::csphase setEntireDataWithFile(std::string const &path,
-													std::string const &status, bool shouldKeepAlive);
-		ClientSocket::csphase setEntireData(std::string const &status, bool shouldKeepAlive);
+													std::string const &status,
+													bool shouldKeepAlive);
+		ClientSocket::csphase setEntireData(std::string const &status,
+											bool shouldKeepAlive);
 };
 #endif
