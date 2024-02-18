@@ -100,6 +100,7 @@ bool isAccess(std::string const &path, int mode) {
 }
 
 std::string getRandomStr(const std::size_t len) {
+	std::srand(std::time(0));
 	static const char alphanum[] =
 		"0123456789"
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"

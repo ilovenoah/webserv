@@ -6,6 +6,8 @@
 #include <sys/errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <cstdlib>
+#include <ctime>
 
 #include <iostream>
 
