@@ -84,17 +84,22 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 					break;
 				}
 				case ClientSocket::SEND: {
-#if defined(_DEBUG)
-					std::clog << rqmap[iter->first].getEntireData()
-							  << std::endl;
-#endif
 					std::map<int, Response>::iterator rsiter =
 						rsmap.find(iter->first);
 					std::map<int, Request>::iterator rqiter =
 						rqmap.find(iter->first);
 					if (rsiter != rsmap.end() && rqiter != rqmap.end()) {
+#if defined(_DEBUG)
+						std::clog << "=============== Response ===============" << std::endl;
+						std::clog << rsiter->second.getEntireData()
+								<< std::endl;
+						std::clog << "========================================" << std::endl;
+#endif
 						iter->second->setPhase(iter->second->trySend(
 							rsiter->second.getEntireData()));
+						if (rsiter->second.isKeepAlive() == false) {
+							iter->second->setPhase(ClientSocket::CLOSE);
+						}
 						rsmap.erase(rsiter);
 						rqiter->second.init();
 					}
@@ -113,6 +118,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 					delete toErase->second;
 					csmap.erase(toErase);
 #if defined(_DEBUG)
+					std::clog << "=============== Connection Info ===============" << std::endl;
 					std::clog << "ClientSocket size: " << csmap.size()
 							  << std::endl;
 					std::clog << "Request size: " << rqmap.size() << std::endl;
@@ -120,6 +126,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 					int checkFd = open("/dev/null", O_RDONLY);
 					std::clog << "check fd: " << checkFd << std::endl;
 					close(checkFd);
+					std::clog << "===============================================" << std::endl;
 #endif
 					break;
 				}
@@ -152,6 +159,12 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 					csiter->second->getServerSocket()->getPort());
 				rsiter->second.setLocationPointer(rqiter->second.getPath());
 				rsiter->second.setActPath(rqiter->second.getPath());
+#if defined(_DEBUG)
+						std::clog << "=============== Request ===============" << std::endl;
+						std::clog << iter->second.getEntireData()
+								<< std::endl;
+						std::clog << "=======================================" << std::endl;
+#endif
 #if defined(_DEBUG)
 				rsiter->second.printConfigInfo();
 #endif

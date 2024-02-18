@@ -11,6 +11,7 @@
 #include "Error.hpp"
 #include "Ok.hpp"
 #include "Result.hpp"
+#include "utils.hpp"
 
 class Request {
 	public:
@@ -38,6 +39,8 @@ class Request {
 		std::string const &getHttpVersion() const;
 		Result<std::string, bool> getHeaderValue(std::string const &key) const;
 		std::string const &getBody() const;
+		bool shouldKeepAlive() const;
+		bool isValidRequest() const;
 		ClientSocket::csphase load(std::stringstream &buffer);
 		std::string getEntireData() const;
 };
