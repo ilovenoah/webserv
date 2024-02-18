@@ -2,6 +2,7 @@
 #define LOOP_HPP
 
 #define POLLTIMEOUT
+#define DEFAULT_SOCKET_TIMEOUT 30
 #include <poll.h>
 
 #include <map>
