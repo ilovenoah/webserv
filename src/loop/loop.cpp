@@ -40,7 +40,7 @@ static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo,
 }
 
 static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
-	if (std::difftime(std::time(NULL), cs.getLastSendTimestamp()) > 5) {
+	if (std::difftime(std::time(NULL), cs.getLastSendTimestamp()) > DEFAULT_SOCKET_TIMEOUT) {
 		return ClientSocket::CLOSE;
 	}
 	if ((cs.getPhase() & POLLHUP) == POLLHUP) {
