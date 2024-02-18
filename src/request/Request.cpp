@@ -112,9 +112,6 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 			}
 			std::getline(ss, value);
-			// spaceremover << value;
-			// value.clear();
-			// spaceremover >> value;
 			this->_header.insert(
 				std::pair<std::string, std::string>(key, value));
 			this->_phase = Request::RQHEADER;
