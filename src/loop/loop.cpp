@@ -157,6 +157,12 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 				rsiter->second.setLocationPointer(rqiter->second.getPath());
 				rsiter->second.setActPath(rqiter->second.getPath());
 #if defined(_DEBUG)
+						std::clog << "=============== Request ===============" << std::endl;
+						std::clog << iter->second.getEntireData()
+								<< std::endl;
+						std::clog << "=======================================" << std::endl;
+#endif
+#if defined(_DEBUG)
 				rsiter->second.printConfigInfo();
 #endif
 			}
