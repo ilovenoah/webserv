@@ -45,6 +45,29 @@ Result<std::string, bool> Request::getHeaderValue(
 
 std::string const &Request::getBody() const { return this->_body; }
 
+bool Request::shouldKeepAlive() const {
+	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator iter = this->_header.find("Connection");
+	if (iter == this->_header.end()) { return true; }
+	if (iter->second.compare("close") == 0) { return false; }
+	if (iter->second.compare("keep-alive") == 0) { return true; }
+	return false;
+}
+
+bool Request::isValidRequest() const {
+	if (this->_method.empty() == true || this->_path.empty() == true || this->_httpVersion.empty() == true) {
+		return false;
+	}
+	if (this->_httpVersion.compare("HTTP/1.1") != 0) {
+		return false;
+	}
+	if (this->_path.find("..") != std::string::npos) {
+		return false;
+	}
+	std::map<std::string, std::string>::const_iterator fiter = this->_header.find("Transfer-Encoding");
+	if (fiter != this->_header.end() && fiter->second.compare("chunked") != 0) { return false; }
+	return true;
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()) {
@@ -56,10 +79,16 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
+			utils::rmCR(line);
 			std::stringstream ss(line);
 			ss >> this->_method;
 			ss >> this->_path;
 			ss >> this->_httpVersion;
+			if (this->isValidRequest() == false) {
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			this->_phase = Request::RQHEADER;
 			nextcsphase = ClientSocket::RECV;
 			break;
@@ -72,15 +101,22 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
+			utils::rmCR(line);
 			std::stringstream ss(line);
 			std::string key;
 			std::string value;
 			std::stringstream spaceremover;
 			std::getline(ss, key, ':');
-			std::getline(ss, value, ':');
-			spaceremover << value;
-			value.clear();
-			spaceremover >> value;
+			ss >> std::ws;
+			if (ss.peek() == EOF) {
+				this->_method.clear();
+				this->_path.clear();
+				this->_httpVersion.clear();
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break ;
+			}
+			std::getline(ss, value);
 			this->_header.insert(
 				std::pair<std::string, std::string>(key, value));
 			this->_phase = Request::RQHEADER;
@@ -102,8 +138,10 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				break;
 			} else if (cliter == this->_header.end() &&
 					   teiter != this->_header.end()) {
-				// chunkedじゃなければ400でかえす
 				if (teiter->second.compare("chunked") != 0) {
+					this->_phase = Request::RQFIN;
+					nextcsphase = ClientSocket::RECV;
+					break;
 				}
 				if (utils::findCRLF(buffer) == false) {
 					this->_phase = Request::RQBODY;
