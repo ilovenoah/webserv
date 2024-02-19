@@ -424,7 +424,7 @@ bool Response::_shouldExecCGIScript() const {
 		for (std::vector<std::string>::const_iterator iter = cgiExtenstions.begin(); iter != cgiExtenstions.end(); ++iter) {
 			std::size_t posExtension(scriptPath.find_last_of('.'));
 			if (posExtension == std::string::npos) { return false; }
-			if (scriptPath.substr(posExtension).compare(*iter) == 0) { return true; }
+			if (scriptPath.substr(posExtension).compare(*iter) == 0 && utils::isAccess(scriptPath, X_OK) == true) { return true; }
 		}
 		std::size_t posSlash(scriptPath.find_last_of('/'));
 		if (posSlash == std::string::npos) { return false; }
