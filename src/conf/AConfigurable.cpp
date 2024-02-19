@@ -178,6 +178,31 @@ const ssize_t &AConfigurable::getClientMaxBodySize() const {
 	return this->_clientMaxBodySize;
 }
 
+static std::string getRuntimePath(std::string const &runtimeName) {
+	std::string runTimePath;
+	const char *pathEnv(std::getenv("PATH"));
+	if (pathEnv == NULL) { return ""; }
+	std::string pathEnvStr(pathEnv);
+	std::stringstream ss(pathEnvStr);
+	std::string elem;
+	while (std::getline(ss, elem, ':')) {
+		if (elem.length() != 0 && elem.find_last_of('/') - 1 != elem.length()) { elem.append("/"); }
+		if (utils::isAccess(elem + runtimeName, X_OK) == true) {  return elem + runtimeName; }
+	}
+	return "";
+}
+
+static std::string getRuntimeName(const std::string &extension) {
+	if (extension.compare(".py") == 0) {
+		return "python";
+	} else if (extension.compare(".php") == 0) {
+		return "php";
+	} else if (extension.compare(".pl") == 0) {
+		return "perl";
+	}
+	return "";
+}
+
 bool AConfigurable::setCgiExtensions(std::string const &attribute,
 									 std::fstream &file) {
 	(void)file;
@@ -199,13 +224,18 @@ bool AConfigurable::setCgiExtensions(std::string const &attribute,
 				return false;
 			}
 		}
-		this->_cgi_extensions.push_back(elem);
+		std::string runtimeName = getRuntimeName(elem);
+		if (runtimeName.empty() == true) { return false; }
+		std::string pathRuntimePath = getRuntimePath(runtimeName);
+		if (pathRuntimePath.empty() == true) { return false; }
+		if (this->_cgi_extensions.count(elem) > 0) { return false; }
+		this->_cgi_extensions.insert(std::pair<std::string, std::string>(elem, pathRuntimePath));
 		ss >> std::ws;
 	}
 	return true;
 }
 
-const std::vector<std::string> &AConfigurable::getCgiExtensions() const {
+const std::map<std::string, std::string> &AConfigurable::getCgiExtensions() const {
 	return this->_cgi_extensions;
 }
 

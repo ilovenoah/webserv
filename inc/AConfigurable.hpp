@@ -25,7 +25,7 @@ class AConfigurable {
 		IsAutoIndexed _autoindex;
 		std::vector<std::string> _index;
 		ssize_t _clientMaxBodySize;
-		std::vector<std::string> _cgi_extensions;
+		std::map<std::string, std::string> _cgi_extensions;
 		std::string _return;
 		std::map<std::string, std::string> _errorPages;
 		std::string _uploadStore;
@@ -46,7 +46,7 @@ class AConfigurable {
 								  std::fstream &file);
 		const ssize_t &getClientMaxBodySize() const;
 		bool setCgiExtensions(std::string const &attribute, std::fstream &file);
-		const std::vector<std::string> &getCgiExtensions() const;
+		const std::map<std::string, std::string> &getCgiExtensions() const;
 		bool setReturn(std::string const &attribute, std::fstream &file);
 		bool setErrorPages(std::string const &attribute, std::fstream &file);
 		const std::string &getReturn() const;
