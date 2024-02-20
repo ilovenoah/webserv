@@ -46,8 +46,21 @@ bool CGIHandler::setGateInterface(const Request &request, const std::string &act
 }
 
 bool CGIHandler::setPathInfo(const Request &request, const std::string &actPath) {
-	(void)actPath;
-	std::string *elem = new(std::nothrow) std::string("PATH_INFO=" + request.getPath());
+	std::string pathInfo;
+
+	if (actPath.find(this->_scriptPath) == std::string::npos) {
+		return false;
+	}
+	pathInfo = actPath.substr(this->_scriptPath.length());
+	std::string::size_type posQuery = pathInfo.find("?");
+	if (posQuery != std::string::npos) {
+		pathInfo.erase(posQuery);
+	}
+	std::string *elem = new(std::nothrow) std::string("PATH_INFO=" + pathInfo);
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+	return true;
+}
 	if (elem == NULL) { return false; }
 	this->_env.push_back(elem->c_str());
 	return true;
