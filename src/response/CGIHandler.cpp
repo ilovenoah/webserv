@@ -170,7 +170,7 @@ bool CGIHandler::setQueryString(const Request &request, const std::string &actPa
 	
 	std::string::size_type posQuery = originalPath.find("?");
 	if (posQuery != std::string::npos) {
-		query = originalPath.substr(posQuery);
+		query = originalPath.substr(posQuery+1);
 	}
 	query = "QUERY_STRING=" + query;
 	char *queryPtr = strDupToCharPtr(query);
