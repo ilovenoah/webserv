@@ -18,9 +18,11 @@
 #include "Result.hpp"
 #include "Server.hpp"
 #include "utils.hpp"
+#include "CGIHandler.hpp"
 
 class Response {
 	private:
+		CGIHandler _cgiHandler;
 		std::string _httpVersion;
 		std::string _status;
 		std::string _statusMsg;
@@ -45,7 +47,7 @@ class Response {
 		ClientSocket::csphase _setRedirectResponse(const Request &request,
 												   bool shouldKeepAlive);
 		bool _shouldAutoIndexed() const;
-		bool _shouldExecCGIScript() const;
+		bool _shouldExecCGIScript();
 		ClientSocket::csphase _setEntireDataWithBody(std::string const &status,
 													 std::string const &body,
 													 bool shouldKeepAlive);
@@ -61,8 +63,9 @@ class Response {
 		void setStatusMsg(std::string const &statusMsg);
 		void setBody(std::string const &body);
 		bool isKeepAlive() const;
+		bool isCGIActive() const;
 		void printConfigInfo() const;
-		ClientSocket::csphase load(Config &config, Request const &request);
+		ClientSocket::csphase load(Config &config, Request &request);
 		std::string getEntireData() const;
 		void setActPath(std::string const &path);
 		std::string const &getActPath() const;
