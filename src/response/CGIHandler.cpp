@@ -11,8 +11,8 @@ bool CGIHandler::setAuthType(const Request &request, const std::string &scriptPa
 	return true;
 }
 
-bool CGIHandler::setContentLength(const Request &request, const std::string &scriptPath) {
-	(void)scriptPath;
+bool CGIHandler::setContentLength(const Request &request, const std::string &actPath) {
+	(void)actPath;
 	std::string contenLength;
 	Result res = request.getHeaderValue("Content-Length");
 	if (res.isOK() == true) {
@@ -24,8 +24,8 @@ bool CGIHandler::setContentLength(const Request &request, const std::string &scr
 	return true;
 }
 
-bool CGIHandler::setContentType(const Request &request, const std::string &scriptPath) {
-	(void)scriptPath;
+bool CGIHandler::setContentType(const Request &request, const std::string &actPath) {
+	(void)actPath;
 	std::string contentType;
 	Result res = request.getHeaderValue("Content-Type");
 	if (res.isOK() == true) {
@@ -37,16 +37,16 @@ bool CGIHandler::setContentType(const Request &request, const std::string &scrip
 	return true;
 }
 
-bool CGIHandler::setGateInterface(const Request &request, const std::string &scriptPath) {
-	(void)scriptPath;
+bool CGIHandler::setGateInterface(const Request &request, const std::string &actPath) {
+	(void)actPath;
 	std::string *elem = new(std::nothrow) std::string("GATEWAY_INTERFACE=CGI/1.1");
 	if (elem == NULL) { return false; }
 	this->_env.push_back(elem->c_str());
 	return true;
 }
 
-bool CGIHandler::setPathInfo(const Request &request, const std::string &scriptPath) {
-	(void)scriptPath;
+bool CGIHandler::setPathInfo(const Request &request, const std::string &actPath) {
+	(void)actPath;
 	std::string *elem = new(std::nothrow) std::string("PATH_INFO=" + request.getPath());
 	if (elem == NULL) { return false; }
 	this->_env.push_back(elem->c_str());

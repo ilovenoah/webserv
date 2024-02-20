@@ -23,17 +23,17 @@ class CGIHandler
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _metaVarSetterVec;
 
 	public:
-		bool init(const Request &request, std::string const &scriptPath, std::string const &runtimePath);
+		bool init(const Request &request, std::string const &actPath, std::string const &runtimePath);
 		bool activate();
 		bool isActive() const;
 		void setRevents(const short revents);
 		short getRevents() const;
 		int getMonitoredFd() const;
-		bool setAuthType(const Request &request, const std::string &scriptPath);
-		bool setContentLength(const Request &request, const std::string &scriptPath);
-		bool setContentType(const Request &request, const std::string &scriptPath);
-		bool setGateInterface(const Request &request, const std::string &scriptPath);
-		bool setPathInfo(const Request &request, const std::string &scriptPath);
+		bool setAuthType(const Request &request, const std::string &actPath);
+		bool setContentLength(const Request &request, const std::string &actPath);
+		bool setContentType(const Request &request, const std::string &actPath);
+		bool setGateInterface(const Request &request, const std::string &actPath);
+		bool setPathInfo(const Request &request, const std::string &actPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 };
 
