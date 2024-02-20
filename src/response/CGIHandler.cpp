@@ -21,3 +21,16 @@ bool CGIHandler::setContentLength(const Request &request, const std::string &scr
 	this->_env.push_back(elem->c_str());
 	return true;
 }
+
+bool CGIHandler::setContentType(const Request &request, const std::string &scriptPath) {
+	std::string contentType;
+	Result res = request.getHeaderValue("Content-Type");
+	if (res.isOK() == true) {
+		contentType = res.getOk();
+	}
+	std::string *elem = new(std::nothrow) std::string("CONTENT_TYPE=" + contentType);
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+	return true;
+
+}

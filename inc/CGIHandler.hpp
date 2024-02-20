@@ -31,6 +31,7 @@ class CGIHandler
 		int getMonitoredFd() const;
 		bool setAuthType(const Request &request, const std::string &scriptPath);
 		bool setContentLength(const Request &request, const std::string &scriptPath);
+		bool setContentType(const Request &request, const std::string &scriptPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 };
 
