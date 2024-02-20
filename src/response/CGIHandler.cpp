@@ -61,6 +61,42 @@ bool CGIHandler::setPathInfo(const Request &request, const std::string &actPath)
 	this->_env.push_back(elem->c_str());
 	return true;
 }
+
+static std::string const removeLocationFromString(std::string const &path,
+												  std::string const &location) {
+	std::string result = path;
+	size_t pos = result.find(location);
+	if (pos != std::string::npos) {
+		result.erase(pos, location.length());
+	}
+	return result;
+}
+
+bool CGIHandler::setPathTranslated(const Request &request, const std::string &actPath) {
+	std::string pathInfo;
+	std::string pathTranslated;
+
+	if (actPath.find(this->_scriptPath) == std::string::npos) {
+		return false;
+	}
+	pathInfo = actPath.substr(this->_scriptPath.length());
+	std::string::size_type posQuery = pathInfo.find("?");
+	if (posQuery != std::string::npos) {
+		pathInfo.erase(posQuery);
+	}
+	if (pathInfo.empty() == false) {
+		Location *location = this->_server->getLocationPointer(pathInfo);
+		if (location != NULL) {
+			if (location->getAliasDirective().empty() == false) {
+				pathTranslated = location->getAliasDirective() + removeLocationFromString(pathInfo, location->getLocationPath());;
+			} else {
+				pathTranslated = location->getRoot() + pathInfo;
+			}
+		} else {
+			pathTranslated = this->_server->getRoot() + pathInfo;
+		}
+	}
+	std::string *elem = new(std::nothrow) std::string("PATH_TRANSLATED=" + pathTranslated);
 	if (elem == NULL) { return false; }
 	this->_env.push_back(elem->c_str());
 	return true;
