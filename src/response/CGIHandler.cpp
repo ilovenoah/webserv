@@ -137,3 +137,17 @@ bool CGIHandler::setRemoteMethod(const Request &request, const std::string &actP
 	return true;
 }
 
+bool CGIHandler::setScriptName(const Request &request, const std::string &actPath){
+	std::string scriptName(request.getPath());
+	std::string fileName;
+
+	std::string::size_type posSlash = this->_scriptPath.find_last_of('/');
+	if (posSlash == std::string::npos) { return false; }
+	fileName = this->_scriptPath.substr(posSlash);
+	scriptName.erase(scriptName.find(fileName) + fileName.length());
+	
+	std::string *elem = new(std::nothrow) std::string("SCRIPT_NAME=" + scriptName);
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+	return true;
+}

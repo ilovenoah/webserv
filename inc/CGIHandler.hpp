@@ -41,6 +41,7 @@ class CGIHandler
 		bool setRemoteAddr(const Request &request, const std::string &actPath);
 		bool setRemoteHost(const Request &request, const std::string &actPath);
 		bool setRemoteMethod(const Request &request, const std::string &actPath);
+		bool setScriptName(const Request &request, const std::string &actPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 };
 
