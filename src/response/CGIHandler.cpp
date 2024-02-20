@@ -6,7 +6,7 @@ bool CGIHandler::setAuthType(const Request &request, const std::string &scriptPa
 	}
 	std::string *elem = new(std::nothrow) std::string("AUTH_TYPE=" + authType);
 	if (elem == NULL) { return false; }
-	env.push_back(elem->c_str());
+	this->_env.push_back(elem->c_str());
 	return true;
 }
 
@@ -18,6 +18,6 @@ bool CGIHandler::setContentLength(const Request &request, const std::string &scr
 	}
 	std::string *elem = new(std::nothrow) std::string("CONTENT_LENGTH=" + contenLength);
 	if (elem == NULL) { return false; }
-	env.push_back(elem->c_str());
+	this->_env.push_back(elem->c_str());
 	return true;
 }

@@ -12,7 +12,7 @@ class CGIHandler
 		enum cgiphase { CGIEXEC, CGIWRITE, CGIRECV, CGIFIN };
 
 	private:
-		std::vector<const char *> env;
+		std::vector<const char *> _env;
 		std::string _scriptPath;
 		std::string _runtimePath;
 		bool _isActive;
