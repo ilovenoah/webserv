@@ -102,3 +102,17 @@ bool CGIHandler::setPathTranslated(const Request &request, const std::string &ac
 	return true;
 }
 
+bool CGIHandler::setQueryString(const Request &request, const std::string &actPath) {
+	std::string query;
+	std::string originalPath(request.getPath());
+	
+	std::string::size_type posQuery = originalPath.find("?");
+	if (posQuery != std::string::npos) {
+		query = originalPath.substr(posQuery);
+	}
+	std::string *elem = new(std::nothrow) std::string("QUERY_STRING=" + query);
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+	return true;
+}
+

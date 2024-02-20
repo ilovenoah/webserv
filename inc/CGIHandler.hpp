@@ -37,6 +37,7 @@ class CGIHandler
 		bool setGateInterface(const Request &request, const std::string &actPath);
 		bool setPathInfo(const Request &request, const std::string &actPath);
 		bool setPathTranslated(const Request &request, const std::string &actPath);
+		bool setQueryString(const Request &request, const std::string &actPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 };
 
