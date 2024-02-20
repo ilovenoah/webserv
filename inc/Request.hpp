@@ -40,6 +40,7 @@ class Request {
 		std::string const &getHttpVersion() const;
 		Result<std::string, bool> getHeaderValue(std::string const &key) const;
 		std::string const &getBody() const;
+		std::string const &getRemoteAddr() const;
 		bool shouldKeepAlive() const;
 		bool isValidRequest() const;
 		ClientSocket::csphase load(std::stringstream &buffer);

@@ -45,6 +45,8 @@ Result<std::string, bool> Request::getHeaderValue(
 
 std::string const &Request::getBody() const { return this->_body; }
 
+std::string const &Request::getRemoteAddr() const { return this->_remoteAddr; }
+
 bool Request::shouldKeepAlive() const {
 	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator
 		iter = this->_header.find("Connection");
