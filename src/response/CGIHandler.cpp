@@ -172,3 +172,10 @@ bool CGIHandler::setServerPort(const Request &request, const std::string &actPat
 	if (elem == NULL) { return false; }
 	this->_env.push_back(elem->c_str());
 }
+
+bool CGIHandler::setServerProtocol(const Request &request, const std::string &actPath) {
+	std::string *elem = new(std::nothrow) std::string("SERVER_PROTOCOL=" + request.getHttpVersion());
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+}
+
