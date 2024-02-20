@@ -132,20 +132,20 @@ bool CGIHandler::setPathTranslated(const Request &request, const std::string &ac
 	}
 	pathInfo = actPath.substr(this->_scriptPath.length());
 	if (pathInfo.compare("/") != 0) {
-	std::string::size_type posQuery = pathInfo.find("?");
-	if (posQuery != std::string::npos) {
-		pathInfo.erase(posQuery);
-	}
-	if (pathInfo.empty() == false) {
-		Location *location = this->_server->getLocationPointer(pathInfo);
-		if (location != NULL) {
-			if (location->getAliasDirective().empty() == false) {
-				pathTranslated = location->getAliasDirective() + removeLocationFromString(pathInfo, location->getLocationPath());;
+		std::string::size_type posQuery = pathInfo.find("?");
+		if (posQuery != std::string::npos) {
+			pathInfo.erase(posQuery);
+		}
+		if (pathInfo.empty() == false) {
+			Location *location = this->_server->getLocationPointer(pathInfo);
+			if (location != NULL) {
+				if (location->getAliasDirective().empty() == false) {
+					pathTranslated = location->getAliasDirective() + removeLocationFromString(pathInfo, location->getLocationPath());;
+				} else {
+					pathTranslated = location->getRoot() + pathInfo;
+				}
 			} else {
-				pathTranslated = location->getRoot() + pathInfo;
-			}
-		} else {
-			pathTranslated = this->_server->getRoot() + pathInfo;
+				pathTranslated = this->_server->getRoot() + pathInfo;
 			}
 		}
 		std::string::size_type posDot = pathTranslated.find_first_of('.');
