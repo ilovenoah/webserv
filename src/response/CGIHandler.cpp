@@ -44,3 +44,12 @@ bool CGIHandler::setGateInterface(const Request &request, const std::string &scr
 	this->_env.push_back(elem->c_str());
 	return true;
 }
+
+bool CGIHandler::setPathInfo(const Request &request, const std::string &scriptPath) {
+	(void)scriptPath;
+	std::string *elem = new(std::nothrow) std::string("PATH_INFO=" + request.getPath());
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+	return true;
+}
+

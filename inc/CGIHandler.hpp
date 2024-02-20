@@ -33,6 +33,7 @@ class CGIHandler
 		bool setContentLength(const Request &request, const std::string &scriptPath);
 		bool setContentType(const Request &request, const std::string &scriptPath);
 		bool setGateInterface(const Request &request, const std::string &scriptPath);
+		bool setPathInfo(const Request &request, const std::string &scriptPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 };
 
