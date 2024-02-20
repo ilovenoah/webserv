@@ -30,6 +30,7 @@ class CGIHandler
 		short getRevents() const;
 		int getMonitoredFd() const;
 		bool setAuthType(const Request &request, const std::string &scriptPath);
+		bool setContentLength(const Request &request, const std::string &scriptPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 };
 
