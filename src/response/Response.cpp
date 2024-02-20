@@ -412,7 +412,7 @@ bool Response::_shouldAutoIndexed() const {
 	return false;
 }
 
-bool Response::_shouldExecCGIScript() const {
+bool Response::_shouldExecCGIScript() {
 	std::string scriptPath(this->_actPath);
 	std::map<std::string, std::string> cgiExtenstions;
 	if (this->_location != NULL) {
@@ -424,7 +424,11 @@ bool Response::_shouldExecCGIScript() const {
 		for (std::map<std::string, std::string>::const_iterator iter = cgiExtenstions.begin(); iter != cgiExtenstions.end(); ++iter) {
 			std::size_t posExtension(scriptPath.find_last_of('.'));
 			if (posExtension == std::string::npos) { return false; }
-			if (scriptPath.substr(posExtension).compare(iter->first) == 0 && utils::isAccess(scriptPath, X_OK) == true) { return true; }
+			if (scriptPath.substr(posExtension).compare(iter->first) == 0 && utils::isAccess(scriptPath, X_OK) == true && utils::isAccess(iter->second, X_OK)) {
+				this->_cgiHandler.setRuntimePath(iter->second);
+				this->_cgiHandler.setScriptPath(scriptPath);
+				return true;
+			}
 		}
 		std::size_t posSlash(scriptPath.find_last_of('/'));
 		if (posSlash == std::string::npos) { return false; }
@@ -433,7 +437,7 @@ bool Response::_shouldExecCGIScript() const {
 	return false;
 }
 
-ClientSocket::csphase Response::load(Config &config, Request const &request) {
+ClientSocket::csphase Response::load(Config &config, Request &request) {
 	std::ifstream fs;
 
 	(void)config;
