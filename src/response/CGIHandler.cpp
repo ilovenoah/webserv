@@ -32,5 +32,11 @@ bool CGIHandler::setContentType(const Request &request, const std::string &scrip
 	if (elem == NULL) { return false; }
 	this->_env.push_back(elem->c_str());
 	return true;
+}
 
+bool CGIHandler::setGateInterface(const Request &request, const std::string &scriptPath) {
+	std::string *elem = new(std::nothrow) std::string("GATEWAY_INTERFACE=CGI/1.1");
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+	return true;
 }
