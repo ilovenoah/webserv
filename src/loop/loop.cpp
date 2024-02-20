@@ -73,7 +73,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			}
 			csmap.insert(
 				std::pair<int, ClientSocket *>(socketInfo.first, newCs));
-			rqmap.insert(std::pair<int, Request>(socketInfo.first, Request()));
+			rqmap.insert(std::pair<int, Request>(socketInfo.first, Request(newCs->getRemoteAddr())));
 		}
 		for (std::map<int, ClientSocket *>::iterator iter = csmap.begin();
 			 iter != csmap.end();) {

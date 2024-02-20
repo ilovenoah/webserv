@@ -25,9 +25,10 @@ class Request {
 		std::string _body;
 		Request::rqphase _phase;
 		std::size_t _chunksize;
+		std::string _remoteAddr;
 
 	public:
-		Request();
+		Request(const std::string &remoteAddr);
 		void init();
 		void setReqphase(Request::rqphase const rqphase);
 		Request::rqphase getReqphase() const;

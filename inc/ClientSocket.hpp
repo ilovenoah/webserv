@@ -18,7 +18,7 @@ class ClientSocket {
 
 	private:
 		int _fd;
-		std::string _remoteIpAddr;
+		std::string _remoteAddr;
 		short _revents;
 		ClientSocket::csphase _phase;
 		std::time_t _lastSendTimestamp;
@@ -29,7 +29,7 @@ class ClientSocket {
 		ClientSocket();
 		ClientSocket(const std::pair<int, sockaddr_in> &socketInfo, ServerSocket *serverSocket);
 		int getFd() const;
-		std::string const &getRemoteIpAddr() const;
+		std::string const &getRemoteAddr() const;
 		void setRevents(short revents);
 		short getRevents() const;
 		ClientSocket::csphase tryRecv();
