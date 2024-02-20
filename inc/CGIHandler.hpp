@@ -45,6 +45,7 @@ class CGIHandler
 		bool setServerName(const Request &request, const std::string &actPath);
 		bool setServerPort(const Request &request, const std::string &actPath);
 		bool setServerProtocol(const Request &request, const std::string &actPath);
+		bool setServerSoftware(const Request &request, const std::string &actPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 };
 
