@@ -116,3 +116,9 @@ bool CGIHandler::setQueryString(const Request &request, const std::string &actPa
 	return true;
 }
 
+bool CGIHandler::setRemoteAddr(const Request &request, const std::string &actPath) {
+	std::string *elem = new(std::nothrow) std::string("REMOTE_ADDR=" + request.getRemoteAddr());
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+	return true;
+}

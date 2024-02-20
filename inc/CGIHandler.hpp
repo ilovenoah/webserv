@@ -38,6 +38,7 @@ class CGIHandler
 		bool setPathInfo(const Request &request, const std::string &actPath);
 		bool setPathTranslated(const Request &request, const std::string &actPath);
 		bool setQueryString(const Request &request, const std::string &actPath);
+		bool setRemoteAddr(const Request &request, const std::string &actPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 };
 
