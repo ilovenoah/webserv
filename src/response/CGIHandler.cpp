@@ -122,3 +122,11 @@ bool CGIHandler::setRemoteAddr(const Request &request, const std::string &actPat
 	this->_env.push_back(elem->c_str());
 	return true;
 }
+
+bool CGIHandler::setRemoteHost(const Request &request, const std::string &actPath) {
+	std::string *elem = new(std::nothrow) std::string("REMOTE_HOST=");
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+	return true;
+}
+
