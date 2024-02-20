@@ -1,4 +1,5 @@
 bool CGIHandler::setAuthType(const Request &request, const std::string &scriptPath) {
+	(void)scriptPath;
 	std::string authType;
 	Result res = request.getHeaderValue("Authorization");
 	if (res.isOK() == true) {
@@ -11,6 +12,7 @@ bool CGIHandler::setAuthType(const Request &request, const std::string &scriptPa
 }
 
 bool CGIHandler::setContentLength(const Request &request, const std::string &scriptPath) {
+	(void)scriptPath;
 	std::string contenLength;
 	Result res = request.getHeaderValue("Content-Length");
 	if (res.isOK() == true) {
@@ -23,6 +25,7 @@ bool CGIHandler::setContentLength(const Request &request, const std::string &scr
 }
 
 bool CGIHandler::setContentType(const Request &request, const std::string &scriptPath) {
+	(void)scriptPath;
 	std::string contentType;
 	Result res = request.getHeaderValue("Content-Type");
 	if (res.isOK() == true) {
@@ -35,6 +38,7 @@ bool CGIHandler::setContentType(const Request &request, const std::string &scrip
 }
 
 bool CGIHandler::setGateInterface(const Request &request, const std::string &scriptPath) {
+	(void)scriptPath;
 	std::string *elem = new(std::nothrow) std::string("GATEWAY_INTERFACE=CGI/1.1");
 	if (elem == NULL) { return false; }
 	this->_env.push_back(elem->c_str());
