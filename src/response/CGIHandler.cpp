@@ -203,11 +203,10 @@ bool CGIHandler::setScriptName(const Request &request, const std::string &actPat
 	std::string scriptName(request.getPath());
 	std::string fileName;
 
-	std::string::size_type posSlash = scriptName.find_last_of('/');
+	std::string::size_type posSlash = this->_scriptPath.find_last_of('/');
 	if (posSlash == std::string::npos) { return false; }
 	fileName = this->_scriptPath.substr(posSlash);
 	scriptName.erase(scriptName.find(fileName) + fileName.length());
-
 	scriptName = "SCRIPT_NAME=" + scriptName;
 	char *scriptNamePtr = strDupToCharPtr(scriptName);
 	if (scriptNamePtr == NULL) { return false; }
@@ -263,11 +262,9 @@ bool CGIHandler::setServerSoftware(const Request &request, const std::string &ac
 	return true;
 }
 
-bool CGIHandler::init(Request &request, Server &server, std::string const &actPath, std::string const &scriptPath, std::string const &runtimePath) {
+bool CGIHandler::init(Request &request, Server &server, std::string const &actPath) {
 	this->_request = &request;
 	this->_server = &server;
-	this->_scriptPath = scriptPath;
-	this->_runtimePath = runtimePath;
 	for (std::vector<bool (CGIHandler::*)(const Request &, const std::string &)>::iterator iter = this->_metaVarSetterVec.begin(); iter != this->_metaVarSetterVec.end(); ++iter) {
 		if ((this->*(*iter))(request, actPath) == false) {
 			// error handling
