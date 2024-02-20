@@ -151,3 +151,14 @@ bool CGIHandler::setScriptName(const Request &request, const std::string &actPat
 	this->_env.push_back(elem->c_str());
 	return true;
 }
+
+bool CGIHandler::setServerName(const Request &request, const std::string &actPath) {
+	std::stringstream ss(this->_server->getListen());
+	std::string ipAddr;
+
+	std::getline(ss, ipAddr, ':');
+	std::string *elem = new(std::nothrow) std::string("SERVER_NAME=" + ipAddr);
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+}
+
