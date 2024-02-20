@@ -162,3 +162,13 @@ bool CGIHandler::setServerName(const Request &request, const std::string &actPat
 	this->_env.push_back(elem->c_str());
 }
 
+bool CGIHandler::setServerPort(const Request &request, const std::string &actPath) {
+	std::stringstream ss(this->_server->getListen());
+	std::string port;
+
+	std::getline(ss, port, ':');
+	std::getline(ss, port);
+	std::string *elem = new(std::nothrow) std::string("SERVER_PORT=" + port);
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+}
