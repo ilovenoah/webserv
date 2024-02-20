@@ -193,6 +193,27 @@ bool CGIHandler::setServerProtocol(const Request &request, const std::string &ac
 }
 
 bool CGIHandler::setServerSoftware(const Request &request, const std::string &actPath) {
+
+bool CGIHandler::init(Request &request, Server &server, std::string const &actPath, std::string const &scriptPath, std::string const &runtimePath) {
+	this->_request = &request;
+	this->_server = &server;
+	this->_scriptPath = scriptPath;
+	this->_runtimePath = runtimePath;
+	for (std::vector<bool (CGIHandler::*)(const Request &, const std::string &)>::iterator iter = this->_metaVarSetterVec.begin(); iter != this->_metaVarSetterVec.end(); ++iter) {
+		if ((this->*(*iter))(request, actPath) == false) {
+			// error handling
+			return false;
+		}
+	}
+	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
+		std::clog << *iter << std::endl;
+	}
+	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end();++iter) {
+		delete [] *iter;
+	}
+	return true;
+}
+
 void CGIHandler::setRuntimePath(const std::string &runtimePath) {
 	this->_runtimePath = runtimePath;
 }
