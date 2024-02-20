@@ -5,6 +5,7 @@
 #include <map>
 
 #include "Request.hpp"
+#include "Server.hpp"
 
 class CGIHandler
 {
@@ -12,6 +13,7 @@ class CGIHandler
 		enum cgiphase { CGIEXEC, CGIWRITE, CGIRECV, CGIFIN };
 
 	private:
+		Server *_server;
 		std::vector<const char *> _env;
 		std::string _scriptPath;
 		std::string _runtimePath;
@@ -23,7 +25,7 @@ class CGIHandler
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _metaVarSetterVec;
 
 	public:
-		bool init(const Request &request, std::string const &actPath, std::string const &runtimePath);
+		bool init(const Request &request, const Server *server, std::string const &actPath, std::string const &runtimePath);
 		bool activate();
 		bool isActive() const;
 		void setRevents(const short revents);
