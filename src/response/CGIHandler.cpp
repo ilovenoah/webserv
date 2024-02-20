@@ -180,8 +180,10 @@ bool CGIHandler::setServerProtocol(const Request &request, const std::string &ac
 }
 
 bool CGIHandler::setServerSoftware(const Request &request, const std::string &actPath) {
-	std::string *elem = new(std::nothrow) std::string("SERVER_SOFTWARE=webserv/1.0");
-	if (elem == NULL) { return false; }
-	this->_env.push_back(elem->c_str());
+void CGIHandler::setRuntimePath(const std::string &runtimePath) {
+	this->_runtimePath = runtimePath;
 }
 
+void CGIHandler::setScriptPath(const std::string &scriptPath) {
+	this->_scriptPath = scriptPath;
+}

@@ -25,8 +25,8 @@ class CGIHandler
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _metaVarSetterVec;
 
 	public:
-		bool init(const Request &request, const Server *server, std::string const &actPath, std::string const &runtimePath);
-		bool activate();
+		void setRuntimePath(const std::string &scriptPath);
+		void setScriptPath(const std::string &scriptPath);
 		bool isActive() const;
 		void setRevents(const short revents);
 		short getRevents() const;
