@@ -130,3 +130,10 @@ bool CGIHandler::setRemoteHost(const Request &request, const std::string &actPat
 	return true;
 }
 
+bool CGIHandler::setRemoteMethod(const Request &request, const std::string &actPath) {
+	std::string *elem = new(std::nothrow) std::string("REQUEST_METHOD=" + request.getMethod());
+	if (elem == NULL) { return false; }
+	this->_env.push_back(elem->c_str());
+	return true;
+}
+

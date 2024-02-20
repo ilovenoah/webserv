@@ -40,6 +40,7 @@ class CGIHandler
 		bool setQueryString(const Request &request, const std::string &actPath);
 		bool setRemoteAddr(const Request &request, const std::string &actPath);
 		bool setRemoteHost(const Request &request, const std::string &actPath);
+		bool setRemoteMethod(const Request &request, const std::string &actPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 };
 
