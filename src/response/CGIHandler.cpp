@@ -1,3 +1,6 @@
+CGIHandler::CGIHandler()
+	: _server(NULL), _request(NULL), _isActive(false), _revents(0), _wpfd(0), _rpfd(0) {}
+
 
 static char *strDupToCharPtr(std::string const &src) {
 	std::size_t i_str(0);

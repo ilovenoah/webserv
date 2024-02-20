@@ -14,6 +14,7 @@ class CGIHandler
 
 	private:
 		Server *_server;
+		Request *_request;
 		std::vector<const char *> _env;
 		std::string _scriptPath;
 		std::string _runtimePath;
@@ -25,6 +26,7 @@ class CGIHandler
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _metaVarSetterVec;
 
 	public:
+		CGIHandler();
 		void setRuntimePath(const std::string &scriptPath);
 		void setScriptPath(const std::string &scriptPath);
 		bool isActive() const;
