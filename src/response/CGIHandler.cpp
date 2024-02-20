@@ -131,6 +131,7 @@ bool CGIHandler::setPathTranslated(const Request &request, const std::string &ac
 		return false;
 	}
 	pathInfo = actPath.substr(this->_scriptPath.length());
+	if (pathInfo.compare("/") != 0) {
 	std::string::size_type posQuery = pathInfo.find("?");
 	if (posQuery != std::string::npos) {
 		pathInfo.erase(posQuery);
@@ -145,6 +146,14 @@ bool CGIHandler::setPathTranslated(const Request &request, const std::string &ac
 			}
 		} else {
 			pathTranslated = this->_server->getRoot() + pathInfo;
+			}
+		}
+		std::string::size_type posDot = pathTranslated.find_first_of('.');
+		if (posDot == 0) {
+			const char *pwd = std::getenv("PWD");
+			if (pwd == NULL) { return false; }
+			pathTranslated.erase(0, 1);
+			pathTranslated = pwd + pathTranslated;
 		}
 	}
 	pathTranslated = "PATH_TRANSLATED=" + pathTranslated;
