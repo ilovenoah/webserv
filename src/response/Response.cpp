@@ -494,17 +494,27 @@ static std::string const removeLocationFromString(std::string const &path,
 }
 
 void Response::setActPath(std::string const &path) {
+	std::string root;
+	std::string	pathUnderRoot;
+
 	if (this->_location == NULL) {
-		this->_actPath = this->_server->getRoot() + path;
+		root = this->_server->getRoot();
+		pathUnderRoot = path;
 	} else if (this->_location->getAliasDirective().empty() == false) {
-		this->_actPath =
-			this->_location->getAliasDirective() +
-			removeLocationFromString(path, this->_location->getLocationPath());
+		root = this->_location->getAliasDirective();
+		pathUnderRoot = removeLocationFromString(path, this->_location->getLocationPath());
 	} else if (this->_location->getRoot().empty() == true) {
-		this->_actPath = this->_server->getRoot() + path;
+		root = this->_server->getRoot();
+		pathUnderRoot = path;
 	} else {
-		this->_actPath = this->_location->getRoot() + path;
+		root = this->_location->getRoot();
+		pathUnderRoot = path;
 	}
+	std::string::size_type posSlash = root.find_last_of('/');
+	if (posSlash != std::string::npos && posSlash + 1 == root.length()) {
+		root.erase(posSlash, 1);
+	}
+	this->_actPath = root + path;
 }
 
 std::string const &Response::getActPath() const { return this->_actPath; }
