@@ -140,20 +140,13 @@ bool CGIHandler::setPathTranslated(const Request &request, const std::string &ac
 			Location *location = this->_server->getLocationPointer(pathInfo);
 			if (location != NULL) {
 				if (location->getAliasDirective().empty() == false) {
-					pathTranslated = location->getAliasDirective() + removeLocationFromString(pathInfo, location->getLocationPath());;
+					pathTranslated = location->getAliasDirective() + removeLocationFromString(pathInfo, location->getLocationPath());
 				} else {
 					pathTranslated = location->getRoot() + pathInfo;
 				}
 			} else {
 				pathTranslated = this->_server->getRoot() + pathInfo;
 			}
-		}
-		std::string::size_type posDot = pathTranslated.find_first_of('.');
-		if (posDot == 0) {
-			const char *pwd = std::getenv("PWD");
-			if (pwd == NULL) { return false; }
-			pathTranslated.erase(0, 1);
-			pathTranslated = pwd + pathTranslated;
 		}
 	}
 	pathTranslated = "PATH_TRANSLATED=" + pathTranslated;
