@@ -113,4 +113,14 @@ std::string getRandomStr(const std::size_t len) {
 	}
 	return randomStr;
 }
+
+std::string replaceUri(std::string const &uri, std::string const &a, std::string const &b) {
+	std::string replacedUri(uri);
+
+	std::string::size_type pos;
+	while ((pos = replacedUri.find(a)) != std::string::npos) {
+		replacedUri.replace(pos, a.length(), b);
+	}
+	return replacedUri;
+}
 }  // namespace utils

@@ -92,7 +92,8 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
-			utils::rmCR(line);
+			line = utils::rmCR(line);
+			line = utils::replaceUri(line, "//", "/");
 			std::stringstream ss(line);
 			ss >> this->_method;
 			ss >> this->_path;
