@@ -102,14 +102,30 @@ bool Location::setAliasDirective(std::string const &attribute,
 	if (res.getOk() == false) {
 		return false;
 	}
-	if (elem[0] != '/' && elem.find("./") != 0) {
-		elem = "./" + elem;
+	if (elem.find("..") != std::string::npos) {
+		return false;
 	}
-	if ((elem.compare("/") != 0 && elem.compare("./") != 0) &&
-		elem.find_last_of('/') == elem.length() - 1) {
+	if (elem == "/") {
+		this->_root = elem;
+		return true;
+	}
+	if (elem.find("./") == 0 || elem == ".") {
+		const char *env_p = std::getenv("PWD");
+		if (env_p == NULL) {
+			throw std::runtime_error(PWD_NOT_FOUND);
+		}
+		if (elem == ".") {
+			elem = env_p;
+		} else {
+			elem = env_p + elem.substr(1);
+		}
+	}
+	elem = utils::replaceUri(elem, ".", "");
+	elem = utils::replaceUri(elem, "//", "/");
+	if (elem.find_last_of('/') == elem.length() - 1) {
 		elem.erase(elem.length() - 1);
 	}
-	this->_aliasDirective = elem;
+	this->_root = elem;
 	return true;
 }
 
