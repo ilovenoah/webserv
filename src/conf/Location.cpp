@@ -106,7 +106,7 @@ bool Location::setAliasDirective(std::string const &attribute,
 		return false;
 	}
 	if (elem == "/") {
-		this->_root = elem;
+		this->_aliasDirective = elem;
 		return true;
 	}
 	if (elem.find("./") == 0 || elem == ".") {
@@ -125,7 +125,7 @@ bool Location::setAliasDirective(std::string const &attribute,
 	if (elem.find_last_of('/') == elem.length() - 1) {
 		elem.erase(elem.length() - 1);
 	}
-	this->_root = elem;
+	this->_aliasDirective = elem;
 	return true;
 }
 
