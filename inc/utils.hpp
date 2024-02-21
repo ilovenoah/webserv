@@ -28,6 +28,7 @@ bool isNumber(std::string const &str);
 Result<bool, std::string> isDirectory(std::string const &path);
 bool isAccess(std::string const &path, int mode);
 std::string getRandomStr(const std::size_t len);
+std::string replaceUri(std::string const &uri, std::string const &a, std::string const &b);
 }  // namespace utils
 
 #endif
