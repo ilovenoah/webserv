@@ -58,15 +58,16 @@ bool shouldIgnoreLine(std::string const &line) {
 	return false;
 }
 
-bool rmCR(std::string &line) {
-	if (line.empty() == true) {
-		return false;
+std::string rmCR(std::string const &line) {
+	std::string removedlline(line);
+	if (removedlline.empty() == true) {
+		return removedlline;
 	}
-	if (line[line.size() - 1] == '\r') {
-		line = line.substr(0, line.size() - 1);
-		return true;
+	if (removedlline[removedlline.size() - 1] == '\r') {
+		removedlline = removedlline.substr(0, removedlline.size() - 1);
+		return removedlline;
 	}
-	return false;
+	return removedlline;
 }
 
 bool isNumber(std::string const &str) {

@@ -23,7 +23,7 @@ std::size_t hexStrToSizeT(std::string &str);
 std::string sizeTtoString(std::size_t num);
 bool findCRLF(std::stringstream &stream);
 bool shouldIgnoreLine(std::string const &line);
-bool rmCR(std::string &line);
+std::string rmCR(std::string const &line);
 bool isNumber(std::string const &str);
 Result<bool, std::string> isDirectory(std::string const &path);
 bool isAccess(std::string const &path, int mode);
