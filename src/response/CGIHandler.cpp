@@ -300,13 +300,6 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
 		std::clog << *iter << std::endl;
 	}
-	{
-		std::string path;
-		std::string::size_type posLastSlash = this->_scriptPath.find_last_of('/');
-		if (posLastSlash != std::string::npos) {
-			path = this->_scriptPath.substr(0, posLastSlash+1);
-		}
-	}
 	this->deleteEnv();
 	return true;
 }
