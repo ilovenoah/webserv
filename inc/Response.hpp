@@ -74,5 +74,6 @@ class Response {
 													bool shouldKeepAlive);
 		ClientSocket::csphase setEntireData(std::string const &status,
 											bool shouldKeepAlive);
+		CGIHandler &getCgiHandler();
 };
 #endif

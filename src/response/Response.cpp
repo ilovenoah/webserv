@@ -589,3 +589,7 @@ ClientSocket::csphase Response::_setEntireDataWithBody(
 	}
 	return ClientSocket::SEND;
 }
+
+CGIHandler &Response::getCgiHandler() {
+	return this->_cgiHandler;
+}
