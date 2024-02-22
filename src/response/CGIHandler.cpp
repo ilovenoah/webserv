@@ -268,17 +268,49 @@ bool CGIHandler::setServerSoftware(const Request &request, const std::string &ac
 }
 
 bool CGIHandler::init(Request &request, Server &server, std::string const &actPath) {
+	extern char **environ;
 	this->_request = &request;
 	this->_server = &server;
 	for (std::vector<bool (CGIHandler::*)(const Request &, const std::string &)>::iterator iter = this->_metaVarSetterVec.begin(); iter != this->_metaVarSetterVec.end(); ++iter) {
 		if ((this->*(*iter))(request, actPath) == false) {
 			// error handling
+			this->deleteEnv();
 			return false;
 		}
+	}
+	for (std::size_t i_env = 0; environ[i_env] != NULL; ++i_env) {
+		char *elem;
+		if (std::strncmp(environ[i_env], "PWD=", 4) == 0) {
+			
+			std::string pathScriptDir(this->_scriptPath);
+			std::string::size_type posLastSlash = pathScriptDir.find_last_of('/');
+			if (posLastSlash != std::string::npos) {
+				pathScriptDir.erase(posLastSlash+1);
+			}
+			elem = strDupToCharPtr("PWD=" + pathScriptDir);
+		} else {
+			elem = strDupToCharPtr(environ[i_env]);
+		}
+		if (elem == NULL) {
+			this->deleteEnv();
+			return false;
+		}
+		this->_env.push_back(elem);
 	}
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
 		std::clog << *iter << std::endl;
 	}
+	{
+		std::string path;
+		std::string::size_type posLastSlash = this->_scriptPath.find_last_of('/');
+		if (posLastSlash != std::string::npos) {
+			path = this->_scriptPath.substr(0, posLastSlash+1);
+		}
+	}
+	this->deleteEnv();
+	return true;
+}
+
 bool CGIHandler::deleteEnv() {
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end();++iter) {
 		delete [] *iter;
