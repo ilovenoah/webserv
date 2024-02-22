@@ -31,7 +31,10 @@ CGIHandler::CGIHandler()
 static char *strDupToCharPtr(std::string const &src) {
 	std::size_t i_str(0);
 	char *str = new(std::nothrow) char[src.length() + 1]();
-	if (str == NULL) { return NULL; }
+	if (str == NULL) {
+		utils::putSysError("new");
+		return NULL;
+	}
 	std::memset(str, 0, src.length() + 1);
 	for (std::string::const_iterator iter = src.begin(); iter != src.end(); ++iter) {
 		str[i_str] = *iter;
