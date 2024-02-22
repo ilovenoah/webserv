@@ -24,11 +24,11 @@ class CGIHandler
 		int _rpfd;
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _initMetaVarSetterVec();
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _metaVarSetterVec;
+		bool _deleteEnv();
 
 	public:
 		CGIHandler();
 		bool init(Request &request, Server &server, std::string const &actPath);
-		bool deleteEnv();
 		// bool activate();
 		void setRuntimePath(const std::string &scriptPath);
 		void setScriptPath(const std::string &scriptPath);

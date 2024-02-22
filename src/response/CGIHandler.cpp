@@ -274,7 +274,7 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 	for (std::vector<bool (CGIHandler::*)(const Request &, const std::string &)>::iterator iter = this->_metaVarSetterVec.begin(); iter != this->_metaVarSetterVec.end(); ++iter) {
 		if ((this->*(*iter))(request, actPath) == false) {
 			// error handling
-			this->deleteEnv();
+			this->_deleteEnv();
 			return false;
 		}
 	}
@@ -292,7 +292,7 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 			elem = strDupToCharPtr(environ[i_env]);
 		}
 		if (elem == NULL) {
-			this->deleteEnv();
+			this->_deleteEnv();
 			return false;
 		}
 		this->_env.push_back(elem);
@@ -300,11 +300,11 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
 		std::clog << *iter << std::endl;
 	}
-	this->deleteEnv();
+	this->_deleteEnv();
 	return true;
 }
 
-bool CGIHandler::deleteEnv() {
+bool CGIHandler::_deleteEnv() {
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end();++iter) {
 		delete [] *iter;
 	}
