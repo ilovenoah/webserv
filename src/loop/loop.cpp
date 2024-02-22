@@ -1,7 +1,8 @@
 #include "loop.hpp"
 
 static bool setRevents(std::map<int, ServerSocket> &ssmap,
-					   std::map<int, ClientSocket *> &csmap) {
+					   std::map<int, ClientSocket *> &csmap, std::map<int, Response> &rsmap) {
+	std::map<int, Response*> chmap;
 	std::vector<struct pollfd> pollfds;
 	for (std::map<int, ServerSocket>::iterator iter = ssmap.begin();
 		 iter != ssmap.end(); ++iter) {
@@ -19,6 +20,16 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 		pfd.events = POLLIN | POLLOUT | POLLHUP;
 		pollfds.push_back(pfd);
 	}
+	for (std::map<int, Response>::iterator iter = rsmap.begin();
+		 iter != rsmap.end(); ++iter) {
+		if (iter->second.isCGIActive() == false) { continue ; }
+		struct pollfd pfd;
+		std::memset(&pfd, 0, sizeof(struct pollfd));
+		pfd.fd = iter->second.getCgiHandler().getMonitoredFd();
+		pfd.events = POLLIN | POLLOUT | POLLHUP;
+		pollfds.push_back(pfd);
+		chmap.insert(std::pair<int, Response*>(pfd.fd, &(iter->second)));
+	}
 	if (poll(pollfds.data(), pollfds.size(), 0) == -1) {
 		utils::putSysError("poll");
 		return false;
@@ -29,6 +40,8 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 			ssmap[iter->fd].setRevents(iter->revents);
 		} else if (csmap.find(iter->fd) != csmap.end()) {
 			csmap[iter->fd]->setRevents(iter->revents);
+		} else if (chmap.find(iter->fd) != chmap.end()) {
+			chmap[iter->fd]->getCgiHandler().setRevents(iter->revents);
 		}
 	}
 	return true;
@@ -55,7 +68,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 	std::map<int, Request> rqmap;
 	std::map<int, Response> rsmap;
 	while (true) {
-		if (setRevents(ssmap, csmap) == false) {
+		if (setRevents(ssmap, csmap, rsmap) == false) {
 			return false;
 		}
 		for (std::map<int, ServerSocket>::iterator iter = ssmap.begin();
