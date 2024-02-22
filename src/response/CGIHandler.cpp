@@ -306,7 +306,7 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
 		std::clog << *iter << std::endl;
 	}
-	this->_deleteEnv();
+	this->_env.push_back(NULL);
 	return true;
 }
 
