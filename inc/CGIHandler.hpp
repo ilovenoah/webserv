@@ -22,6 +22,7 @@ class CGIHandler
 		short _revents;
 		int _wpfd;
 		int _rpfd;
+		cgiphase _phase;
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _initMetaVarSetterVec();
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _metaVarSetterVec;
 		bool _deleteEnv();
