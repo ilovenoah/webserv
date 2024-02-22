@@ -334,7 +334,7 @@ bool CGIHandler::activate() {
 	}
 	pid_t pid = fork();
 	if (pid == -1) {
-		utils::putSysError("poll");
+		utils::putSysError("fork");
 		utils::x_close(ipfd[0]);
 		utils::x_close(ipfd[1]);
 		utils::x_close(opfd[0]);
