@@ -22,7 +22,7 @@ SOCK_NAME	=	ServerSocket.cpp ClientSocket.cpp
 UTILS_NAME	=	utils.cpp CaseInsensitiveCompare.cpp
 LOOP_NAME	=	loop.cpp
 REQU_NAME	=	Request.cpp
-RESP_NAME	=	Response.cpp
+RESP_NAME	=	Response.cpp CGIHandler.cpp
 
 OBJ_NAME	=	$(MAIN_NAME:.cpp=.o)
 OBJ_NAME	+=	$(addprefix $(CONF_DIR), $(CONF_NAME:.cpp=.o))

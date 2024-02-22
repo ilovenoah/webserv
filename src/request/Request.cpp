@@ -1,6 +1,6 @@
 #include "Request.hpp"
 
-Request::Request() : _phase(Request::RQLINE), _chunksize(0) {}
+Request::Request(const std::string &remoteAddr) : _phase(Request::RQLINE), _chunksize(0), _remoteAddr(remoteAddr) {}
 
 void Request::init() {
 	this->_method.clear();
@@ -45,6 +45,8 @@ Result<std::string, bool> Request::getHeaderValue(
 
 std::string const &Request::getBody() const { return this->_body; }
 
+std::string const &Request::getRemoteAddr() const { return this->_remoteAddr; }
+
 bool Request::shouldKeepAlive() const {
 	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator
 		iter = this->_header.find("Connection");
@@ -79,6 +81,25 @@ bool Request::isValidRequest() const {
 	return true;
 }
 
+static std::string decodeURIComponentUTF8(std::string const &encoded) {
+	std::ostringstream oss;
+	for (size_t i = 0; i < encoded.size(); ++i) {
+		if (encoded[i] == '%' && i + 2 < encoded.size()) {
+			std::string hexStr = encoded.substr(i + 1, 2);
+			std::istringstream hexStream(hexStr);
+			int hexValue;
+			hexStream >> std::hex >> hexValue;
+			oss << (char)(hexValue);
+			i += 2;
+		} else if (encoded[i] == '+') {
+			oss << ' ';
+		} else {
+			oss << encoded[i];
+		}
+	}
+	return oss.str();
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()) {
@@ -90,7 +111,9 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
-			utils::rmCR(line);
+			line = decodeURIComponentUTF8(line);
+			line = utils::replaceUri(line, "//", "/");
+			line = utils::rmCR(line);
 			std::stringstream ss(line);
 			ss >> this->_method;
 			ss >> this->_path;

@@ -33,6 +33,7 @@
 #define FAIL_LISTEN "listen failed"
 #define EPOLL_CREATE_ERROR "epoll_create1 failed."
 #define EPOLL_CTL_ERROR "epoll_ctl failed"
+#define PWD_NOT_FOUND "pwd not found"
 
 #define RED "\033[31m"
 #define RESET "\033[0m"

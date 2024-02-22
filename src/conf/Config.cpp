@@ -61,7 +61,7 @@ Server Config::_createServerInstance(std::fstream &file) {
 		if (utils::shouldIgnoreLine(line)) {
 			continue;
 		}
-		utils::rmCR(line);
+		line = utils::rmCR(line);
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
@@ -101,7 +101,7 @@ bool Config::load() {
 			if (utils::shouldIgnoreLine(line)) {
 				continue;
 			}
-			utils::rmCR(line);
+			line = utils::rmCR(line);
 			std::stringstream ss(line);
 			std::string elem;
 			ss >> elem;

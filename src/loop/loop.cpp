@@ -36,7 +36,7 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 
 static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo,
 								   ServerSocket *serverSocket) {
-	return new (std::nothrow) ClientSocket(socketInfo.first, serverSocket);
+	return new (std::nothrow) ClientSocket(socketInfo, serverSocket);
 }
 
 static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
@@ -73,7 +73,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			}
 			csmap.insert(
 				std::pair<int, ClientSocket *>(socketInfo.first, newCs));
-			rqmap.insert(std::pair<int, Request>(socketInfo.first, Request()));
+			rqmap.insert(std::pair<int, Request>(socketInfo.first, Request(newCs->getRemoteAddr())));
 		}
 		for (std::map<int, ClientSocket *>::iterator iter = csmap.begin();
 			 iter != csmap.end();) {
