@@ -392,6 +392,36 @@ void CGIHandler::setScriptPath(const std::string &scriptPath) {
 	this->_scriptPath = scriptPath;
 }
 
+bool CGIHandler::isActive() const {
+	return this->_isActive;
+}
+
+void CGIHandler::setRevents(const short revents) {
+	this->_revents = revents;
+}
+
+short CGIHandler::getRevents() const {
+	return this->_revents;
+}
+
+int CGIHandler::getMonitoredFd() const {
+	int monitoredFd(0);
+	switch (this->_phase)
+	{
+		case CGIHandler::CGIWRITE:
+			monitoredFd = this->_wpfd;
+			break;
+		
+		case CGIHandler::CGIRECV:
+			monitoredFd = this->_rpfd;
+			break;
+		default:
+			monitoredFd = this->_wpfd;
+			break;
+	}
+	return monitoredFd;
+}
+
 // bool CGIHandler::activate(std::string const &cgiScriptURI, std::string const &runTimePath) {
 
 // }
