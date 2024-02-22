@@ -123,4 +123,45 @@ std::string replaceUri(std::string const &uri, std::string const &a, std::string
 	}
 	return replacedUri;
 }
+
+int x_close(int fd) {
+	if (close(fd) == -1) {
+		utils::putSysError("close");
+		return -1;
+	}
+	return 0;
+}
+
+int x_pipe(int pfd[2]) {
+	if (pipe(pfd) == -1) {
+		utils::putSysError("pipe");
+		return -1;
+	}
+	return 0;
+}
+
+int x_chdir(const char *dir) {
+	if (chdir(dir) == -1) {
+		utils::putSysError("chdir");
+		return -1;
+	}
+	return 0;
+}
+
+int x_dup2(int fd, int fd2) {
+	if (dup2(fd, fd2) == -1) {
+		utils::putSysError("dup2");
+		return -1;
+	}
+	return 0;
+}
+
+int x_kill(int pid, int sig) {
+	if (kill(pid, sig) == -1) {
+		utils::putSysError("kill");
+		return -1;
+	}
+	return 0;
+}
+
 }  // namespace utils

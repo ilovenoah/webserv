@@ -310,6 +310,80 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 	return true;
 }
 
+bool CGIHandler::activate() {
+	int ipfd[2];
+	int opfd[2];
+	std::string pathScriptDir(this->_scriptPath);
+	std::string::size_type posLastSlash(pathScriptDir.find_last_of('/'));
+	if (posLastSlash != std::string::npos) {
+		pathScriptDir.erase(posLastSlash+1);
+	}
+	const char *arg[3];
+	arg[0] = this->_runtimePath.c_str();
+	arg[1] = this->_scriptPath.c_str();
+	arg[2] = NULL;
+	std::memset(ipfd, 0, sizeof(ipfd));
+	std::memset(opfd, 0, sizeof(opfd));
+	if (utils::x_pipe(ipfd) == -1) {
+		return false;
+	}
+	if (utils::x_pipe(opfd) == -1) {
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		return false;
+	}
+	pid_t pid = fork();
+	if (pid == -1) {
+		utils::putSysError("poll");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (pid == 0) {
+		if (utils::x_chdir(pathScriptDir.c_str()) == -1) {
+			this->_deleteEnv();
+			exit(EXIT_FAILURE);
+		}
+		if (utils::x_dup2(ipfd[0], 0) == -1) {
+			this->_deleteEnv();
+			exit(EXIT_FAILURE);
+		}
+		if (utils::x_close(ipfd[1]) == -1) {
+			this->_deleteEnv();
+			exit(EXIT_FAILURE);
+		}
+		if (utils::x_dup2(opfd[1], 1) == -1) {
+			this->_deleteEnv();
+			exit(EXIT_FAILURE);
+		}
+		if (utils::x_close(opfd[0]) == -1) {
+			this->_deleteEnv();
+			exit(EXIT_FAILURE);
+		}
+		execve(this->_runtimePath.c_str(), (char *const *)arg, (char *const *)this->_env.data());
+		utils::putSysError("execve");
+		this->_deleteEnv();
+		exit(EXIT_FAILURE);
+	}
+	if (utils::x_close(ipfd[0]) == -1) {
+		this->_deleteEnv();
+		utils::x_close(opfd[1]);
+		utils::x_kill(pid, SIGTERM);
+		return false;
+	}
+	if (utils::x_close(opfd[1]) == -1) {
+		this->_deleteEnv();
+		utils::x_kill(pid, SIGTERM);
+		return false;
+	}
+	this->_deleteEnv();
+	this->_wpfd = ipfd[1];
+	this->_rpfd = opfd[0];
+	return true;
+}
+
 void CGIHandler::setRuntimePath(const std::string &runtimePath) {
 	this->_runtimePath = runtimePath;
 }
