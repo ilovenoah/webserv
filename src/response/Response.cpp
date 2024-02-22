@@ -441,6 +441,9 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 	std::ifstream fs;
 
 	(void)config;
+	// if (this->_cgiHandler.isActive() == true) {
+	// 	return this->_cgiHandler.setCGIResponse();
+	// }
 	if (request.isValidRequest() == false) {
 		this->_setErrorResponse("400", false);
 		return ClientSocket::SEND;
@@ -457,7 +460,10 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 		return this->_setRedirectResponse(request, request.shouldKeepAlive());
 	}
 	if (this->_shouldExecCGIScript() == true) {
-		return this->_setEntireDataWithBody("200", "This is CGI", request.shouldKeepAlive());
+		this->_cgiHandler.init(request, *(this->_server), this->_actPath);
+		this->_cgiHandler.activate();
+		this->_setEntireDataWithBody("200", "this is CGI", true);
+		return ClientSocket::SEND;
 	}
 	if (request.getMethod() == "GET") {
 		return this->_setGetResponse(request);
