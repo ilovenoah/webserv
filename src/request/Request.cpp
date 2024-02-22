@@ -81,6 +81,25 @@ bool Request::isValidRequest() const {
 	return true;
 }
 
+static std::string decodeURIComponentUTF8(std::string const &encoded) {
+	std::ostringstream oss;
+	for (size_t i = 0; i < encoded.size(); ++i) {
+		if (encoded[i] == '%' && i + 2 < encoded.size()) {
+			std::string hexStr = encoded.substr(i + 1, 2);
+			std::istringstream hexStream(hexStr);
+			int hexValue;
+			hexStream >> std::hex >> hexValue;
+			oss << (char)(hexValue);
+			i += 2;
+		} else if (encoded[i] == '+') {
+			oss << ' ';
+		} else {
+			oss << encoded[i];
+		}
+	}
+	return oss.str();
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()) {
@@ -92,8 +111,9 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
-			line = utils::rmCR(line);
+			line = decodeURIComponentUTF8(line);
 			line = utils::replaceUri(line, "//", "/");
+			line = utils::rmCR(line);
 			std::stringstream ss(line);
 			ss >> this->_method;
 			ss >> this->_path;
