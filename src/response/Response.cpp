@@ -101,6 +101,10 @@ bool Response::isKeepAlive() const {
 	return false;
 }
 
+bool Response::isCGIActive() const {
+	return this->_cgiHandler.isActive();
+}
+
 void Response::printConfigInfo() const {
 	std::clog << "============== Routing result ==============" << std::endl;
 	std::clog << "Server name: ";
