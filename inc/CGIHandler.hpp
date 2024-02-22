@@ -29,7 +29,7 @@ class CGIHandler
 	public:
 		CGIHandler();
 		bool init(Request &request, Server &server, std::string const &actPath);
-		// bool activate();
+		bool activate();
 		void setRuntimePath(const std::string &scriptPath);
 		void setScriptPath(const std::string &scriptPath);
 		bool isActive() const;

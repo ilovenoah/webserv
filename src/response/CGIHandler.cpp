@@ -27,6 +27,12 @@ std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> CGIHandl
 CGIHandler::CGIHandler()
 	: _server(NULL), _request(NULL), _isActive(false), _revents(0), _wpfd(0), _rpfd(0) {}
 
+bool CGIHandler::_deleteEnv() {
+	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end();++iter) {
+		delete [] *iter;
+	}
+	return true;
+}
 
 static char *strDupToCharPtr(std::string const &src) {
 	std::size_t i_str(0);
@@ -301,13 +307,6 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 		std::clog << *iter << std::endl;
 	}
 	this->_deleteEnv();
-	return true;
-}
-
-bool CGIHandler::_deleteEnv() {
-	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end();++iter) {
-		delete [] *iter;
-	}
 	return true;
 }
 
