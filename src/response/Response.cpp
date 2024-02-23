@@ -424,11 +424,15 @@ void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
 	std::streampos endPos = ss.tellg();
 	std::string::size_type readByte= endPos - startPos;
 	this->_cgiHandler.eraseRbuffer(readByte);
+	if (this->_headers.find("Location") != this->_headers.end() && this->_headers.find("Content-Type") == this->_headers.end()) {
+		this->_headers.insert(std::pair<std::string, std::string>("Connection", "close"));
+		return ;
+	}
 	if (shouldKeepAlive == true) {
 		this->_headers.insert(std::pair<std::string, std::string>("Connection", "keep-alive"));
-	} else {
-		this->_headers.insert(std::pair<std::string, std::string>("Connection", "close"));
+		return ;
 	}
+	this->_headers.insert(std::pair<std::string, std::string>("Connection", "close"));
 }
 
 void Response::_setCGIResponseBody() {
