@@ -4,8 +4,13 @@
 #include <string>
 #include <map>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include "Request.hpp"
 #include "Server.hpp"
+
+#define CGI_BUFFERSIZE 4096
 
 class CGIHandler
 {
@@ -19,6 +24,7 @@ class CGIHandler
 		std::string _scriptPath;
 		std::string _runtimePath;
 		std::string _wbuffer;
+		std::string _rbuffer;
 		bool _isActive;
 		short _revents;
 		int _wpfd;
@@ -59,6 +65,7 @@ class CGIHandler
 		void setCGIPhase(CGIHandler::cgiphase phase);
 		CGIHandler::cgiphase detectCGIPhase() const;
 		CGIHandler::cgiphase tryWrite();
+		CGIHandler::cgiphase tryRecv();
 		pid_t tryWait() const;
 };
 

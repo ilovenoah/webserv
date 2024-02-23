@@ -565,6 +565,23 @@ CGIHandler::cgiphase CGIHandler::tryWrite() {
 	return CGIHandler::CGIRECV;
 }
 
+CGIHandler::cgiphase CGIHandler::tryRecv() {
+	if ((this->_revents & POLLIN) != POLLIN) {
+		return CGIHandler::CGIWRITE;
+	}
+	char buf[CGI_BUFFERSIZE];
+	std::memset(buf, 0, sizeof(buf));
+	ssize_t rlen = read(this->_rpfd, buf, CGI_BUFFERSIZE - 1);
+	if (rlen == -1) {
+		utils::putSysError("read");
+		return CGIHandler::CGISET;
+	}
+	if (rlen == 0) {
+		return CGIHandler::CGISET;
+	}
+	this->_rbuffer.append(buf, rlen);
+	return CGIHandler::CGISET;
+}
 
 pid_t CGIHandler::tryWait() const {
 	int status(0);
