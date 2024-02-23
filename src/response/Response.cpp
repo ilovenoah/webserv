@@ -406,6 +406,36 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request,
 	return ClientSocket::SEND;
 }
 
+ClientSocket::csphase Response::_setCGIResponse(bool shouldKeepAlive) {
+	ClientSocket::csphase phase(ClientSocket::RECV);
+	switch (this->_cgiHandler.getCGIPhase())
+	{
+		case CGIHandler::CGIWRITE: {
+			this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryWrite());
+			break;
+		}
+		case CGIHandler::CGIRECV: {
+			// this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryRecv());
+			break;
+		}
+		case CGIHandler::CGIWAIT: {
+			// this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryWait());
+			break;
+		}
+		case CGIHandler::CGISET: {
+			// Set response data to Response instance with CGI result 
+			// this->_cgiHandler.setCGIPhase(CGIHandler::CGIFIN);
+			// phase = ClientSocket::SEND;
+			break;
+		}
+		case CGIHandler::CGIFIN: {
+			// phase = ClientSocket::SEND;
+			break;
+		}
+	}
+	return phase;
+}
+
 bool Response::_shouldAutoIndexed() const {
 	if (this->_location != NULL &&
 		this->_location->getAutoindex() == AConfigurable::TRUE) {
