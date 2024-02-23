@@ -53,6 +53,7 @@ class CGIHandler
 		bool setServerProtocol(const Request &request, const std::string &actPath);
 		bool setServerSoftware(const Request &request, const std::string &actPath);
 		CGIHandler::cgiphase getCGIPhase() const;
+		void setCGIPhase(CGIHandler::cgiphase phase);
 };
 
 #endif

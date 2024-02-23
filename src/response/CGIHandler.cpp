@@ -423,6 +423,10 @@ int CGIHandler::getMonitoredFd() const {
 	return monitoredFd;
 }
 
-// bool CGIHandler::activate(std::string const &cgiScriptURI, std::string const &runTimePath) {
+CGIHandler::cgiphase CGIHandler::getCGIPhase() const {
+	return this->_phase;
+}
 
-// }
+void CGIHandler::setCGIPhase(CGIHandler::cgiphase phase) {
+	this->_phase = phase;
+}
