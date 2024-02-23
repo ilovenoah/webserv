@@ -438,6 +438,27 @@ void Response::_setCGIResponseBody() {
 	}
 }
 
+void Response::_setCGIResponseStatus() {
+	std::map<std::string, std::string>::const_iterator lciter = this->_headers.find("Location");
+	if (lciter == this->_headers.end()) {
+		this->_status = "200";
+		this->_statusMsg = "Ok";
+		return ;
+	}
+	if (lciter->second.find_first_of('/') == 0) {
+		// local redirect response
+		return ;
+	}
+	std::map<std::string, std::string>::const_iterator ctiter = this->_headers.find("Content-Type");
+	if (ctiter == this->_headers.end()) {
+		this->_status = "302";
+		this->_statusMsg = "Found";
+		return ;
+	}
+	this->_status = "200";
+	this->_statusMsg = "Ok";
+}
+
 
 ClientSocket::csphase Response::_setCGIResponse(bool shouldKeepAlive) {
 	ClientSocket::csphase phase(ClientSocket::RECV);
