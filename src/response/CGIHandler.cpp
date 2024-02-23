@@ -306,7 +306,7 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
 		std::clog << *iter << std::endl;
 	}
-	this->_buffer = this->_request->getBody();
+	this->_wbuffer = this->_request->getBody();
 	this->_env.push_back(NULL);
 	return true;
 }
@@ -545,22 +545,23 @@ CGIHandler::cgiphase CGIHandler::detectCGIPhase() const {
 	return phase;
 }
 
-	if (this->_buffer.size() == 0) {
+CGIHandler::cgiphase CGIHandler::tryWrite() {
+	if (this->_wbuffer.size() == 0) {
 		return CGIHandler::CGIRECV;
 	}
 	if ((this->_revents & POLLOUT) != POLLOUT) {
 		return CGIHandler::CGIWRITE;
 	}
-	ssize_t wlen = write(this->_wpfd, this->_buffer.c_str(), this->_buffer.size());
+	ssize_t wlen = write(this->_wpfd, this->_wbuffer.c_str(), this->_wbuffer.size());
 	if (wlen == -1) {
 		utils::putSysError("write");
 		return CGIHandler::CGIFIN;
 	}
-	if (wlen < this->_buffer.size()) {
-		this->_buffer.erase(0, wlen);
+	if (wlen < this->_wbuffer.size()) {
+		this->_wbuffer.erase(0, wlen);
 		return CGIHandler::CGIWRITE;
 	}
-	this->_buffer.clear();
+	this->_wbuffer.clear();
 	return CGIHandler::CGIRECV;
 }
 
