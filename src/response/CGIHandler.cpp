@@ -463,6 +463,14 @@ const std::string &CGIHandler::getRbuffer() const {
 	return this->_rbuffer;
 }
 
+void CGIHandler::eraseRbuffer(std::string::size_type readBytes) {
+	if (readBytes <= _rbuffer.size()) {
+		_rbuffer.erase(0, readBytes);
+	} else {
+		_rbuffer.clear();
+	}
+}
+
 bool CGIHandler::isActive() const {
 	return this->_isActive;
 }
