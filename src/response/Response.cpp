@@ -411,7 +411,7 @@ void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
 	std::string line;
 	std::streampos startPos = ss.tellg();
 
-	while (std::getline(ss, line) && line.compare("\r") != 0) {
+	while (std::getline(ss, line) && line.compare("\r") != 0 && line.empty() == false) {
 		line = utils::rmCR(line);
 		std::stringstream hss(line);
 		std::string key;
