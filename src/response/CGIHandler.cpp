@@ -25,7 +25,7 @@ std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> CGIHandl
 std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> CGIHandler::_metaVarSetterVec = _initMetaVarSetterVec();
 
 CGIHandler::CGIHandler()
-	: _phase(CGIHandler::CGIWRITE), _server(NULL), _request(NULL), _isActive(false), _revents(0), _wpfd(0), _rpfd(0) {}
+	: _server(NULL), _request(NULL), _isActive(false), _revents(0), _wpfd(0), _rpfd(0), _phase(CGIHandler::CGIWRITE) {}
 
 bool CGIHandler::_deleteEnv() {
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end();++iter) {
