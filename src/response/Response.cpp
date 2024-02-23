@@ -497,6 +497,7 @@ ClientSocket::csphase Response::_setCGIResponse(bool shouldKeepAlive) {
 			this->_setCGIResponseStatus();
 			if (this->_isValidCGIResponse() == false) {
 				this->_headers.clear();
+				this->_body.clear();
 				this->setEntireData("500", false);
 			}
 			this->_cgiHandler.setCGIPhase(CGIHandler::CGIFIN);
