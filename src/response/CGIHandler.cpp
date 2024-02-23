@@ -527,17 +527,6 @@ CGIHandler::cgiphase CGIHandler::detectCGIPhase() const {
 			}
 			break;
 		}
-		case CGIHandler::CGIWAIT: {
-			if (waitpid == -1) {
-				phase = CGIHandler::CGISET;
-				break;
-			}
-			if (waitpid != 0) {
-				phase = CGIHandler::CGISET;
-				break;
-			}
-			break;
-		}
 		default: {
 			break;
 		}
