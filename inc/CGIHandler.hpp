@@ -22,7 +22,7 @@ class CGIHandler
 		short _revents;
 		int _wpfd;
 		int _rpfd;
-		int _pid;
+		pid_t _pid;
 		cgiphase _phase;
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _initMetaVarSetterVec();
 		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _metaVarSetterVec;
@@ -38,7 +38,7 @@ class CGIHandler
 		void setRevents(const short revents);
 		short getRevents() const;
 		int getMonitoredFd() const;
-		int getPid() const;
+		pid_t getPid() const;
 		bool setAuthType(const Request &request, const std::string &actPath);
 		bool setContentLength(const Request &request, const std::string &actPath);
 		bool setContentType(const Request &request, const std::string &actPath);

@@ -424,7 +424,7 @@ int CGIHandler::getMonitoredFd() const {
 	return monitoredFd;
 }
 
-int CGIHandler::getPid() const {
+pid_t CGIHandler::getPid() const {
 	return this->_pid;
 }
 
