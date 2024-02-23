@@ -139,7 +139,6 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			std::stringstream ss(line);
 			std::string key;
 			std::string value;
-			std::stringstream spaceremover;
 			std::getline(ss, key, ':');
 			ss >> std::ws;
 			if (ss.peek() == EOF) {
