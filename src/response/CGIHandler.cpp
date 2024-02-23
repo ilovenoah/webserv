@@ -332,6 +332,70 @@ bool CGIHandler::activate() {
 		utils::x_close(ipfd[1]);
 		return false;
 	}
+	if (fcntl(ipfd[0], F_SETFL, O_NONBLOCK) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(ipfd[1], F_SETFL, O_NONBLOCK) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(opfd[0], F_SETFL, O_NONBLOCK) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(opfd[1], F_SETFL, O_NONBLOCK) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(ipfd[0], FD_CLOEXEC) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(ipfd[1], FD_CLOEXEC) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(opfd[0], FD_CLOEXEC) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(opfd[1], FD_CLOEXEC) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
 	pid_t pid = fork();
 	if (pid == -1) {
 		utils::putSysError("fork");
