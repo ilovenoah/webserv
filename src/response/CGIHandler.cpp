@@ -580,7 +580,7 @@ CGIHandler::cgiphase CGIHandler::tryRecv() {
 		return CGIHandler::CGISET;
 	}
 	this->_rbuffer.append(buf, rlen);
-	return CGIHandler::CGISET;
+	return CGIHandler::CGIRECV;
 }
 
 pid_t CGIHandler::tryWait() const {
