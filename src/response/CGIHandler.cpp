@@ -564,7 +564,8 @@ CGIHandler::cgiphase CGIHandler::detectCGIPhase() const {
 	return CGIHandler::CGIRECV;
 }
 
-pid_t CGIHandler::tryWait() {
+
+pid_t CGIHandler::tryWait() const {
 	int status(0);
 	return waitpid(this->_pid, &status, WNOHANG);
 }

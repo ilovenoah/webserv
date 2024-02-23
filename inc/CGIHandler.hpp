@@ -59,7 +59,7 @@ class CGIHandler
 		void setCGIPhase(CGIHandler::cgiphase phase);
 		CGIHandler::cgiphase detectCGIPhase() const;
 		CGIHandler::cgiphase tryWrite();
-		pid_t tryWait();
+		pid_t tryWait() const;
 };
 
 #endif
