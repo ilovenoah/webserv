@@ -487,13 +487,18 @@ ClientSocket::csphase Response::_setCGIResponse(bool shouldKeepAlive) {
 			break;
 		}
 		case CGIHandler::CGISET: {
-			// Set response data to Response instance with CGI result 
-			// this->_cgiHandler.setCGIPhase(CGIHandler::CGIFIN);
-			// phase = ClientSocket::SEND;
+			this->_setCGIResponseHeader(shouldKeepAlive);
+			this->_setCGIResponseBody();
+			this->_setCGIResponseStatus();
+			if (this->_isValidCGIResponse() == false) {
+				this->_headers.clear();
+				this->setEntireData("500", false);
+			}
+			this->_cgiHandler.setCGIPhase(CGIHandler::CGIFIN);
 			break;
 		}
 		case CGIHandler::CGIFIN: {
-			// phase = ClientSocket::SEND;
+			phase = ClientSocket::SEND;
 			break;
 		}
 	}
