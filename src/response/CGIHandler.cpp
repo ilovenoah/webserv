@@ -500,6 +500,34 @@ CGIHandler::cgiphase CGIHandler::getCGIPhase() const {
 void CGIHandler::setCGIPhase(CGIHandler::cgiphase phase) {
 	this->_phase = phase;
 }
+
+CGIHandler::cgiphase CGIHandler::tryWrite() {
+	pid_t waitpid = this->tryWait();
+	if (waitpid == -1) {
+		return CGIHandler::CGIFIN;
+	}
+	if (waitpid != 0) {
+		return CGIHandler::CGIRECV;
+	}
+	if (this->_buffer.size() == 0) {
+		return CGIHandler::CGIRECV;
+	}
+	if ((this->_revents & POLLOUT) != POLLOUT) {
+		return CGIHandler::CGIWRITE;
+	}
+	ssize_t wlen = write(this->_wpfd, this->_buffer.c_str(), this->_buffer.size());
+	if (wlen == -1) {
+		utils::putSysError("write");
+		return CGIHandler::CGIFIN;
+	}
+	if (wlen < this->_buffer.size()) {
+		this->_buffer.erase(0, wlen);
+		return CGIHandler::CGIWRITE;
+	}
+	this->_buffer.clear();
+	return CGIHandler::CGIRECV;
+}
+
 pid_t CGIHandler::tryWait() {
 	int status(0);
 	return waitpid(this->_pid, &status, WNOHANG);
