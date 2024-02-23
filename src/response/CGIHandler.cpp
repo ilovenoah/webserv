@@ -555,7 +555,7 @@ CGIHandler::cgiphase CGIHandler::tryWrite() {
 	ssize_t wlen = write(this->_wpfd, this->_wbuffer.c_str(), this->_wbuffer.size());
 	if (wlen == -1) {
 		utils::putSysError("write");
-		return CGIHandler::CGIFIN;
+		return CGIHandler::CGISET;
 	}
 	if (wlen < this->_wbuffer.size()) {
 		this->_wbuffer.erase(0, wlen);
