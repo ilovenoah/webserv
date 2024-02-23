@@ -445,9 +445,9 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 	std::ifstream fs;
 
 	(void)config;
-	// if (this->_cgiHandler.isActive() == true) {
-	// 	return this->_cgiHandler.setCGIResponse();
-	// }
+	if (this->_cgiHandler.isActive() == true) {
+		return this->_setCGIResponse(request.shouldKeepAlive());
+	}
 	if (request.isValidRequest() == false) {
 		this->_setErrorResponse("400", false);
 		return ClientSocket::SEND;
