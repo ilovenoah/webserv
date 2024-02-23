@@ -18,6 +18,7 @@ class CGIHandler
 		std::vector<const char *> _env;
 		std::string _scriptPath;
 		std::string _runtimePath;
+		std::string _buffer;
 		bool _isActive;
 		short _revents;
 		int _wpfd;
