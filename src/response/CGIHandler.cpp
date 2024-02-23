@@ -381,6 +381,7 @@ bool CGIHandler::activate() {
 	this->_deleteEnv();
 	this->_wpfd = ipfd[1];
 	this->_rpfd = opfd[0];
+	this->_pid = pid;
 	this->_isActive = true;
 	return true;
 }
@@ -421,6 +422,10 @@ int CGIHandler::getMonitoredFd() const {
 			break;
 	}
 	return monitoredFd;
+}
+
+int CGIHandler::getPid() const {
+	return this->_pid;
 }
 
 CGIHandler::cgiphase CGIHandler::getCGIPhase() const {
