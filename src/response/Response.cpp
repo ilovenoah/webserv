@@ -408,18 +408,14 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request,
 
 ClientSocket::csphase Response::_setCGIResponse(bool shouldKeepAlive) {
 	ClientSocket::csphase phase(ClientSocket::RECV);
-	switch (this->_cgiHandler.getCGIPhase())
+	switch (this->_cgiHandler.detectCGIPhase())
 	{
 		case CGIHandler::CGIWRITE: {
 			this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryWrite());
 			break;
 		}
 		case CGIHandler::CGIRECV: {
-			// this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryRecv());
-			break;
-		}
-		case CGIHandler::CGIWAIT: {
-			// this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryWait());
+			this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryRecv());
 			break;
 		}
 		case CGIHandler::CGISET: {

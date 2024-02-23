@@ -15,7 +15,7 @@
 class CGIHandler
 {
 	public:
-		enum cgiphase { CGIWRITE, CGIRECV, CGIWAIT, CGISET, CGIFIN };
+		enum cgiphase { CGIWRITE, CGIRECV, CGISET, CGIFIN };
 
 	private:
 		Server *_server;
