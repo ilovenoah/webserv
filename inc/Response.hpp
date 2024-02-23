@@ -47,6 +47,7 @@ class Response {
 		ClientSocket::csphase _setRedirectResponse(const Request &request,
 												   bool shouldKeepAlive);
 		ClientSocket::csphase _setCGIResponse(bool shouldKeepAlive);
+		void _setCGIResponseHeader(const bool shouldKeepAlive);
 		bool _shouldAutoIndexed() const;
 		bool _shouldExecCGIScript();
 		ClientSocket::csphase _setEntireDataWithBody(std::string const &status,

@@ -406,6 +406,32 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request,
 	return ClientSocket::SEND;
 }
 
+void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
+	std::stringstream ss(this->_cgiHandler.getRbuffer());
+	std::string line;
+	std::streampos startPos = ss.tellg();
+
+	while (std::getline(ss, line) && line.compare("\r") != 0) {
+		line = utils::rmCR(line);
+		std::stringstream hss(line);
+		std::string key;
+		std::string value;
+		std::getline(hss, key, ':');
+		hss >> std::ws;
+		std::getline(hss, value);
+		this->_headers.insert(std::pair<std::string, std::string>(key, value));
+	}
+	std::streampos endPos = ss.tellg();
+	std::string::size_type readByte= endPos - startPos;
+	this->_cgiHandler.eraseRbuffer(readByte);
+	if (shouldKeepAlive == true) {
+		this->_headers.insert(std::pair<std::string, std::string>("Connection", "keep-alive"));
+	} else {
+		this->_headers.insert(std::pair<std::string, std::string>("Connection", "close"));
+	}
+}
+
+
 ClientSocket::csphase Response::_setCGIResponse(bool shouldKeepAlive) {
 	ClientSocket::csphase phase(ClientSocket::RECV);
 	switch (this->_cgiHandler.detectCGIPhase())
