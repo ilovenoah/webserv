@@ -459,6 +459,10 @@ void CGIHandler::setScriptPath(const std::string &scriptPath) {
 	this->_scriptPath = scriptPath;
 }
 
+const std::string &CGIHandler::getRbuffer() const {
+	return this->_rbuffer;
+}
+
 bool CGIHandler::isActive() const {
 	return this->_isActive;
 }

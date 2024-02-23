@@ -41,6 +41,7 @@ class CGIHandler
 		bool activate();
 		void setRuntimePath(const std::string &scriptPath);
 		void setScriptPath(const std::string &scriptPath);
+		const std::string &getRbuffer() const;
 		bool isActive() const;
 		void setRevents(const short revents);
 		short getRevents() const;
