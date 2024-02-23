@@ -431,6 +431,13 @@ void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
 	}
 }
 
+void Response::_setCGIResponseBody() {
+	std::string body(this->_cgiHandler.getRbuffer());
+	if (body.empty() != true) {
+		this->_body = body;
+	}
+}
+
 
 ClientSocket::csphase Response::_setCGIResponse(bool shouldKeepAlive) {
 	ClientSocket::csphase phase(ClientSocket::RECV);
