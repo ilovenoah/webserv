@@ -501,14 +501,50 @@ void CGIHandler::setCGIPhase(CGIHandler::cgiphase phase) {
 	this->_phase = phase;
 }
 
-CGIHandler::cgiphase CGIHandler::tryWrite() {
+CGIHandler::cgiphase CGIHandler::detectCGIPhase() const {
+	CGIHandler::cgiphase phase(this->_phase);
 	pid_t waitpid = this->tryWait();
-	if (waitpid == -1) {
-		return CGIHandler::CGIFIN;
+	switch(phase) {
+		case CGIHandler::CGIWRITE: {
+			if (waitpid == -1) {
+				phase = CGIHandler::CGISET;
+				break;
+			}
+			if (waitpid != 0) {
+				phase = CGIHandler::CGIRECV;
+				break;
+			}
+			break;
+		}
+		case CGIHandler::CGIRECV: {
+			if (waitpid == -1) {
+				phase = CGIHandler::CGISET;
+				break;
+			}
+			if (waitpid != 0) {
+				phase = CGIHandler::CGISET;
+				break;
+			}
+			break;
+		}
+		case CGIHandler::CGIWAIT: {
+			if (waitpid == -1) {
+				phase = CGIHandler::CGISET;
+				break;
+			}
+			if (waitpid != 0) {
+				phase = CGIHandler::CGISET;
+				break;
+			}
+			break;
+		}
+		default: {
+			break;
+		}
 	}
-	if (waitpid != 0) {
-		return CGIHandler::CGIRECV;
-	}
+	return phase;
+}
+
 	if (this->_buffer.size() == 0) {
 		return CGIHandler::CGIRECV;
 	}
