@@ -459,6 +459,20 @@ void Response::_setCGIResponseStatus() {
 	this->_statusMsg = "Ok";
 }
 
+bool Response::_isValidCGIResponse() const {
+	if (this->_headers.find("Location") == this->_headers.end()) {
+		if (this->_headers.find("Content-Type") == this->_headers.end()) {
+			return false;
+		}
+		return true;
+	}
+	if (this->_body.empty() == false) {
+		if (this->_headers.find("Content-Type") == this->_headers.end() || this->_headers.find("Status") == this->_headers.end()) {
+			return false;
+		}
+	}
+	return true;
+}
 
 ClientSocket::csphase Response::_setCGIResponse(bool shouldKeepAlive) {
 	ClientSocket::csphase phase(ClientSocket::RECV);

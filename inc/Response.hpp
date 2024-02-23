@@ -50,6 +50,7 @@ class Response {
 		void _setCGIResponseHeader(const bool shouldKeepAlive);
 		void _setCGIResponseBody();
 		void _setCGIResponseStatus();
+		bool _isValidCGIResponse() const;
 		bool _shouldAutoIndexed() const;
 		bool _shouldExecCGIScript();
 		ClientSocket::csphase _setEntireDataWithBody(std::string const &status,
