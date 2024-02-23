@@ -464,10 +464,16 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 		return this->_setRedirectResponse(request, request.shouldKeepAlive());
 	}
 	if (this->_shouldExecCGIScript() == true) {
-		this->_cgiHandler.init(request, *(this->_server), this->_actPath);
-		this->_cgiHandler.activate();
-		this->_setEntireDataWithBody("200", "this is CGI", true);
-		return ClientSocket::SEND;
+		if (this->_cgiHandler.init(request, *(this->_server), this->_actPath) == false) {
+			this->_setErrorResponse("500", false);
+			return ClientSocket::SEND;
+		}
+		if (this->_cgiHandler.activate() == false) {
+			this->_setErrorResponse("500", false);
+			return ClientSocket::SEND;
+		}
+		// this->_setEntireDataWithBody("200", "this is CGI", true);
+		return ClientSocket::RECV;
 	}
 	if (request.getMethod() == "GET") {
 		return this->_setGetResponse(request);
