@@ -500,3 +500,7 @@ CGIHandler::cgiphase CGIHandler::getCGIPhase() const {
 void CGIHandler::setCGIPhase(CGIHandler::cgiphase phase) {
 	this->_phase = phase;
 }
+pid_t CGIHandler::tryWait() {
+	int status(0);
+	return waitpid(this->_pid, &status, WNOHANG);
+}
