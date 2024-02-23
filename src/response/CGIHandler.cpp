@@ -550,7 +550,7 @@ CGIHandler::cgiphase CGIHandler::tryWrite() {
 		utils::putSysError("write");
 		return CGIHandler::CGISET;
 	}
-	if (wlen < this->_wbuffer.size()) {
+	if ((std::size_t)wlen < this->_wbuffer.size()) {
 		this->_wbuffer.erase(0, wlen);
 		return CGIHandler::CGIWRITE;
 	}
