@@ -571,7 +571,6 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 			this->_setErrorResponse("500", false);
 			return ClientSocket::SEND;
 		}
-		// this->_setEntireDataWithBody("200", "this is CGI", true);
 		return ClientSocket::RECV;
 	}
 	if (request.getMethod() == "GET") {
