@@ -30,7 +30,7 @@ void Request::setHttpVersion(std::string const &httpVersion) {
 }
 
 void Request::addHeader(std::string const &key, std::string const &value) {
-	this->header.insert(std::pair<std::string, std::string>(key, value));
+	this->_header.insert(std::pair<std::string, std::string>(key, value));
 }
 
 std::string const &Request::getHttpVersion() const {

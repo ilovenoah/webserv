@@ -590,3 +590,20 @@ pid_t CGIHandler::tryWait() const {
 	int status(0);
 	return waitpid(this->_pid, &status, WNOHANG);
 }
+
+void CGIHandler::clear() {
+	this->_server = NULL;
+	this->_request = NULL;
+	this->_env.clear();
+	this->_scriptPath.clear();
+	this->_runtimePath.clear();
+	this->_wbuffer.clear();
+	this->_rbuffer.clear();
+	this->_isActive = false;
+	this->_revents = 0;
+	this->_wpfd = 0;
+	this->_rpfd = 0;
+	this->_rpfd = 0;
+	this->_pid = 0;
+	this->_phase = CGIHandler::CGIWRITE;	
+}
