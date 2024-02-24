@@ -304,11 +304,11 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 		this->_env.push_back(elem);
 	}
 #if defined(_DEBUG)
-	std::clog << "============= CGI Metavariables ============="
+	std::clog << "============= CGI Metavariables =============" << std::endl;
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
 		std::clog << *iter << std::endl;
 	}
-	std::clog << "============================================="
+	std::clog << "=============================================" << std::endl;
 #endif
 	this->_wbuffer = this->_request->getBody();
 	this->_env.push_back(NULL);
