@@ -37,6 +37,7 @@ class Request {
 		void setPath(std::string const &path);
 		std::string const &getPath() const;
 		void setHttpVersion(std::string const &httpVersion);
+		void addHeader(std::string const &key, std::string const &value);
 		std::string const &getHttpVersion() const;
 		Result<std::string, bool> getHeaderValue(std::string const &key) const;
 		std::string const &getBody() const;

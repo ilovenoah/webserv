@@ -69,6 +69,7 @@ class CGIHandler
 		CGIHandler::cgiphase tryWrite();
 		CGIHandler::cgiphase tryRecv();
 		pid_t tryWait() const;
+		void clear();
 };
 
 #endif
