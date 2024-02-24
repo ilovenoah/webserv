@@ -25,7 +25,7 @@ std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> CGIHandl
 std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> CGIHandler::_metaVarSetterVec = _initMetaVarSetterVec();
 
 CGIHandler::CGIHandler()
-	: _server(NULL), _request(NULL), _isActive(false), _revents(0), _wpfd(0), _rpfd(0) {}
+	: _server(NULL), _request(NULL), _isActive(false), _revents(0), _wpfd(0), _rpfd(0), _phase(CGIHandler::CGIWRITE) {}
 
 bool CGIHandler::_deleteEnv() {
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end();++iter) {
@@ -306,6 +306,7 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
 		std::clog << *iter << std::endl;
 	}
+	this->_wbuffer = this->_request->getBody();
 	this->_env.push_back(NULL);
 	return true;
 }
@@ -330,6 +331,70 @@ bool CGIHandler::activate() {
 	if (utils::x_pipe(opfd) == -1) {
 		utils::x_close(ipfd[0]);
 		utils::x_close(ipfd[1]);
+		return false;
+	}
+	if (fcntl(ipfd[0], F_SETFL, O_NONBLOCK) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(ipfd[1], F_SETFL, O_NONBLOCK) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(opfd[0], F_SETFL, O_NONBLOCK) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(opfd[1], F_SETFL, O_NONBLOCK) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(ipfd[0], FD_CLOEXEC) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(ipfd[1], FD_CLOEXEC) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(opfd[0], FD_CLOEXEC) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
+		return false;
+	}
+	if (fcntl(opfd[1], FD_CLOEXEC) == -1) {
+		utils::putSysError("fcntl");
+		utils::x_close(ipfd[0]);
+		utils::x_close(ipfd[1]);
+		utils::x_close(opfd[0]);
+		utils::x_close(opfd[1]);
 		return false;
 	}
 	pid_t pid = fork();
@@ -381,6 +446,8 @@ bool CGIHandler::activate() {
 	this->_deleteEnv();
 	this->_wpfd = ipfd[1];
 	this->_rpfd = opfd[0];
+	this->_pid = pid;
+	this->_isActive = true;
 	return true;
 }
 
@@ -392,6 +459,132 @@ void CGIHandler::setScriptPath(const std::string &scriptPath) {
 	this->_scriptPath = scriptPath;
 }
 
-// bool CGIHandler::activate(std::string const &cgiScriptURI, std::string const &runTimePath) {
+const std::string &CGIHandler::getRbuffer() const {
+	return this->_rbuffer;
+}
 
-// }
+void CGIHandler::eraseRbuffer(std::string::size_type readBytes) {
+	if (readBytes <= _rbuffer.size()) {
+		_rbuffer.erase(0, readBytes);
+	} else {
+		_rbuffer.clear();
+	}
+}
+
+bool CGIHandler::isActive() const {
+	return this->_isActive;
+}
+
+void CGIHandler::setRevents(const short revents) {
+	this->_revents = revents;
+}
+
+short CGIHandler::getRevents() const {
+	return this->_revents;
+}
+
+int CGIHandler::getMonitoredFd() const {
+	int monitoredFd(0);
+	switch (this->_phase)
+	{
+		case CGIHandler::CGIWRITE:
+			monitoredFd = this->_wpfd;
+			break;
+		
+		case CGIHandler::CGIRECV:
+			monitoredFd = this->_rpfd;
+			break;
+		default:
+			monitoredFd = this->_wpfd;
+			break;
+	}
+	return monitoredFd;
+}
+
+pid_t CGIHandler::getPid() const {
+	return this->_pid;
+}
+
+CGIHandler::cgiphase CGIHandler::getCGIPhase() const {
+	return this->_phase;
+}
+
+void CGIHandler::setCGIPhase(CGIHandler::cgiphase phase) {
+	this->_phase = phase;
+}
+
+CGIHandler::cgiphase CGIHandler::detectCGIPhase() const {
+	CGIHandler::cgiphase phase(this->_phase);
+	pid_t waitpid = this->tryWait();
+	switch(phase) {
+		case CGIHandler::CGIWRITE: {
+			if (waitpid == -1) {
+				phase = CGIHandler::CGISET;
+				break;
+			}
+			if (waitpid != 0) {
+				phase = CGIHandler::CGIRECV;
+				break;
+			}
+			break;
+		}
+		case CGIHandler::CGIRECV: {
+			if (waitpid == -1) {
+				phase = CGIHandler::CGISET;
+				break;
+			}
+			if (waitpid != 0) {
+				phase = CGIHandler::CGISET;
+				break;
+			}
+			break;
+		}
+		default: {
+			break;
+		}
+	}
+	return phase;
+}
+
+CGIHandler::cgiphase CGIHandler::tryWrite() {
+	if (this->_wbuffer.size() == 0) {
+		return CGIHandler::CGIRECV;
+	}
+	if ((this->_revents & POLLOUT) != POLLOUT) {
+		return CGIHandler::CGIWRITE;
+	}
+	ssize_t wlen = write(this->_wpfd, this->_wbuffer.c_str(), this->_wbuffer.size());
+	if (wlen == -1) {
+		utils::putSysError("write");
+		return CGIHandler::CGISET;
+	}
+	if ((std::size_t)wlen < this->_wbuffer.size()) {
+		this->_wbuffer.erase(0, wlen);
+		return CGIHandler::CGIWRITE;
+	}
+	this->_wbuffer.clear();
+	return CGIHandler::CGIRECV;
+}
+
+CGIHandler::cgiphase CGIHandler::tryRecv() {
+	if ((this->_revents & POLLIN) != POLLIN) {
+		return CGIHandler::CGIWRITE;
+	}
+	char buf[CGI_BUFFERSIZE];
+	std::memset(buf, 0, sizeof(buf));
+	ssize_t rlen = read(this->_rpfd, buf, CGI_BUFFERSIZE - 1);
+	if (rlen == -1) {
+		utils::putSysError("read");
+		return CGIHandler::CGISET;
+	}
+	if (rlen == 0) {
+		return CGIHandler::CGISET;
+	}
+	this->_rbuffer.append(buf, rlen);
+	return CGIHandler::CGIRECV;
+}
+
+pid_t CGIHandler::tryWait() const {
+	int status(0);
+	return waitpid(this->_pid, &status, WNOHANG);
+}

@@ -210,7 +210,7 @@ static std::string getRuntimePath(std::string const &runtimeName) {
 
 static std::string getRuntimeName(const std::string &extension) {
 	if (extension.compare(".py") == 0) {
-		return "python";
+		return "python3";
 	} else if (extension.compare(".php") == 0) {
 		return "php";
 	} else if (extension.compare(".pl") == 0) {

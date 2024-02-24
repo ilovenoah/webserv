@@ -101,6 +101,10 @@ bool Response::isKeepAlive() const {
 	return false;
 }
 
+bool Response::isCGIActive() const {
+	return this->_cgiHandler.isActive();
+}
+
 void Response::printConfigInfo() const {
 	std::clog << "============== Routing result ==============" << std::endl;
 	std::clog << "Server name: ";
@@ -402,6 +406,111 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request,
 	return ClientSocket::SEND;
 }
 
+void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
+	std::stringstream ss(this->_cgiHandler.getRbuffer());
+	std::string line;
+	std::streampos startPos = ss.tellg();
+
+	while (std::getline(ss, line) && line.compare("\r") != 0 && line.empty() == false) {
+		line = utils::rmCR(line);
+		std::stringstream hss(line);
+		std::string key;
+		std::string value;
+		std::getline(hss, key, ':');
+		hss >> std::ws;
+		std::getline(hss, value);
+		this->_headers.insert(std::pair<std::string, std::string>(key, value));
+	}
+	std::streampos endPos = ss.tellg();
+	std::string::size_type readByte= endPos - startPos;
+	this->_cgiHandler.eraseRbuffer(readByte);
+	if (this->_headers.find("Location") != this->_headers.end() && this->_headers.find("Content-Type") == this->_headers.end()) {
+		this->_headers.insert(std::pair<std::string, std::string>("Connection", "close"));
+		return ;
+	}
+	if (shouldKeepAlive == true) {
+		this->_headers.insert(std::pair<std::string, std::string>("Connection", "keep-alive"));
+		return ;
+	}
+	this->_headers.insert(std::pair<std::string, std::string>("Connection", "close"));
+}
+
+void Response::_setCGIResponseBody() {
+	std::string body(this->_cgiHandler.getRbuffer());
+	if (body.empty() != true) {
+		this->_body = body;
+		this->_headers.insert(std::pair<std::string, std::string>("Content-Length", utils::sizeTtoString(this->_body.size())));
+	}
+}
+
+void Response::_setCGIResponseStatus() {
+	std::map<std::string, std::string>::const_iterator lciter = this->_headers.find("Location");
+	if (lciter == this->_headers.end()) {
+		this->_status = "200";
+		this->_statusMsg = "Ok";
+		return ;
+	}
+	if (lciter->second.find_first_of('/') == 0) {
+		// local redirect response
+		return ;
+	}
+	std::map<std::string, std::string>::const_iterator ctiter = this->_headers.find("Content-Type");
+	if (ctiter == this->_headers.end()) {
+		this->_status = "302";
+		this->_statusMsg = "Found";
+		return ;
+	}
+	this->_status = "200";
+	this->_statusMsg = "Ok";
+}
+
+bool Response::_isValidCGIResponse() const {
+	if (this->_headers.find("Location") == this->_headers.end()) {
+		if (this->_headers.find("Content-Type") == this->_headers.end()) {
+			return false;
+		}
+		return true;
+	}
+	if (this->_body.empty() == false) {
+		if (this->_headers.find("Content-Type") == this->_headers.end() || this->_headers.find("Status") == this->_headers.end()) {
+			return false;
+		}
+	}
+	return true;
+}
+
+ClientSocket::csphase Response::_setCGIResponse(bool shouldKeepAlive) {
+	ClientSocket::csphase phase(ClientSocket::RECV);
+	switch (this->_cgiHandler.detectCGIPhase())
+	{
+		case CGIHandler::CGIWRITE: {
+			this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryWrite());
+			break;
+		}
+		case CGIHandler::CGIRECV: {
+			this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryRecv());
+			break;
+		}
+		case CGIHandler::CGISET: {
+			this->_setCGIResponseHeader(shouldKeepAlive);
+			this->_setCGIResponseBody();
+			this->_setCGIResponseStatus();
+			if (this->_isValidCGIResponse() == false) {
+				this->_headers.clear();
+				this->_body.clear();
+				this->setEntireData("500", false);
+			}
+			this->_cgiHandler.setCGIPhase(CGIHandler::CGIFIN);
+			break;
+		}
+		case CGIHandler::CGIFIN: {
+			phase = ClientSocket::SEND;
+			break;
+		}
+	}
+	return phase;
+}
+
 bool Response::_shouldAutoIndexed() const {
 	if (this->_location != NULL &&
 		this->_location->getAutoindex() == AConfigurable::TRUE) {
@@ -441,9 +550,9 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 	std::ifstream fs;
 
 	(void)config;
-	// if (this->_cgiHandler.isActive() == true) {
-	// 	return this->_cgiHandler.setCGIResponse();
-	// }
+	if (this->_cgiHandler.isActive() == true) {
+		return this->_setCGIResponse(request.shouldKeepAlive());
+	}
 	if (request.isValidRequest() == false) {
 		this->_setErrorResponse("400", false);
 		return ClientSocket::SEND;
@@ -460,10 +569,15 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 		return this->_setRedirectResponse(request, request.shouldKeepAlive());
 	}
 	if (this->_shouldExecCGIScript() == true) {
-		this->_cgiHandler.init(request, *(this->_server), this->_actPath);
-		this->_cgiHandler.activate();
-		this->_setEntireDataWithBody("200", "this is CGI", true);
-		return ClientSocket::SEND;
+		if (this->_cgiHandler.init(request, *(this->_server), this->_actPath) == false) {
+			this->_setErrorResponse("500", false);
+			return ClientSocket::SEND;
+		}
+		if (this->_cgiHandler.activate() == false) {
+			this->_setErrorResponse("500", false);
+			return ClientSocket::SEND;
+		}
+		return ClientSocket::RECV;
 	}
 	if (request.getMethod() == "GET") {
 		return this->_setGetResponse(request);
@@ -588,4 +702,8 @@ ClientSocket::csphase Response::_setEntireDataWithBody(
 			std::pair<std::string, std::string>("Connection", "close"));
 	}
 	return ClientSocket::SEND;
+}
+
+CGIHandler &Response::getCgiHandler() {
+	return this->_cgiHandler;
 }
