@@ -563,6 +563,7 @@ CGIHandler::cgiphase CGIHandler::tryWrite() {
 		return CGIHandler::CGIWRITE;
 	}
 	this->_wbuffer.clear();
+	utils::x_close(this->_wpfd);
 	return CGIHandler::CGIRECV;
 }
 
@@ -578,6 +579,7 @@ CGIHandler::cgiphase CGIHandler::tryRecv() {
 		return CGIHandler::CGISET;
 	}
 	if (rlen == 0) {
+		utils::x_close(this->_rpfd);
 		return CGIHandler::CGISET;
 	}
 	this->_rbuffer.append(buf, rlen);
