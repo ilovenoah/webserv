@@ -488,7 +488,6 @@ bool Response::_isLocalRedirectResponse() {
 		return false;
 	}
 	if (lriter->second.find("/") == 0) {
-		std::clog << "this->_headers.size(): " << this->_headers.size() << std::endl;
 		return true;
 	}
 	return false;
