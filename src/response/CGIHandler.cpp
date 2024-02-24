@@ -303,9 +303,13 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 		}
 		this->_env.push_back(elem);
 	}
+#if defined(_DEBUG)
+	std::clog << "============= CGI Metavariables ============="
 	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
 		std::clog << *iter << std::endl;
 	}
+	std::clog << "============================================="
+#endif
 	this->_wbuffer = this->_request->getBody();
 	this->_env.push_back(NULL);
 	return true;
