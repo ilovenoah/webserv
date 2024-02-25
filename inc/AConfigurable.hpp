@@ -25,10 +25,10 @@ class AConfigurable {
 		IsAutoIndexed _autoindex;
 		std::vector<std::string> _index;
 		ssize_t _clientMaxBodySize;
-		std::vector<std::string> _cgi_extensions;
+		std::map<std::string, std::string> _cgi_extensions;
 		std::string _return;
 		std::map<std::string, std::string> _errorPages;
-		std::string _uploadPass;
+		std::string _uploadStore;
 
 	public:
 		AConfigurable();
@@ -37,6 +37,7 @@ class AConfigurable {
 		const std::string &getRoot() const;
 		bool setAllowMethods(std::string const &attribute, std::fstream &file);
 		const std::vector<std::string> &getAllowMethods() const;
+		bool isAllowedMethod(const std::string &method) const;
 		bool setAutoIndex(std::string const &attribute, std::fstream &file);
 		const IsAutoIndexed &getAutoindex() const;
 		bool setIndex(std::string const &attribute, std::fstream &file);
@@ -45,13 +46,13 @@ class AConfigurable {
 								  std::fstream &file);
 		const ssize_t &getClientMaxBodySize() const;
 		bool setCgiExtensions(std::string const &attribute, std::fstream &file);
-		const std::vector<std::string> &getCgiExtensions() const;
+		const std::map<std::string, std::string> &getCgiExtensions() const;
 		bool setReturn(std::string const &attribute, std::fstream &file);
 		bool setErrorPages(std::string const &attribute, std::fstream &file);
 		const std::string &getReturn() const;
 		const std::map<std::string, std::string> &getErrorPages() const;
-		bool setUploadPass(std::string const &attribute, std::fstream &file);
-		const std::string &getUploadPass() const;
+		bool setuploadStore(std::string const &attribute, std::fstream &file);
+		const std::string &getuploadStore() const;
 };
 
 #endif

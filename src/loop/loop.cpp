@@ -1,7 +1,8 @@
 #include "loop.hpp"
 
 static bool setRevents(std::map<int, ServerSocket> &ssmap,
-					   std::map<int, ClientSocket *> &csmap) {
+					   std::map<int, ClientSocket *> &csmap, std::map<int, Response> &rsmap) {
+	std::map<int, Response*> chmap;
 	std::vector<struct pollfd> pollfds;
 	for (std::map<int, ServerSocket>::iterator iter = ssmap.begin();
 		 iter != ssmap.end(); ++iter) {
@@ -19,6 +20,16 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 		pfd.events = POLLIN | POLLOUT | POLLHUP;
 		pollfds.push_back(pfd);
 	}
+	for (std::map<int, Response>::iterator iter = rsmap.begin();
+		 iter != rsmap.end(); ++iter) {
+		if (iter->second.isCGIActive() == false) { continue ; }
+		struct pollfd pfd;
+		std::memset(&pfd, 0, sizeof(struct pollfd));
+		pfd.fd = iter->second.getCgiHandler().getMonitoredFd();
+		pfd.events = POLLIN | POLLOUT | POLLHUP;
+		pollfds.push_back(pfd);
+		chmap.insert(std::pair<int, Response*>(pfd.fd, &(iter->second)));
+	}
 	if (poll(pollfds.data(), pollfds.size(), 0) == -1) {
 		utils::putSysError("poll");
 		return false;
@@ -29,6 +40,8 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 			ssmap[iter->fd].setRevents(iter->revents);
 		} else if (csmap.find(iter->fd) != csmap.end()) {
 			csmap[iter->fd]->setRevents(iter->revents);
+		} else if (chmap.find(iter->fd) != chmap.end()) {
+			chmap[iter->fd]->getCgiHandler().setRevents(iter->revents);
 		}
 	}
 	return true;
@@ -36,11 +49,12 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 
 static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo,
 								   ServerSocket *serverSocket) {
-	return new (std::nothrow) ClientSocket(socketInfo.first, serverSocket);
+	return new (std::nothrow) ClientSocket(socketInfo, serverSocket);
 }
 
 static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
-	if (std::difftime(std::time(NULL), cs.getLastSendTimestamp()) > 5) {
+	if (std::difftime(std::time(NULL), cs.getLastSendTimestamp()) >
+		DEFAULT_SOCKET_TIMEOUT) {
 		return ClientSocket::CLOSE;
 	}
 	if ((cs.getPhase() & POLLHUP) == POLLHUP) {
@@ -54,7 +68,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 	std::map<int, Request> rqmap;
 	std::map<int, Response> rsmap;
 	while (true) {
-		if (setRevents(ssmap, csmap) == false) {
+		if (setRevents(ssmap, csmap, rsmap) == false) {
 			return false;
 		}
 		for (std::map<int, ServerSocket>::iterator iter = ssmap.begin();
@@ -72,7 +86,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			}
 			csmap.insert(
 				std::pair<int, ClientSocket *>(socketInfo.first, newCs));
-			rqmap.insert(std::pair<int, Request>(socketInfo.first, Request()));
+			rqmap.insert(std::pair<int, Request>(socketInfo.first, Request(newCs->getRemoteAddr())));
 		}
 		for (std::map<int, ClientSocket *>::iterator iter = csmap.begin();
 			 iter != csmap.end();) {
@@ -84,17 +98,24 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 					break;
 				}
 				case ClientSocket::SEND: {
-#if defined(_DEBUG)
-					std::clog << rqmap[iter->first].getEntireData()
-							  << std::endl;
-#endif
 					std::map<int, Response>::iterator rsiter =
 						rsmap.find(iter->first);
 					std::map<int, Request>::iterator rqiter =
 						rqmap.find(iter->first);
 					if (rsiter != rsmap.end() && rqiter != rqmap.end()) {
+#if defined(_DEBUG)
+						std::clog << "=============== Response ==============="
+								  << std::endl;
+						std::clog << rsiter->second.getEntireData()
+								  << std::endl;
+						std::clog << "========================================"
+								  << std::endl;
+#endif
 						iter->second->setPhase(iter->second->trySend(
 							rsiter->second.getEntireData()));
+						if (rsiter->second.isKeepAlive() == false) {
+							iter->second->setPhase(ClientSocket::CLOSE);
+						}
 						rsmap.erase(rsiter);
 						rqiter->second.init();
 					}
@@ -113,6 +134,9 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 					delete toErase->second;
 					csmap.erase(toErase);
 #if defined(_DEBUG)
+					std::clog
+						<< "=============== Connection Info ==============="
+						<< std::endl;
 					std::clog << "ClientSocket size: " << csmap.size()
 							  << std::endl;
 					std::clog << "Request size: " << rqmap.size() << std::endl;
@@ -120,6 +144,9 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 					int checkFd = open("/dev/null", O_RDONLY);
 					std::clog << "check fd: " << checkFd << std::endl;
 					close(checkFd);
+					std::clog
+						<< "==============================================="
+						<< std::endl;
 #endif
 					break;
 				}
@@ -152,6 +179,13 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 					csiter->second->getServerSocket()->getPort());
 				rsiter->second.setLocationPointer(rqiter->second.getPath());
 				rsiter->second.setActPath(rqiter->second.getPath());
+#if defined(_DEBUG)
+				std::clog << "=============== Request ==============="
+						  << std::endl;
+				std::clog << iter->second.getEntireData() << std::endl;
+				std::clog << "======================================="
+						  << std::endl;
+#endif
 #if defined(_DEBUG)
 				rsiter->second.printConfigInfo();
 #endif

@@ -6,7 +6,7 @@ std::map<std::string, bool (Server::*)(std::string const &, std::fstream &)>
 Config::initSetterMap() {
 	std::map<std::string, bool (Server::*)(const std::string &, std::fstream &)>
 		srvSetterMap;
-	srvSetterMap["server_name"] = &Server::setServername;
+	srvSetterMap["server_name"] = &Server::setServernames;
 	srvSetterMap["listen"] = &Server::setListen;
 	srvSetterMap["root"] = &Server::setRoot;
 	srvSetterMap["allow_methods"] = &Server::setAllowMethods;
@@ -17,7 +17,7 @@ Config::initSetterMap() {
 	srvSetterMap["return"] = &Server::setReturn;
 	srvSetterMap["error_page"] = &Server::setErrorPages;
 	srvSetterMap["location"] = &Server::setLocations;
-	srvSetterMap["upload_pass"] = &Server::setUploadPass;
+	srvSetterMap["upload_store"] = &Server::setuploadStore;
 	return srvSetterMap;
 }
 
@@ -25,12 +25,11 @@ std::map<std::string, bool (Server::*)(std::string const &, std::fstream &)>
 	Config::_setterMap = initSetterMap();
 
 bool Config::open(char const *path) {
-
-	//isAccess
+	// isAccess
 	Result<bool, std::string> res = utils::isDirectory(path);
 	if (res.isError() == true) {
 		return false;
-	} 
+	}
 	if (res.getOk() == true) {
 		return false;
 	}
@@ -62,7 +61,7 @@ Server Config::_createServerInstance(std::fstream &file) {
 		if (utils::shouldIgnoreLine(line)) {
 			continue;
 		}
-		utils::rmCR(line);
+		line = utils::rmCR(line);
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
@@ -102,7 +101,7 @@ bool Config::load() {
 			if (utils::shouldIgnoreLine(line)) {
 				continue;
 			}
-			utils::rmCR(line);
+			line = utils::rmCR(line);
 			std::stringstream ss(line);
 			std::string elem;
 			ss >> elem;
@@ -114,25 +113,33 @@ bool Config::load() {
 			}
 			if (elem.compare("server") == 0 && bracket == '{') {
 				Server server = this->_createServerInstance(this->_file);
-				std::map<std::string, std::map<std::string, Server> >::iterator
-					smiter = this->_servers.find(server.getListen());
-				if (smiter == this->_servers.end()) {
-					std::map<std::string, Server> svmap;
-					svmap.insert(std::pair<std::string, Server>(
-						server.getServername(), server));
-					this->_servers.insert(
-						std::pair<std::string, std::map<std::string, Server> >(
-							server.getListen(), svmap));
-					this->_defaultServers.insert(std::pair<std::string,
-														   Server *>(
-						server.getListen(),
-						&(this->_servers[server.getListen()].begin()->second)));
-				} else {
-					if (smiter->second.count(server.getServername()) > 0) {
-						throw std::runtime_error(DUPLICATE_SERVER);
+				for (std::vector<std::string>::const_iterator iter =
+						 server.getServernames().begin();
+					 iter != server.getServernames().end(); ++iter) {
+					std::map<std::string,
+							 std::map<std::string, Server> >::iterator smiter =
+						this->_servers.find(server.getListen());
+					if (smiter == this->_servers.end()) {
+						std::map<std::string, Server> svmap;
+						svmap.insert(
+							std::pair<std::string, Server>(*iter, server));
+						this->_servers.insert(
+							std::pair<std::string,
+									  std::map<std::string, Server> >(
+								server.getListen(), svmap));
+						this->_defaultServers.insert(
+							std::pair<std::string, Server *>(
+								server.getListen(),
+								&(this->_servers[server.getListen()]
+									  .begin()
+									  ->second)));
+					} else {
+						if (smiter->second.count(*iter) > 0) {
+							throw std::runtime_error(DUPLICATE_SERVER);
+						}
+						smiter->second.insert(
+							std::pair<std::string, Server>(*iter, server));
 					}
-					smiter->second.insert(std::pair<std::string, Server>(
-						server.getServername(), server));
 				}
 			}
 		}
@@ -152,20 +159,38 @@ void Config::printServers() const {
 	for (std::map<std::string, std::map<std::string, Server> >::const_iterator
 			 iter = this->_servers.begin();
 		 iter != this->_servers.end(); ++iter) {
+		std::clog << "size of servers: " << iter->second.size() << std::endl;
 		std::clog << "====================================" << std::endl;
-		std::clog
-			<< "Default server name: "
-			<< this->getDefaultServer(iter->first).getOk()->getServername()
-			<< std::endl;
+		std::clog << "Default server name: ";
+		{
+			std::vector<std::string> defaultSeverNames =
+				this->getDefaultServer(iter->first).getOk()->getServernames();
+			for (std::vector<std::string>::const_iterator dsiter =
+					 defaultSeverNames.begin();
+				 dsiter != defaultSeverNames.end(); ++dsiter) {
+				std::clog << *dsiter << " ";
+			}
+		}
+		std::clog << std::endl;
 		for (std::map<std::string, Server>::const_iterator iter2 =
 				 iter->second.begin();
 			 iter2 != iter->second.end(); ++iter2) {
 			std::clog << "====================================" << std::endl;
-			std::clog << "Server name: " << iter2->second.getServername()
-					  << std::endl;
+			std::clog << "Server name: ";
+			{
+				std::vector<std::string> defaultSeverNames =
+					iter2->second.getServernames();
+				for (std::vector<std::string>::const_iterator dsiter =
+						 defaultSeverNames.begin();
+					 dsiter != defaultSeverNames.end(); ++dsiter) {
+					std::clog << *dsiter << " ";
+				}
+			}
+			std::clog << std::endl;
 			std::clog << "Listen: " << iter2->second.getListen() << std::endl;
 			std::clog << "Root: " << iter2->second.getRoot() << std::endl;
-			std::clog << "upload_pass: " << iter2->second.getUploadPass() << std::endl;
+			std::clog << "upload_store: " << iter2->second.getuploadStore()
+					  << std::endl;
 			std::clog << "Allow methods: ";
 			for (std::vector<std::string>::const_iterator iter3 =
 					 iter2->second.getAllowMethods().begin();
@@ -185,10 +210,10 @@ void Config::printServers() const {
 			std::clog << "Client max body size: "
 					  << iter2->second.getClientMaxBodySize() << std::endl;
 			std::clog << "Cgi extensions: ";
-			for (std::vector<std::string>::const_iterator iter3 =
+			for (std::map<std::string, std::string>::const_iterator iter3 =
 					 iter2->second.getCgiExtensions().begin();
 				 iter3 != iter2->second.getCgiExtensions().end(); ++iter3) {
-				std::clog << *iter3 << " ";
+				std::clog << iter3->first << "(" << iter3->second << ") ";
 			}
 			std::clog << std::endl;
 			std::clog << "Return: " << iter2->second.getReturn() << std::endl;
@@ -204,9 +229,10 @@ void Config::printServers() const {
 				std::clog << "Location: " << iter3->second.getLocationPath()
 						  << std::endl;
 				std::clog << "	Root: " << iter3->second.getRoot() << std::endl;
-				std::clog << "	upload_pass: " << iter3->second.getUploadPass()
+				std::clog << "	upload_store: "
+						  << iter3->second.getuploadStore() << std::endl;
+				std::clog << "	alias: " << iter3->second.getAliasDirective()
 						  << std::endl;
-				std::clog << "	alias: " << iter3->second.getAliasDirective() << std::endl;
 				std::clog << "	Allow methods: ";
 				for (std::vector<std::string>::const_iterator iter4 =
 						 iter3->second.getAllowMethods().begin();
@@ -226,10 +252,10 @@ void Config::printServers() const {
 				std::clog << "	Client max body size: "
 						  << iter3->second.getClientMaxBodySize() << std::endl;
 				std::clog << "	Cgi extensions: ";
-				for (std::vector<std::string>::const_iterator iter4 =
+				for (std::map<std::string, std::string>::const_iterator iter4 =
 						 iter3->second.getCgiExtensions().begin();
 					 iter4 != iter3->second.getCgiExtensions().end(); ++iter4) {
-					std::clog << *iter4 << " ";
+					std::clog << iter4->first << "(" << iter4->second << ") ";
 				}
 				std::clog << std::endl;
 				std::clog << "	Return: " << iter3->second.getReturn()

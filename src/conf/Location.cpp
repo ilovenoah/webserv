@@ -58,7 +58,7 @@ bool Location::setRoot(std::string const &attribute, std::fstream &file) {
 	if (ss.peek() != EOF) {
 		return false;
 	}
-	//isAccess
+	// isAccess
 	Result<bool, std::string> res = utils::isDirectory(elem);
 	if (res.isError() == true) {
 		return false;
@@ -69,14 +69,16 @@ bool Location::setRoot(std::string const &attribute, std::fstream &file) {
 	if (elem[0] != '/' && elem.find("./") != 0) {
 		elem = "./" + elem;
 	}
-	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) &&
+		elem.find_last_of('/') == elem.length() - 1) {
 		elem.erase(elem.length() - 1);
 	}
 	this->_root = elem;
 	return true;
 }
 
-bool Location::setAliasDirective(std::string const &attribute, std::fstream &file) {
+bool Location::setAliasDirective(std::string const &attribute,
+								 std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
 	std::string elem;
@@ -92,7 +94,7 @@ bool Location::setAliasDirective(std::string const &attribute, std::fstream &fil
 	if (ss.peek() != EOF) {
 		return false;
 	}
-	//isAccess
+	// isAccess
 	Result<bool, std::string> res = utils::isDirectory(elem);
 	if (res.isError() == true) {
 		return false;
@@ -100,10 +102,27 @@ bool Location::setAliasDirective(std::string const &attribute, std::fstream &fil
 	if (res.getOk() == false) {
 		return false;
 	}
-	if (elem[0] != '/' && elem.find("./") != 0) {
-		elem = "./" + elem;
+	if (elem.find("..") != std::string::npos) {
+		return false;
 	}
-	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+	if (elem == "/") {
+		this->_aliasDirective = elem;
+		return true;
+	}
+	if (elem.find("./") == 0 || elem == ".") {
+		const char *env_p = std::getenv("PWD");
+		if (env_p == NULL) {
+			throw std::runtime_error(PWD_NOT_FOUND);
+		}
+		if (elem == ".") {
+			elem = env_p;
+		} else {
+			elem = env_p + elem.substr(1);
+		}
+	}
+	elem = utils::replaceUri(elem, ".", "");
+	elem = utils::replaceUri(elem, "//", "/");
+	if (elem.find_last_of('/') == elem.length() - 1) {
 		elem.erase(elem.length() - 1);
 	}
 	this->_aliasDirective = elem;
@@ -136,13 +155,16 @@ void Location::fillLocationDirectives(Server const &server) {
 	if (this->_errorPages.size() == 0) {
 		this->_errorPages = server.getErrorPages();
 	}
-	if (this->_uploadPass.empty() == true) {
-		this->_uploadPass = server.getUploadPass();
+	if (this->_uploadStore.empty() == true) {
+		this->_uploadStore = server.getuploadStore();
 	}
 	if (this->_root.empty() == true && this->_aliasDirective.empty() == true) {
 		this->_root = server.getRoot();
 	}
-	for (std::map<std::string, std::string>::const_iterator iter = server.getErrorPages().begin(); iter != server.getErrorPages().end(); ++iter) {
-		this->_errorPages.insert(std::pair<std::string, std::string>(iter->first, iter->second));
+	for (std::map<std::string, std::string>::const_iterator iter =
+			 server.getErrorPages().begin();
+		 iter != server.getErrorPages().end(); ++iter) {
+		this->_errorPages.insert(
+			std::pair<std::string, std::string>(iter->first, iter->second));
 	}
 }

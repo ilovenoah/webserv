@@ -18,6 +18,7 @@ class ClientSocket {
 
 	private:
 		int _fd;
+		std::string _remoteAddr;
 		short _revents;
 		ClientSocket::csphase _phase;
 		std::time_t _lastSendTimestamp;
@@ -26,8 +27,9 @@ class ClientSocket {
 	public:
 		std::stringstream buffer;
 		ClientSocket();
-		ClientSocket(int const fd, ServerSocket *serverSocket);
+		ClientSocket(const std::pair<int, sockaddr_in> &socketInfo, ServerSocket *serverSocket);
 		int getFd() const;
+		std::string const &getRemoteAddr() const;
 		void setRevents(short revents);
 		short getRevents() const;
 		ClientSocket::csphase tryRecv();

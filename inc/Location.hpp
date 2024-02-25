@@ -20,7 +20,8 @@ class Location : public AConfigurable {
 		Location();
 		bool setLocationPath(std::string const &attribute);
 		const std::string &getLocationPath() const;
-		bool setAliasDirective(std::string const &attribute, std::fstream &file);
+		bool setAliasDirective(std::string const &attribute,
+							   std::fstream &file);
 		const std::string &getAliasDirective() const;
 		bool setRoot(std::string const &attribute, std::fstream &file);
 		void fillLocationDirectives(Server const &server);

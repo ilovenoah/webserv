@@ -1,15 +1,40 @@
 #include "ClientSocket.hpp"
 
+static std::string convertUintToIpString(u_int32_t s_addr) {
+	int byte;
+	int bitshift(0);
+	std::string ipAddr;
+	std::stringstream ss;
+
+	while (4 > bitshift) {
+		byte = (s_addr >> (bitshift * 8)) & 0xFF;
+		ss << byte;
+		if (bitshift == 3) {
+			ipAddr.append(ss.str());
+		} else {
+			ipAddr.append(ss.str() + ".");
+		}
+		ss.str("");
+		ss.clear(std::stringstream::goodbit);
+		bitshift++;
+	}
+	return ipAddr;
+}
+
 ClientSocket::ClientSocket() : _serverSocket(NULL) {}
 
-ClientSocket::ClientSocket(int const fd, ServerSocket *serverSocket)
-	: _fd(fd),
+ClientSocket::ClientSocket(const std::pair<int, sockaddr_in> &socketInfo, ServerSocket *serverSocket)
+	: _fd(socketInfo.first),
+	  _remoteAddr(convertUintToIpString(socketInfo.second.sin_addr.s_addr)),
 	  _revents(0),
 	  _phase(ClientSocket::RECV),
 	  _lastSendTimestamp(std::time(NULL)),
 	  _serverSocket(serverSocket) {}
 
+
 int ClientSocket::getFd() const { return this->_fd; }
+
+std::string const &ClientSocket::getRemoteAddr() const { return this->_remoteAddr; }
 
 void ClientSocket::setRevents(short revents) { this->_revents = revents; }
 

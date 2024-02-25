@@ -36,10 +36,27 @@ bool AConfigurable::setRoot(std::string const &attribute, std::fstream &file) {
 	if (res.getOk() == false) {
 		return false;
 	}
-	if (elem[0] != '/' && elem.find("./") != 0) {
-		elem = "./" + elem;
+	if (elem.find("..") != std::string::npos) {
+		return false;
 	}
-	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+	if (elem == "/") {
+		this->_root = elem;
+		return true;
+	}
+	if (elem.find("./") == 0 || elem == ".") {
+		const char *env_p = std::getenv("PWD");
+		if (env_p == NULL) {
+			throw std::runtime_error(PWD_NOT_FOUND);
+		}
+		if (elem == ".") {
+			elem = env_p;
+		} else {
+			elem = env_p + elem.substr(1);
+		}
+	}
+	elem = utils::replaceUri(elem, ".", "");
+	elem = utils::replaceUri(elem, "//", "/");
+	if (elem.find_last_of('/') == elem.length() - 1) {
 		elem.erase(elem.length() - 1);
 	}
 	this->_root = elem;
@@ -47,6 +64,17 @@ bool AConfigurable::setRoot(std::string const &attribute, std::fstream &file) {
 }
 
 const std::string &AConfigurable::getRoot() const { return this->_root; }
+
+bool AConfigurable::isAllowedMethod(const std::string &method) const {
+	for (std::vector<std::string>::const_iterator iter =
+			 this->_allowMethods.begin();
+		 iter != this->_allowMethods.end(); ++iter) {
+		if (iter->compare(method) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
 
 bool AConfigurable::setAllowMethods(std::string const &attribute,
 									std::fstream &file) {
@@ -123,26 +151,40 @@ const std::vector<std::string> &AConfigurable::getIndex() const {
 	return this->_index;
 }
 
+static ssize_t byteConverter(std::string const &elem) {
+	if (elem.empty() == true) {
+		return 1;
+	} else if (elem == "k") {
+		return 1000;
+	} else if (elem == "m") {
+		return 1000000;
+	} else {
+		return 1000000000;
+	}
+}
+
 bool AConfigurable::setClientMaxBodySize(std::string const &attribute,
 										 std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
 	std::string elem;
+	ssize_t byte;
 	ss >> elem;
 	elem.clear();
+	ss >> byte;
+	if (ss.fail()) {
+		return false;
+	}
 	ss >> elem;
 	ss >> std::ws;
 	if (ss.peek() != EOF) {
 		return false;
 	}
-	if (elem.empty() == true) {
+	if (elem.empty() == false && (elem != "k" && elem != "m" && elem != "g")) {
 		return false;
 	}
-	if (utils::isNumber(elem) == false) {
-		return false;
-	}
-	this->_clientMaxBodySize = utils::decStrToSizeT(elem);
-	if (this->_clientMaxBodySize > INT_MAX) {
+	this->_clientMaxBodySize = byte * byteConverter(elem);
+	if (this->_clientMaxBodySize > INT_MAX || this->_clientMaxBodySize < 0) {
 		throw std::runtime_error(INVALID_CLIENTMAXBODYSIZE);
 	}
 	return true;
@@ -150,6 +192,31 @@ bool AConfigurable::setClientMaxBodySize(std::string const &attribute,
 
 const ssize_t &AConfigurable::getClientMaxBodySize() const {
 	return this->_clientMaxBodySize;
+}
+
+static std::string getRuntimePath(std::string const &runtimeName) {
+	std::string runTimePath;
+	const char *pathEnv(std::getenv("PATH"));
+	if (pathEnv == NULL) { return ""; }
+	std::string pathEnvStr(pathEnv);
+	std::stringstream ss(pathEnvStr);
+	std::string elem;
+	while (std::getline(ss, elem, ':')) {
+		if (elem.length() != 0 && elem.find_last_of('/') - 1 != elem.length()) { elem.append("/"); }
+		if (utils::isAccess(elem + runtimeName, X_OK) == true) {  return elem + runtimeName; }
+	}
+	return "";
+}
+
+static std::string getRuntimeName(const std::string &extension) {
+	if (extension.compare(".py") == 0) {
+		return "python3";
+	} else if (extension.compare(".php") == 0) {
+		return "php";
+	} else if (extension.compare(".pl") == 0) {
+		return "perl";
+	}
+	return "";
 }
 
 bool AConfigurable::setCgiExtensions(std::string const &attribute,
@@ -173,13 +240,18 @@ bool AConfigurable::setCgiExtensions(std::string const &attribute,
 				return false;
 			}
 		}
-		this->_cgi_extensions.push_back(elem);
+		std::string runtimeName = getRuntimeName(elem);
+		if (runtimeName.empty() == true) { return false; }
+		std::string pathRuntimePath = getRuntimePath(runtimeName);
+		if (pathRuntimePath.empty() == true) { return false; }
+		if (this->_cgi_extensions.count(elem) > 0) { return false; }
+		this->_cgi_extensions.insert(std::pair<std::string, std::string>(elem, pathRuntimePath));
 		ss >> std::ws;
 	}
 	return true;
 }
 
-const std::vector<std::string> &AConfigurable::getCgiExtensions() const {
+const std::map<std::string, std::string> &AConfigurable::getCgiExtensions() const {
 	return this->_cgi_extensions;
 }
 
@@ -260,8 +332,8 @@ const std::map<std::string, std::string> &AConfigurable::getErrorPages() const {
 
 const std::string &AConfigurable::getReturn() const { return this->_return; }
 
-
-bool AConfigurable::setUploadPass(std::string const &attribute, std::fstream &file) {
+bool AConfigurable::setuploadStore(std::string const &attribute,
+								   std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
 	std::string elem;
@@ -274,7 +346,7 @@ bool AConfigurable::setUploadPass(std::string const &attribute, std::fstream &fi
 	if (ss.peek() != EOF) {
 		return false;
 	}
-	//isAccess
+	// isAccess
 	Result<bool, std::string> res = utils::isDirectory(elem);
 	if (res.isError() == true) {
 		return false;
@@ -285,13 +357,14 @@ bool AConfigurable::setUploadPass(std::string const &attribute, std::fstream &fi
 	if (elem[0] != '/' && elem.find("./") != 0) {
 		elem = "./" + elem;
 	}
-	if ((elem.compare("/") != 0 && elem.compare("./") != 0) && elem.find_last_of('/') == elem.length() - 1) {
+	if ((elem.compare("/") != 0 && elem.compare("./") != 0) &&
+		elem.find_last_of('/') == elem.length() - 1) {
 		elem.erase(elem.length() - 1);
 	}
-	this->_uploadPass = elem;
+	this->_uploadStore = elem;
 	return true;
 }
 
-const std::string &AConfigurable::getUploadPass() const {
-	return this->_uploadPass;
+const std::string &AConfigurable::getuploadStore() const {
+	return this->_uploadStore;
 }

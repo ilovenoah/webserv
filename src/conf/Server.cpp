@@ -13,7 +13,7 @@ Server::initSetterMap() {
 	srvSetterMap["cgi_extensions"] = &Location::setCgiExtensions;
 	srvSetterMap["return"] = &Location::setReturn;
 	srvSetterMap["error_page"] = &Location::setErrorPages;
-	srvSetterMap["upload_pass"] = &Location::setUploadPass;
+	srvSetterMap["upload_store"] = &Location::setuploadStore;
 	srvSetterMap["alias"] = &Location::setAliasDirective;
 	return srvSetterMap;
 }
@@ -21,14 +21,16 @@ Server::initSetterMap() {
 std::map<std::string, bool (Location::*)(std::string const &, std::fstream &)>
 	Server::_setterMap = initSetterMap();
 
-Server::Server()
-	: AConfigurable(), _servername(""), _ipAddr("0.0.0.0"), _port("8000") {
-		this->_root = "./";
-	}
+Server::Server() : AConfigurable(), _ipAddr("0.0.0.0"), _port("8000") {
+	this->_root = std::getenv("PWD");
+	this->_servernames.push_back("");
+}
 
-const std::string &Server::getServername() const { return this->_servername; }
+const std::vector<std::string> &Server::getServernames() const {
+	return this->_servernames;
+}
 
-bool Server::setServername(std::string const &attribute, std::fstream &file) {
+bool Server::setServernames(std::string const &attribute, std::fstream &file) {
 	(void)file;
 	std::stringstream ss(attribute);
 	std::string elem;
@@ -37,11 +39,12 @@ bool Server::setServername(std::string const &attribute, std::fstream &file) {
 		return false;
 	}
 	elem.clear();
-	ss >> elem;
-	if (ss.peek() != EOF) {
-		return false;
+	this->_servernames.clear();
+	while (ss.eof() == false) {
+		ss >> elem;
+		this->_servernames.push_back(elem);
+		ss >> std::ws;
 	}
-	this->_servername = elem;
 	return true;
 }
 
@@ -107,7 +110,7 @@ bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 		if (utils::shouldIgnoreLine(line)) {
 			continue;
 		}
-		utils::rmCR(line);
+		line = utils::rmCR(line);
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
