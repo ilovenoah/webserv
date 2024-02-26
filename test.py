@@ -89,31 +89,34 @@ def assert_str(act, exp):
 		print_diff(act, exp)
 	else: print(GREEN + '===== OK =====' + END)
 
-def assert_post(exp_status, sections):
+def assert_post(exp_status, sections, testdir):
 	status = int(exp_status)
 	if (status >= 400 and status < 600):
-		file_path = [os.path.join(UPLOAD_STORE_PATH, path) for path in os.listdir(UPLOAD_STORE_PATH)][0]
-		if (os.path.exists(file_path) == True): print(RED + '===== KO =====' + END)
+		paths = [os.path.join((testdir, UPLOAD_STORE_DIR_NAME, path)) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
+		if (len(paths) != 0): print(RED + '===== KO =====' + END)
 		else: print(GREEN + '===== OK =====' + END)
 
 	else:
-		file_path = [os.path.join(UPLOAD_STORE_PATH, path) for path in os.listdir(UPLOAD_STORE_PATH)][0]
+		paths = [os.path.join((testdir, UPLOAD_STORE_DIR_NAME, path)) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
 		act = get_body(sections)
-		exp = get_file_content(file_path)
+		exp = get_file_content(paths[0])
 		assert_str(act, exp)
-	if os.path.exists(file_path): os.remove(file_path)
+	for file_path in paths:
+		if os.path.exists(file_path): os.remove(file_path)
 
-def assert_delete(exp_status):
+def assert_delete(exp_status, testdir):
 	status = int(exp_status)
 	
 	if (status >= 400 and status < 600):
-		if (os.path.exists(DELETE_FILE_PATH) == False): print(GREEN + '===== OK =====' + END)
+		paths = [os.path.join((testdir, DELETE_FILE_PATH, path)) for path in os.listdir(os.path.join(testdir, DELETE_FILE_PATH))]
+		if (len(paths) == 0): print(GREEN + '===== OK =====' + END)
 		else: print(RED + '===== KO =====' + END)
-		if os.path.exists(DELETE_FILE_PATH): os.remove(DELETE_FILE_PATH)
-
 	else:
-		if (os.path.exists(DELETE_FILE_PATH) == True): print(RED + '===== KO =====' + END)
+		paths = [os.path.join((testdir, DELETE_FILE_PATH, path)) for path in os.listdir(os.path.join(testdir, DELETE_FILE_PATH))]
+		if (len(paths) != 0): print(RED + '===== KO =====' + END)
 		else: print(GREEN + '===== OK =====' + END)
+	for path in paths:
+		if os.path.exists(path): os.remove(path)
 
 def	 main():
 	for testdir in [os.path.join(TESTDIR_PATH, path) for path in os.listdir(TESTDIR_PATH)]:
