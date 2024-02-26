@@ -162,7 +162,7 @@ void Response::_setErrorResponse(const std::string &status,
 	fs.open(localRelativePath.c_str());
 	if (fs.fail() == true) {
 		this->_setEntireDataWithBody(
-			this->_statusMap.find("500")->second.first,
+			this->_statusMap.find("500")->first,
 			this->_statusMap.find("500")->second.second, false);
 		return;
 	} else {
@@ -174,7 +174,7 @@ void Response::_setErrorResponse(const std::string &status,
 		fs.readsome(buf, length);
 		if (fs.fail()) {
 			this->_setEntireDataWithBody(
-				this->_statusMap.find("500")->second.first,
+				this->_statusMap.find("500")->first,
 				this->_statusMap.find("500")->second.second, false);
 			return;
 		}
