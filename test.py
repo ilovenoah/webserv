@@ -119,29 +119,34 @@ def assert_delete(exp_status, testdir):
 		if os.path.exists(path): os.remove(path)
 
 def	 main():
-	for testdir in [os.path.join(TESTDIR_PATH, path) for path in os.listdir(TESTDIR_PATH)]:
-		config_path = os.path.join(testdir, CONFIG_FILEDIR_NAME, CONFIG_FILE_NAME)
-		process = subprocess.Popen([WEBSERV_FILE_PATH, config_path],
-									stdout=subprocess.PIPE,
-									stderr=subprocess.PIPE)
-		print('webserv is starting up...')
-		time.sleep(0.1)
-		for request_file_path, response_file_path in zip(os.listdir(os.path.join(testdir, REQUEST_FILEDIR_NAME)),
-										 		os.listdir(os.path.join(testdir, RESPONSE_FILEDIR_NAME))):
-			sections = get_section_list(get_file_content(os.path.join(testdir, REQUEST_FILEDIR_NAME, request_file_path)))
-			host, port = get_socket(sections)
-			request_data = get_request_data(sections)
-			method = get_method(sections)
-			if (method == 'DELETE'): init_delete_file()
-			response_act = send_raw_data(host, port, request_data)
-			response_exp = get_file_content(os.path.join(testdir, RESPONSE_FILEDIR_NAME, response_file_path))
-			exp_status = get_response_status(response_exp)
-			print()
-			print('File name: \"%s\"' % (response_file_path))
-			assert_str(response_act, response_exp)
-			if (method == 'POST'): assert_post(exp_status, sections)
-			elif (method == 'DELETE'): assert_delete(exp_status)
+	try:
+		for testdir in [os.path.join(TESTDIR_PATH, path) for path in os.listdir(TESTDIR_PATH)]:
+			config_path = os.path.join(testdir, CONFIG_FILEDIR_NAME, CONFIG_FILE_NAME)
+			process = subprocess.Popen([WEBSERV_FILE_PATH, config_path],
+										stdout=subprocess.PIPE,
+										stderr=subprocess.PIPE)
+			print('webserv is starting up...')
+			time.sleep(1)
+			for request_file_path, response_file_path in zip(os.listdir(os.path.join(testdir, REQUEST_FILEDIR_NAME)),
+													os.listdir(os.path.join(testdir, RESPONSE_FILEDIR_NAME))):
+				sections = get_section_list(get_file_content(os.path.join(testdir, REQUEST_FILEDIR_NAME, request_file_path)))
+				host, port = get_socket(sections)
+				request_data = get_request_data(sections)
+				method = get_method(sections)
+				if (method == 'DELETE'): init_delete_file()
+				response_act = send_raw_data(host, port, request_data)
+				response_exp = get_file_content(os.path.join(testdir, RESPONSE_FILEDIR_NAME, response_file_path))
+				exp_status = get_response_status(response_exp)
+				print()
+				print('File name: \"%s\"' % (response_file_path))
+				assert_str(response_act, response_exp)
+				if (method == 'POST'): assert_post(exp_status, sections, testdir)
+				elif (method == 'DELETE'): assert_delete(exp_status, testdir)
 
+			process.terminate()
+			process.wait()
+	except Exception as e:
+		print(e)
 		process.terminate()
 		process.wait()
 
