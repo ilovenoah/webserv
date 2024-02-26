@@ -116,6 +116,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 						if (rsiter->second.isKeepAlive() == false) {
 							iter->second->setPhase(ClientSocket::CLOSE);
 							rsmap.erase(rsiter);
+							++iter;
 							break;
 						}
 						rsmap.erase(rsiter);
@@ -158,8 +159,8 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			 iter != rqmap.end(); ++iter) {
 			std::map<int, ClientSocket *>::iterator csiter =
 				csmap.find(iter->first);
-			if (csiter != csmap.end() &&
-				(utils::findCRLF(csiter->second->buffer) ||
+			if (csiter == csmap.end() || csiter->second->getPhase() == ClientSocket::CLOSE) { continue ; }
+			if ((utils::findCRLF(csiter->second->buffer) ||
 				 iter->second.getReqphase() == Request::RQBODY)) {
 				ClientSocket::csphase nextcsphase =
 					iter->second.load(csiter->second->buffer);
