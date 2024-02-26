@@ -26,7 +26,8 @@ def get_file_content(file_path):
 	return raw_data
 
 def get_section_list(file_content):
-	return file_content.split(CRLF + CRLF, 2)
+	sections = file_content.split(CRLF + CRLF + CRLF)
+	return sections
 
 def get_socket(sections):
 	socket_section = sections[0].split(CRLF)
