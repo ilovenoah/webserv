@@ -139,7 +139,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
-			utils::rmCR(line);
+			line = utils::rmCR(line);
 			std::stringstream ss(line);
 			std::string key;
 			std::string value;
