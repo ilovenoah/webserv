@@ -7,6 +7,9 @@ import difflib
 WEBSERV_FILE_NAME = 'webserv'
 WEBSERV_FILE_PATH = './' + WEBSERV_FILE_NAME
 TESTDIR_PATH = './tests'
+UPLOAD_STORE_PATH = TESTDIR_PATH + '/upload'
+DELETE_DIR_PATH = TESTDIR_PATH + '/delete'
+DELETE_FILE_PATH = DELETE_DIR_PATH + '/test.html'
 CONFIG_FILEDIR_NAME = 'config'
 CONFIG_FILE_NAME = 'default.conf'
 REQUEST_FILEDIR_NAME = 'request_file'
@@ -41,6 +44,14 @@ def get_request_data(sections):
 	request_section += CRLF + CRLF
 	return request_section
 
+def get_body(sections):
+	if len(sections) > 1: request_section = sections[1]
+	else: request_section = ''
+	splited_request = request_section.split(' ')
+	if len(splited_request) > 1: return splited_request[1]
+	return ''
+	
+
 def send_raw_data(host, port, request_data):
 	response = ''
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -53,18 +64,55 @@ def send_raw_data(host, port, request_data):
 	return response
 
 def get_method(sections):
+	if (2 > len(sections)): return None
 	return sections[1].split(' ')[0]
+
+def get_response_status(request_data):
+	return request_data.split(' ')[1]
+
+def get_response_status_message(request_data):
+	return request_data.split(' ')[2]
 
 def	 print_diff(response_act, response_exp):
 	for line in difflib.unified_diff(
 			response_act.split(CRLF), response_exp.split(CRLF), lineterm=''):
 		print(line)
 
-def assert_response(act, exp):
+def init_delete_file():
+	f = open(DELETE_FILE_PATH, 'x')
+	f.close()
+
+def assert_str(act, exp):
 	if (act != exp):
 		print(RED + '===== KO =====' + END)
 		print_diff(act, exp)
 	else: print(GREEN + '===== OK =====' + END)
+
+def assert_post(exp_status, sections):
+	status = int(exp_status)
+	if (status >= 400 and status < 600):
+		file_path = [os.path.join(UPLOAD_STORE_PATH, path) for path in os.listdir(UPLOAD_STORE_PATH)][0]
+		if (os.path.exists(file_path) == True): print(RED + '===== KO =====' + END)
+		else: print(GREEN + '===== OK =====' + END)
+
+	else:
+		file_path = [os.path.join(UPLOAD_STORE_PATH, path) for path in os.listdir(UPLOAD_STORE_PATH)][0]
+		act = get_body(sections)
+		exp = get_file_content(file_path)
+		assert_str(act, exp)
+	if os.path.exists(file_path): os.remove(file_path)
+
+def assert_delete(exp_status):
+	status = int(exp_status)
+	
+	if (status >= 400 and status < 600):
+		if (os.path.exists(DELETE_FILE_PATH) == False): print(GREEN + '===== OK =====' + END)
+		else: print(RED + '===== KO =====' + END)
+		if os.path.exists(DELETE_FILE_PATH): os.remove(DELETE_FILE_PATH)
+
+	else:
+		if (os.path.exists(DELETE_FILE_PATH) == True): print(RED + '===== KO =====' + END)
+		else: print(GREEN + '===== OK =====' + END)
 
 def	 main():
 	for testdir in [os.path.join(TESTDIR_PATH, path) for path in os.listdir(TESTDIR_PATH)]:
@@ -80,13 +128,16 @@ def	 main():
 			host, port = get_socket(sections)
 			request_data = get_request_data(sections)
 			method = get_method(sections)
+			if (method == 'DELETE'): init_delete_file()
 			response_act = send_raw_data(host, port, request_data)
 			response_exp = get_file_content(os.path.join(testdir, RESPONSE_FILEDIR_NAME, response_file_path))
+			exp_status = get_response_status(response_exp)
 			print()
 			print('File name: \"%s\"' % (response_file_path))
-			assert_response(response_act, response_exp)
-			# if (method == 'POST'):
-			# elif (method == 'DELETE'):
+			assert_str(response_act, response_exp)
+			if (method == 'POST'): assert_post(exp_status, sections)
+			elif (method == 'DELETE'): assert_delete(exp_status)
+
 		process.terminate()
 		process.wait()
 
