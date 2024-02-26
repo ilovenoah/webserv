@@ -115,6 +115,8 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 							rsiter->second.getEntireData()));
 						if (rsiter->second.isKeepAlive() == false) {
 							iter->second->setPhase(ClientSocket::CLOSE);
+							rsmap.erase(rsiter);
+							break;
 						}
 						rsmap.erase(rsiter);
 						rqiter->second.init();
