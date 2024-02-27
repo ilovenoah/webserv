@@ -141,7 +141,9 @@ def	 main():
 				request_data = get_request_data(sections)
 				method = get_method(sections)
 				if (method == 'DELETE'): init_delete_file()
-				response_act = send_raw_data(host, port, request_data)
+				post_data_path = None
+				if (method == 'POST'): post_data_path = get_post_data_path(sections)
+				response_act = send_raw_data(host, port, request_data, post_data_path)
 				response_exp = get_file_content(os.path.join(testdir, RESPONSE_FILEDIR_NAME, response_file_path))
 				exp_status = get_response_status(response_exp)
 				print()
