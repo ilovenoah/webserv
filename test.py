@@ -92,12 +92,12 @@ def assert_str(act, exp):
 def assert_post(exp_status, sections, testdir):
 	status = int(exp_status)
 	if (status >= 400 and status < 600):
-		paths = [os.path.join((testdir, UPLOAD_STORE_DIR_NAME, path)) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
+		paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
 		if (len(paths) != 0): print(RED + '===== KO =====' + END)
 		else: print(GREEN + '===== OK =====' + END)
 
 	else:
-		paths = [os.path.join((testdir, UPLOAD_STORE_DIR_NAME, path)) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
+		paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
 		act = get_body(sections)
 		exp = get_file_content(paths[0])
 		assert_str(act, exp)
