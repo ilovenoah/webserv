@@ -83,6 +83,13 @@ def init_delete_file():
 	f = open(DELETE_FILE_PATH, 'x')
 	f.close()
 
+def get_post_data_path(sections):
+	property_section = sections[0].split(CRLF)
+	if (len(property_section) != 3): return None
+	post_data_path_section = property_section[2].split(' ')
+	if (len(post_data_path_section) != 2): return None
+	return post_data_path_section[1]
+
 def assert_str(act, exp):
 	if (act != exp):
 		print(RED + '===== KO =====' + END)
