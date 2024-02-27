@@ -48,7 +48,7 @@ def get_request_data(sections):
 def get_body(sections):
 	if len(sections) > 1: request_section = sections[1]
 	else: request_section = ''
-	splited_request = request_section.split(' ')
+	splited_request = request_section.split(CRLF + CRLF)
 	if len(splited_request) > 1: return splited_request[1]
 	return ''
 	
