@@ -8,8 +8,8 @@ WEBSERV_FILE_NAME = 'webserv'
 WEBSERV_FILE_PATH = './' + WEBSERV_FILE_NAME
 TESTDIR_PATH = './tests'
 UPLOAD_STORE_DIR_NAME = 'upload'
-DELETE_DIR_PATH = TESTDIR_PATH + '/delete'
-DELETE_FILE_PATH = DELETE_DIR_PATH + '/test.html'
+DELETE_DIR_NAME = 'www/delete'
+DELETE_FILE_PATH = DELETE_DIR_NAME + '/test.html'
 CONFIG_FILEDIR_NAME = 'config'
 CONFIG_FILE_NAME = 'default.conf'
 REQUEST_FILEDIR_NAME = 'request_file'
@@ -79,8 +79,8 @@ def	 print_diff(response_act, response_exp):
 			response_act.split(CRLF), response_exp.split(CRLF), lineterm=''):
 		print(line)
 
-def init_delete_file():
-	f = open(DELETE_FILE_PATH, 'x')
+def init_delete_file(testdir):
+	f = open(os.path.join(testdir, DELETE_FILE_PATH), 'x')
 	f.close()
 
 def get_post_data_path(sections):
@@ -115,15 +115,14 @@ def assert_delete(exp_status, testdir):
 	status = int(exp_status)
 	
 	if (status >= 400 and status < 600):
-		paths = [os.path.join((testdir, DELETE_FILE_PATH, path)) for path in os.listdir(os.path.join(testdir, DELETE_FILE_PATH))]
-		if (len(paths) == 0): print(GREEN + '===== OK =====' + END)
+		path = os.path.join(testdir, DELETE_FILE_PATH)
+		if (os.path.exists(path) == True): print(GREEN + '===== OK =====' + END)
 		else: print(RED + '===== KO =====' + END)
 	else:
-		paths = [os.path.join((testdir, DELETE_FILE_PATH, path)) for path in os.listdir(os.path.join(testdir, DELETE_FILE_PATH))]
-		if (len(paths) != 0): print(RED + '===== KO =====' + END)
+		path = os.path.join(testdir, DELETE_FILE_PATH)
+		if (os.path.exists(path) == True): print(RED + '===== KO =====' + END)
 		else: print(GREEN + '===== OK =====' + END)
-	for path in paths:
-		if os.path.exists(path): os.remove(path)
+	if os.path.exists(path): os.remove(path)
 
 def	 main():
 	try:
@@ -140,7 +139,7 @@ def	 main():
 				host, port = get_socket(sections)
 				request_data = get_request_data(sections)
 				method = get_method(sections)
-				if (method == 'DELETE'): init_delete_file()
+				if (method == 'DELETE'): init_delete_file(testdir)
 				post_data_path = None
 				if (method == 'POST'): post_data_path = get_post_data_path(sections)
 				response_act = send_raw_data(host, port, request_data, post_data_path)
