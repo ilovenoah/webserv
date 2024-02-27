@@ -53,7 +53,7 @@ def get_body(sections):
 	return ''
 	
 
-def send_raw_data(host, port, request_data):
+def send_raw_data(host, port, request_data, post_data_path):
 	response = ''
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 		s.connect((host, port))
