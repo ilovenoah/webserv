@@ -1,6 +1,6 @@
 HTTP/1.1 200 Ok
 Connection: close
-Content-Length: 221
+Content-Length: 249
 
 <html>
 <head><title>Index of /</title></head>
@@ -8,6 +8,7 @@ Content-Length: 221
 <h1>Index of /</h1><hr><pre>
 <a href="../">../</a>
 <a href="error">error</a>
+<a href="delete">delete</a>
 <a href="content">content</a>
 <a href="index.html">index.html</a>
 </pre><hr></body>
