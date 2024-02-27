@@ -595,7 +595,7 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 		this->_location->isAllowedMethod(request.getMethod()) == false) {
 		this->_setErrorResponse("405", request.shouldKeepAlive());
 		return ClientSocket::SEND;
-	} else if (this->_server->isAllowedMethod(request.getMethod()) == false) {
+	} else if (this->_location == NULL && this->_server->isAllowedMethod(request.getMethod()) == false) {
 		this->_setErrorResponse("405", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
