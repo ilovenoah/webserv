@@ -114,7 +114,8 @@ std::string getRandomStr(const std::size_t len) {
 	return randomStr;
 }
 
-std::string replaceUri(std::string const &uri, std::string const &a, std::string const &b) {
+std::string replaceUri(std::string const &uri, std::string const &a,
+					   std::string const &b) {
 	std::string replacedUri(uri);
 
 	std::string::size_type pos;

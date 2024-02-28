@@ -27,7 +27,8 @@ class ClientSocket {
 	public:
 		std::stringstream buffer;
 		ClientSocket();
-		ClientSocket(const std::pair<int, sockaddr_in> &socketInfo, ServerSocket *serverSocket);
+		ClientSocket(const std::pair<int, sockaddr_in> &socketInfo,
+					 ServerSocket *serverSocket);
 		int getFd() const;
 		std::string const &getRemoteAddr() const;
 		void setRevents(short revents);

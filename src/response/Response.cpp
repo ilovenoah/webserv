@@ -101,9 +101,7 @@ bool Response::isKeepAlive() const {
 	return false;
 }
 
-bool Response::isCGIActive() const {
-	return this->_cgiHandler.isActive();
-}
+bool Response::isCGIActive() const { return this->_cgiHandler.isActive(); }
 
 void Response::printConfigInfo() const {
 	std::clog << "============== Routing result ==============" << std::endl;
@@ -240,15 +238,18 @@ bool Response::_setDirectoryListingPage(const std::string &path,
 			dp = readdir(dirp);
 			continue;
 		}
-		dirMap.insert(std::pair<std::string, std::string>(dp->d_name, aTagStart + dp->d_name + "\">" + dp->d_name + aTagEnd +
-					"\n"));
+		dirMap.insert(std::pair<std::string, std::string>(
+			dp->d_name,
+			aTagStart + dp->d_name + "\">" + dp->d_name + aTagEnd + "\n"));
 		dp = readdir(dirp);
 	}
 	if (closedir(dirp) == -1) {
 		utils::putSysError("opendir");
 		return false;
 	}
-	for (std::map<std::string, std::string>::const_iterator iter = dirMap.begin(); iter != dirMap.end(); ++iter) {
+	for (std::map<std::string, std::string>::const_iterator iter =
+			 dirMap.begin();
+		 iter != dirMap.end(); ++iter) {
 		data.append(iter->second);
 	}
 	data.append("</pre><hr></body>\n</html>");
@@ -304,8 +305,9 @@ ClientSocket::csphase Response::_setPostResponse(const Request &request) {
 			(size_t)this->_location->getClientMaxBodySize()) {
 		this->_setErrorResponse("413", false);
 		return ClientSocket::SEND;
-	} else if (this->_location == NULL && request.getBody().size() >
-			   (size_t)this->_server->getClientMaxBodySize()) {
+	} else if (this->_location == NULL &&
+			   request.getBody().size() >
+				   (size_t)this->_server->getClientMaxBodySize()) {
 		this->_setErrorResponse("413", false);
 		return ClientSocket::SEND;
 	}
@@ -357,7 +359,8 @@ bool Response::_shouldRedirect() const {
 	if (this->_location != NULL &&
 		this->_location->getReturn().empty() == false) {
 		return true;
-	} else if (this->_location == NULL && this->_server->getReturn().empty() == false) {
+	} else if (this->_location == NULL &&
+			   this->_server->getReturn().empty() == false) {
 		return true;
 	}
 	return false;
@@ -415,7 +418,8 @@ void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
 	std::string line;
 	std::streampos startPos = ss.tellg();
 
-	while (std::getline(ss, line) && line.compare("\r") != 0 && line.empty() == false) {
+	while (std::getline(ss, line) && line.compare("\r") != 0 &&
+		   line.empty() == false) {
 		line = utils::rmCR(line);
 		std::stringstream hss(line);
 		std::string key;
@@ -426,63 +430,74 @@ void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
 		this->_headers.insert(std::pair<std::string, std::string>(key, value));
 	}
 	std::streampos endPos = ss.tellg();
-	std::string::size_type readByte= endPos - startPos;
+	std::string::size_type readByte = endPos - startPos;
 	this->_cgiHandler.eraseRbuffer(readByte);
-	std::map<std::string, std::string>::const_iterator iter = this->_headers.find("Location");
+	std::map<std::string, std::string>::const_iterator iter =
+		this->_headers.find("Location");
 	if (iter != this->_headers.end() && iter->second.find("/") == 0) {
-		return ;
+		return;
 	}
-	if (iter != this->_headers.end() && this->_headers.find("Content-Type") == this->_headers.end()) {
-		this->_headers.insert(std::pair<std::string, std::string>("Connection", "close"));
-		return ;
+	if (iter != this->_headers.end() &&
+		this->_headers.find("Content-Type") == this->_headers.end()) {
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Connection", "close"));
+		return;
 	}
 	if (shouldKeepAlive == true) {
-		this->_headers.insert(std::pair<std::string, std::string>("Connection", "keep-alive"));
-		return ;
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Connection", "keep-alive"));
+		return;
 	}
-	this->_headers.insert(std::pair<std::string, std::string>("Connection", "close"));
+	this->_headers.insert(
+		std::pair<std::string, std::string>("Connection", "close"));
 }
 
 void Response::_setCGIResponseBody() {
 	std::string body(this->_cgiHandler.getRbuffer());
 	if (body.empty() != true) {
 		this->_body = body;
-		this->_headers.insert(std::pair<std::string, std::string>("Content-Length", utils::sizeTtoString(this->_body.size())));
+		this->_headers.insert(std::pair<std::string, std::string>(
+			"Content-Length", utils::sizeTtoString(this->_body.size())));
 	}
 }
 
 void Response::_setCGIResponseStatus() {
-	std::map<std::string, std::string>::const_iterator lciter = this->_headers.find("Location");
+	std::map<std::string, std::string>::const_iterator lciter =
+		this->_headers.find("Location");
 	if (lciter == this->_headers.end()) {
 		this->_status = "200";
 		this->_statusMsg = "Ok";
-		return ;
+		return;
 	}
 	if (lciter->second.find_first_of('/') == 0) {
-		return ;
+		return;
 	}
-	std::map<std::string, std::string>::const_iterator ctiter = this->_headers.find("Content-Type");
+	std::map<std::string, std::string>::const_iterator ctiter =
+		this->_headers.find("Content-Type");
 	if (ctiter == this->_headers.end()) {
 		this->_status = "302";
 		this->_statusMsg = "Found";
-		return ;
+		return;
 	}
 	this->_status = "200";
 	this->_statusMsg = "Ok";
 }
 
 bool Response::_isValidCGIResponse() const {
-	std::map<std::string, std::string>::const_iterator lriter = this->_headers.find("Location");
+	std::map<std::string, std::string>::const_iterator lriter =
+		this->_headers.find("Location");
 	if (lriter == this->_headers.end()) {
 		if (this->_headers.find("Content-Type") == this->_headers.end()) {
 			return false;
 		}
 		return true;
-	} else if (lriter != this->_headers.end() && lriter->second.find("/") == 0 && this->_headers.size() != 1) {
+	} else if (lriter != this->_headers.end() &&
+			   lriter->second.find("/") == 0 && this->_headers.size() != 1) {
 		return false;
 	}
 	if (this->_body.empty() == false) {
-		if (this->_headers.find("Content-Type") == this->_headers.end() || this->_headers.find("Status") == this->_headers.end()) {
+		if (this->_headers.find("Content-Type") == this->_headers.end() ||
+			this->_headers.find("Status") == this->_headers.end()) {
 			return false;
 		}
 	}
@@ -490,8 +505,10 @@ bool Response::_isValidCGIResponse() const {
 }
 
 bool Response::_isLocalRedirectResponse() {
-	std::map<std::string, std::string>::const_iterator lriter = this->_headers.find("Location");
-	 if (lriter == this->_headers.end() || this->_headers.size() != 1 || this->_body.empty() == false) {
+	std::map<std::string, std::string>::const_iterator lriter =
+		this->_headers.find("Location");
+	if (lriter == this->_headers.end() || this->_headers.size() != 1 ||
+		this->_body.empty() == false) {
 		return false;
 	}
 	if (lriter->second.find("/") == 0) {
@@ -500,10 +517,10 @@ bool Response::_isLocalRedirectResponse() {
 	return false;
 }
 
-ClientSocket::csphase Response::_setCGIResponse(Request &request ,bool shouldKeepAlive) {
+ClientSocket::csphase Response::_setCGIResponse(Request &request,
+												bool shouldKeepAlive) {
 	ClientSocket::csphase phase(ClientSocket::RECV);
-	switch (this->_cgiHandler.detectCGIPhase())
-	{
+	switch (this->_cgiHandler.detectCGIPhase()) {
 		case CGIHandler::CGIWRITE: {
 			this->_cgiHandler.setCGIPhase(this->_cgiHandler.tryWrite());
 			break;
@@ -520,13 +537,16 @@ ClientSocket::csphase Response::_setCGIResponse(Request &request ,bool shouldKee
 				this->_headers.clear();
 				this->_body.clear();
 				this->setEntireData("500", false);
-			}	
+			}
 			if (this->_isLocalRedirectResponse() == true) {
-				Result<std::string, bool> hostres = request.getHeaderValue("Host");
-				Result<std::string, bool> connres = request.getHeaderValue("Connection");
+				Result<std::string, bool> hostres =
+					request.getHeaderValue("Host");
+				Result<std::string, bool> connres =
+					request.getHeaderValue("Connection");
 				request.init();
 				request.setMethod("GET");
-				std::map<std::string, std::string>::const_iterator lriter = this->_headers.find("Location");
+				std::map<std::string, std::string>::const_iterator lriter =
+					this->_headers.find("Location");
 				std::string path(lriter->second);
 				request.setPath(path);
 				request.setHttpVersion("HTTP/1.1");
@@ -560,7 +580,8 @@ bool Response::_shouldAutoIndexed() const {
 	if (this->_location != NULL &&
 		this->_location->getAutoindex() == AConfigurable::TRUE) {
 		return true;
-	} else if (this->_location == NULL && this->_server->getAutoindex() == AConfigurable::TRUE) {
+	} else if (this->_location == NULL &&
+			   this->_server->getAutoindex() == AConfigurable::TRUE) {
 		return true;
 	}
 	return false;
@@ -575,17 +596,25 @@ bool Response::_shouldExecCGIScript() {
 		cgiExtenstions = this->_server->getCgiExtensions();
 	}
 	while (scriptPath.compare(".") != 0) {
-		for (std::map<std::string, std::string>::const_iterator iter = cgiExtenstions.begin(); iter != cgiExtenstions.end(); ++iter) {
+		for (std::map<std::string, std::string>::const_iterator iter =
+				 cgiExtenstions.begin();
+			 iter != cgiExtenstions.end(); ++iter) {
 			std::size_t posExtension(scriptPath.find_last_of('.'));
-			if (posExtension == std::string::npos) { return false; }
-			if (scriptPath.substr(posExtension).compare(iter->first) == 0 && utils::isAccess(scriptPath, X_OK) == true && utils::isAccess(iter->second, X_OK)) {
+			if (posExtension == std::string::npos) {
+				return false;
+			}
+			if (scriptPath.substr(posExtension).compare(iter->first) == 0 &&
+				utils::isAccess(scriptPath, X_OK) == true &&
+				utils::isAccess(iter->second, X_OK)) {
 				this->_cgiHandler.setRuntimePath(iter->second);
 				this->_cgiHandler.setScriptPath(scriptPath);
 				return true;
 			}
 		}
 		std::size_t posSlash(scriptPath.find_last_of('/'));
-		if (posSlash == std::string::npos) { return false; }
+		if (posSlash == std::string::npos) {
+			return false;
+		}
 		scriptPath.erase(posSlash);
 	}
 	return false;
@@ -606,7 +635,8 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 		this->_location->isAllowedMethod(request.getMethod()) == false) {
 		this->_setErrorResponse("405", request.shouldKeepAlive());
 		return ClientSocket::SEND;
-	} else if (this->_location == NULL && this->_server->isAllowedMethod(request.getMethod()) == false) {
+	} else if (this->_location == NULL &&
+			   this->_server->isAllowedMethod(request.getMethod()) == false) {
 		this->_setErrorResponse("405", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
@@ -614,7 +644,8 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 		return this->_setRedirectResponse(request, request.shouldKeepAlive());
 	}
 	if (this->_shouldExecCGIScript() == true) {
-		if (this->_cgiHandler.init(request, *(this->_server), this->_actPath) == false) {
+		if (this->_cgiHandler.init(request, *(this->_server), this->_actPath) ==
+			false) {
 			this->_setErrorResponse("500", false);
 			return ClientSocket::SEND;
 		}
@@ -660,14 +691,15 @@ static std::string const removeLocationFromString(std::string const &path,
 
 void Response::setActPath(std::string const &path) {
 	std::string root;
-	std::string	pathUnderRoot;
+	std::string pathUnderRoot;
 
 	if (this->_location == NULL) {
 		root = this->_server->getRoot();
 		pathUnderRoot = path;
 	} else if (this->_location->getAliasDirective().empty() == false) {
 		root = this->_location->getAliasDirective();
-		pathUnderRoot = removeLocationFromString(path, this->_location->getLocationPath());
+		pathUnderRoot =
+			removeLocationFromString(path, this->_location->getLocationPath());
 	} else if (this->_location->getRoot().empty() == true) {
 		root = this->_server->getRoot();
 		pathUnderRoot = path;
@@ -749,9 +781,7 @@ ClientSocket::csphase Response::_setEntireDataWithBody(
 	return ClientSocket::SEND;
 }
 
-CGIHandler &Response::getCgiHandler() {
-	return this->_cgiHandler;
-}
+CGIHandler &Response::getCgiHandler() { return this->_cgiHandler; }
 
 void Response::_clearResponse() {
 	this->_cgiHandler.clear();

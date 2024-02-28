@@ -1,8 +1,9 @@
 #include "CGIHandler.hpp"
 
-
-std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> CGIHandler::_initMetaVarSetterVec() {
-	std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> metaVarSetterVec;
+std::vector<bool (CGIHandler::*)(const Request &, const std::string &)>
+CGIHandler::_initMetaVarSetterVec() {
+	std::vector<bool (CGIHandler::*)(const Request &, const std::string &)>
+		metaVarSetterVec;
 
 	metaVarSetterVec.push_back(&CGIHandler::setAuthType);
 	metaVarSetterVec.push_back(&CGIHandler::setContentLength);
@@ -22,48 +23,61 @@ std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> CGIHandl
 	return metaVarSetterVec;
 }
 
-std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> CGIHandler::_metaVarSetterVec = _initMetaVarSetterVec();
+std::vector<bool (CGIHandler::*)(const Request &, const std::string &)>
+	CGIHandler::_metaVarSetterVec = _initMetaVarSetterVec();
 
 CGIHandler::CGIHandler()
-	: _server(NULL), _request(NULL), _isActive(false), _revents(0), _wpfd(0), _rpfd(0), _phase(CGIHandler::CGIWRITE) {}
+	: _server(NULL),
+	  _request(NULL),
+	  _isActive(false),
+	  _revents(0),
+	  _wpfd(0),
+	  _rpfd(0),
+	  _phase(CGIHandler::CGIWRITE) {}
 
 bool CGIHandler::_deleteEnv() {
-	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end();++iter) {
-		delete [] *iter;
+	for (std::vector<const char *>::iterator iter = this->_env.begin();
+		 iter != this->_env.end(); ++iter) {
+		delete[] * iter;
 	}
 	return true;
 }
 
 static char *strDupToCharPtr(std::string const &src) {
 	std::size_t i_str(0);
-	char *str = new(std::nothrow) char[src.length() + 1]();
+	char *str = new (std::nothrow) char[src.length() + 1]();
 	if (str == NULL) {
 		utils::putSysError("new");
 		return NULL;
 	}
 	std::memset(str, 0, src.length() + 1);
-	for (std::string::const_iterator iter = src.begin(); iter != src.end(); ++iter) {
+	for (std::string::const_iterator iter = src.begin(); iter != src.end();
+		 ++iter) {
 		str[i_str] = *iter;
 		i_str++;
 	}
 	return str;
 }
 
-bool CGIHandler::setAuthType(const Request &request, const std::string &actPath) {
+bool CGIHandler::setAuthType(const Request &request,
+							 const std::string &actPath) {
 	(void)actPath;
 	std::string authType;
 	Result<std::string, bool> res = request.getHeaderValue("Authorization");
 	if (res.isOK() == true) {
 		authType = res.getOk();
 	}
-	authType =  "AUTH_TYPE=" + authType;
+	authType = "AUTH_TYPE=" + authType;
 	char *authTypePtr = strDupToCharPtr(authType);
-	if (authTypePtr == NULL) { return false; }
+	if (authTypePtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(authTypePtr);
 	return true;
 }
 
-bool CGIHandler::setContentLength(const Request &request, const std::string &actPath) {
+bool CGIHandler::setContentLength(const Request &request,
+								  const std::string &actPath) {
 	(void)actPath;
 	std::string contenLength;
 	Result<std::string, bool> res = request.getHeaderValue("Content-Length");
@@ -72,12 +86,15 @@ bool CGIHandler::setContentLength(const Request &request, const std::string &act
 	}
 	contenLength = "CONTENT_LENGTH=" + contenLength;
 	char *contenLengthPtr = strDupToCharPtr(contenLength);
-	if (contenLengthPtr == NULL) { return false; }
+	if (contenLengthPtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(contenLengthPtr);
 	return true;
 }
 
-bool CGIHandler::setContentType(const Request &request, const std::string &actPath) {
+bool CGIHandler::setContentType(const Request &request,
+								const std::string &actPath) {
 	(void)actPath;
 	std::string contentType;
 	Result<std::string, bool> res = request.getHeaderValue("Content-Type");
@@ -86,23 +103,29 @@ bool CGIHandler::setContentType(const Request &request, const std::string &actPa
 	}
 	contentType = "CONTENT_TYPE=" + contentType;
 	char *contentTypePtr = strDupToCharPtr(contentType);
-	if (contentTypePtr == NULL) { return false; }
+	if (contentTypePtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(contentTypePtr);
 	return true;
 }
 
-bool CGIHandler::setGateInterface(const Request &request, const std::string &actPath) {
+bool CGIHandler::setGateInterface(const Request &request,
+								  const std::string &actPath) {
 	(void)actPath;
 	(void)request;
 
 	std::string gateWayInterface("GATEWAY_INTERFACE=CGI/1.1");
 	char *gateWayInterfacePtr = strDupToCharPtr(gateWayInterface);
-	if (gateWayInterfacePtr == NULL) { return false; }
+	if (gateWayInterfacePtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(gateWayInterfacePtr);
 	return true;
 }
 
-bool CGIHandler::setPathInfo(const Request &request, const std::string &actPath) {
+bool CGIHandler::setPathInfo(const Request &request,
+							 const std::string &actPath) {
 	(void)request;
 	std::string pathInfo;
 
@@ -116,7 +139,9 @@ bool CGIHandler::setPathInfo(const Request &request, const std::string &actPath)
 	}
 	pathInfo = "PATH_INFO=" + pathInfo;
 	char *pathInfoPtr = strDupToCharPtr(pathInfo);
-	if (pathInfoPtr == NULL) { return false; }
+	if (pathInfoPtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(pathInfoPtr);
 	return true;
 }
@@ -131,7 +156,8 @@ static std::string const removeLocationFromString(std::string const &path,
 	return result;
 }
 
-bool CGIHandler::setPathTranslated(const Request &request, const std::string &actPath) {
+bool CGIHandler::setPathTranslated(const Request &request,
+								   const std::string &actPath) {
 	(void)request;
 	std::string pathInfo;
 	std::string pathTranslated;
@@ -149,7 +175,9 @@ bool CGIHandler::setPathTranslated(const Request &request, const std::string &ac
 			Location *location = this->_server->getLocationPointer(pathInfo);
 			if (location != NULL) {
 				if (location->getAliasDirective().empty() == false) {
-					pathTranslated = location->getAliasDirective() + removeLocationFromString(pathInfo, location->getLocationPath());
+					pathTranslated = location->getAliasDirective() +
+									 removeLocationFromString(
+										 pathInfo, location->getLocationPath());
 				} else {
 					pathTranslated = location->getRoot() + pathInfo;
 				}
@@ -160,72 +188,92 @@ bool CGIHandler::setPathTranslated(const Request &request, const std::string &ac
 	}
 	pathTranslated = "PATH_TRANSLATED=" + pathTranslated;
 	char *pathTranslatedPtr = strDupToCharPtr(pathTranslated);
-	if (pathTranslatedPtr == NULL) { return false; }
+	if (pathTranslatedPtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(pathTranslatedPtr);
 	return true;
 }
 
-bool CGIHandler::setQueryString(const Request &request, const std::string &actPath) {
+bool CGIHandler::setQueryString(const Request &request,
+								const std::string &actPath) {
 	(void)actPath;
 	std::string query;
 	std::string originalPath(request.getPath());
-	
+
 	std::string::size_type posQuery = originalPath.find("?");
 	if (posQuery != std::string::npos) {
-		query = originalPath.substr(posQuery+1);
+		query = originalPath.substr(posQuery + 1);
 	}
 	query = "QUERY_STRING=" + query;
 	char *queryPtr = strDupToCharPtr(query);
-	if (queryPtr == NULL) { return false; }
+	if (queryPtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(queryPtr);
 	return true;
 }
 
-bool CGIHandler::setRemoteAddr(const Request &request, const std::string &actPath) {
+bool CGIHandler::setRemoteAddr(const Request &request,
+							   const std::string &actPath) {
 	(void)actPath;
 	std::string remoteAddr("REMOTE_ADDR=" + request.getRemoteAddr());
 	char *remoteAddrPtr = strDupToCharPtr(remoteAddr);
-	if (remoteAddrPtr == NULL) { return false; }
+	if (remoteAddrPtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(remoteAddrPtr);
 	return true;
 }
 
-bool CGIHandler::setRemoteHost(const Request &request, const std::string &actPath) {
+bool CGIHandler::setRemoteHost(const Request &request,
+							   const std::string &actPath) {
 	(void)actPath;
 	(void)request;
 	std::string remoteHost("REMOTE_HOST=");
 	char *remoteHostPtr = strDupToCharPtr(remoteHost);
-	if (remoteHostPtr == NULL) { return false; }
+	if (remoteHostPtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(remoteHostPtr);
 	return true;
 }
 
-bool CGIHandler::setRemoteMethod(const Request &request, const std::string &actPath) {
+bool CGIHandler::setRemoteMethod(const Request &request,
+								 const std::string &actPath) {
 	(void)actPath;
 	std::string remoteMethod("REQUEST_METHOD=" + request.getMethod());
 	char *remoteMethodPtr = strDupToCharPtr(remoteMethod);
-	if (remoteMethodPtr == NULL) { return false; }
+	if (remoteMethodPtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(remoteMethodPtr);
 	return true;
 }
 
-bool CGIHandler::setScriptName(const Request &request, const std::string &actPath){
+bool CGIHandler::setScriptName(const Request &request,
+							   const std::string &actPath) {
 	(void)actPath;
 	std::string scriptName(request.getPath());
 	std::string fileName;
 
 	std::string::size_type posSlash = this->_scriptPath.find_last_of('/');
-	if (posSlash == std::string::npos) { return false; }
+	if (posSlash == std::string::npos) {
+		return false;
+	}
 	fileName = this->_scriptPath.substr(posSlash);
 	scriptName.erase(scriptName.find(fileName) + fileName.length());
 	scriptName = "SCRIPT_NAME=" + scriptName;
 	char *scriptNamePtr = strDupToCharPtr(scriptName);
-	if (scriptNamePtr == NULL) { return false; }
+	if (scriptNamePtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(scriptNamePtr);
 	return true;
 }
 
-bool CGIHandler::setServerName(const Request &request, const std::string &actPath) {
+bool CGIHandler::setServerName(const Request &request,
+							   const std::string &actPath) {
 	(void)request;
 	(void)actPath;
 	std::stringstream ss(this->_server->getListen());
@@ -234,12 +282,15 @@ bool CGIHandler::setServerName(const Request &request, const std::string &actPat
 	std::getline(ss, ipAddr, ':');
 	std::string serverName("SERVER_NAME=" + ipAddr);
 	char *serverNamePtr = strDupToCharPtr(serverName);
-	if (serverNamePtr == NULL) { return false; }
+	if (serverNamePtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(serverNamePtr);
 	return true;
 }
 
-bool CGIHandler::setServerPort(const Request &request, const std::string &actPath) {
+bool CGIHandler::setServerPort(const Request &request,
+							   const std::string &actPath) {
 	(void)request;
 	(void)actPath;
 	std::stringstream ss(this->_server->getListen());
@@ -249,35 +300,47 @@ bool CGIHandler::setServerPort(const Request &request, const std::string &actPat
 	std::getline(ss, port);
 	std::string serverPort("SERVER_PORT=" + port);
 	char *serverPortPtr = strDupToCharPtr(serverPort);
-	if (serverPortPtr == NULL) { return false; }
+	if (serverPortPtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(serverPortPtr);
 	return true;
 }
 
-bool CGIHandler::setServerProtocol(const Request &request, const std::string &actPath) {
+bool CGIHandler::setServerProtocol(const Request &request,
+								   const std::string &actPath) {
 	(void)actPath;
 	std::string serverProtocol("SERVER_PROTOCOL=" + request.getHttpVersion());
 	char *serverProtocolPtr = strDupToCharPtr(serverProtocol);
-	if (serverProtocolPtr == NULL) { return false; }
+	if (serverProtocolPtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(serverProtocolPtr);
 	return true;
 }
 
-bool CGIHandler::setServerSoftware(const Request &request, const std::string &actPath) {
+bool CGIHandler::setServerSoftware(const Request &request,
+								   const std::string &actPath) {
 	(void)actPath;
 	(void)request;
 	std::string serverSoftware("SERVER_SOFTWARE=webserv/1.0");
 	char *serverSoftwarePtr = strDupToCharPtr(serverSoftware);
-	if (serverSoftwarePtr == NULL) { return false; }
+	if (serverSoftwarePtr == NULL) {
+		return false;
+	}
 	this->_env.push_back(serverSoftwarePtr);
 	return true;
 }
 
-bool CGIHandler::init(Request &request, Server &server, std::string const &actPath) {
+bool CGIHandler::init(Request &request, Server &server,
+					  std::string const &actPath) {
 	extern char **environ;
 	this->_request = &request;
 	this->_server = &server;
-	for (std::vector<bool (CGIHandler::*)(const Request &, const std::string &)>::iterator iter = this->_metaVarSetterVec.begin(); iter != this->_metaVarSetterVec.end(); ++iter) {
+	for (std::vector<bool (CGIHandler::*)(const Request &,
+										  const std::string &)>::iterator iter =
+			 this->_metaVarSetterVec.begin();
+		 iter != this->_metaVarSetterVec.end(); ++iter) {
 		if ((this->*(*iter))(request, actPath) == false) {
 			// error handling
 			this->_deleteEnv();
@@ -287,11 +350,11 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 	for (std::size_t i_env = 0; environ[i_env] != NULL; ++i_env) {
 		char *elem;
 		if (std::strncmp(environ[i_env], "PWD=", 4) == 0) {
-			
 			std::string pathScriptDir(this->_scriptPath);
-			std::string::size_type posLastSlash = pathScriptDir.find_last_of('/');
+			std::string::size_type posLastSlash =
+				pathScriptDir.find_last_of('/');
 			if (posLastSlash != std::string::npos) {
-				pathScriptDir.erase(posLastSlash+1);
+				pathScriptDir.erase(posLastSlash + 1);
 			}
 			elem = strDupToCharPtr("PWD=" + pathScriptDir);
 		} else {
@@ -305,7 +368,8 @@ bool CGIHandler::init(Request &request, Server &server, std::string const &actPa
 	}
 #if defined(_DEBUG)
 	std::clog << "============= CGI Metavariables =============" << std::endl;
-	for (std::vector<const char *>::iterator iter = this->_env.begin(); iter != this->_env.end(); ++iter) {
+	for (std::vector<const char *>::iterator iter = this->_env.begin();
+		 iter != this->_env.end(); ++iter) {
 		std::clog << *iter << std::endl;
 	}
 	std::clog << "=============================================" << std::endl;
@@ -321,7 +385,7 @@ bool CGIHandler::activate() {
 	std::string pathScriptDir(this->_scriptPath);
 	std::string::size_type posLastSlash(pathScriptDir.find_last_of('/'));
 	if (posLastSlash != std::string::npos) {
-		pathScriptDir.erase(posLastSlash+1);
+		pathScriptDir.erase(posLastSlash + 1);
 	}
 	const char *arg[3];
 	arg[0] = this->_runtimePath.c_str();
@@ -431,7 +495,8 @@ bool CGIHandler::activate() {
 			this->_deleteEnv();
 			exit(EXIT_FAILURE);
 		}
-		execve(this->_runtimePath.c_str(), (char *const *)arg, (char *const *)this->_env.data());
+		execve(this->_runtimePath.c_str(), (char *const *)arg,
+			   (char *const *)this->_env.data());
 		utils::putSysError("execve");
 		this->_deleteEnv();
 		exit(EXIT_FAILURE);
@@ -463,9 +528,7 @@ void CGIHandler::setScriptPath(const std::string &scriptPath) {
 	this->_scriptPath = scriptPath;
 }
 
-const std::string &CGIHandler::getRbuffer() const {
-	return this->_rbuffer;
-}
+const std::string &CGIHandler::getRbuffer() const { return this->_rbuffer; }
 
 void CGIHandler::eraseRbuffer(std::string::size_type readBytes) {
 	if (readBytes <= _rbuffer.size()) {
@@ -475,26 +538,19 @@ void CGIHandler::eraseRbuffer(std::string::size_type readBytes) {
 	}
 }
 
-bool CGIHandler::isActive() const {
-	return this->_isActive;
-}
+bool CGIHandler::isActive() const { return this->_isActive; }
 
-void CGIHandler::setRevents(const short revents) {
-	this->_revents = revents;
-}
+void CGIHandler::setRevents(const short revents) { this->_revents = revents; }
 
-short CGIHandler::getRevents() const {
-	return this->_revents;
-}
+short CGIHandler::getRevents() const { return this->_revents; }
 
 int CGIHandler::getMonitoredFd() const {
 	int monitoredFd(0);
-	switch (this->_phase)
-	{
+	switch (this->_phase) {
 		case CGIHandler::CGIWRITE:
 			monitoredFd = this->_wpfd;
 			break;
-		
+
 		case CGIHandler::CGIRECV:
 			monitoredFd = this->_rpfd;
 			break;
@@ -505,13 +561,9 @@ int CGIHandler::getMonitoredFd() const {
 	return monitoredFd;
 }
 
-pid_t CGIHandler::getPid() const {
-	return this->_pid;
-}
+pid_t CGIHandler::getPid() const { return this->_pid; }
 
-CGIHandler::cgiphase CGIHandler::getCGIPhase() const {
-	return this->_phase;
-}
+CGIHandler::cgiphase CGIHandler::getCGIPhase() const { return this->_phase; }
 
 void CGIHandler::setCGIPhase(CGIHandler::cgiphase phase) {
 	this->_phase = phase;
@@ -520,7 +572,7 @@ void CGIHandler::setCGIPhase(CGIHandler::cgiphase phase) {
 CGIHandler::cgiphase CGIHandler::detectCGIPhase() const {
 	CGIHandler::cgiphase phase(this->_phase);
 	pid_t waitpid = this->tryWait();
-	switch(phase) {
+	switch (phase) {
 		case CGIHandler::CGIWRITE: {
 			if (waitpid == -1) {
 				phase = CGIHandler::CGISET;
@@ -557,7 +609,8 @@ CGIHandler::cgiphase CGIHandler::tryWrite() {
 	if ((this->_revents & POLLOUT) != POLLOUT) {
 		return CGIHandler::CGIWRITE;
 	}
-	ssize_t wlen = write(this->_wpfd, this->_wbuffer.c_str(), this->_wbuffer.size());
+	ssize_t wlen =
+		write(this->_wpfd, this->_wbuffer.c_str(), this->_wbuffer.size());
 	if (wlen == -1) {
 		utils::putSysError("write");
 		return CGIHandler::CGISET;
@@ -609,5 +662,5 @@ void CGIHandler::clear() {
 	this->_rpfd = 0;
 	this->_rpfd = 0;
 	this->_pid = 0;
-	this->_phase = CGIHandler::CGIWRITE;	
+	this->_phase = CGIHandler::CGIWRITE;
 }

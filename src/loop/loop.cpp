@@ -1,8 +1,9 @@
 #include "loop.hpp"
 
 static bool setRevents(std::map<int, ServerSocket> &ssmap,
-					   std::map<int, ClientSocket *> &csmap, std::map<int, Response> &rsmap) {
-	std::map<int, Response*> chmap;
+					   std::map<int, ClientSocket *> &csmap,
+					   std::map<int, Response> &rsmap) {
+	std::map<int, Response *> chmap;
 	std::vector<struct pollfd> pollfds;
 	for (std::map<int, ServerSocket>::iterator iter = ssmap.begin();
 		 iter != ssmap.end(); ++iter) {
@@ -22,13 +23,15 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 	}
 	for (std::map<int, Response>::iterator iter = rsmap.begin();
 		 iter != rsmap.end(); ++iter) {
-		if (iter->second.isCGIActive() == false) { continue ; }
+		if (iter->second.isCGIActive() == false) {
+			continue;
+		}
 		struct pollfd pfd;
 		std::memset(&pfd, 0, sizeof(struct pollfd));
 		pfd.fd = iter->second.getCgiHandler().getMonitoredFd();
 		pfd.events = POLLIN | POLLOUT | POLLHUP;
 		pollfds.push_back(pfd);
-		chmap.insert(std::pair<int, Response*>(pfd.fd, &(iter->second)));
+		chmap.insert(std::pair<int, Response *>(pfd.fd, &(iter->second)));
 	}
 	if (poll(pollfds.data(), pollfds.size(), 0) == -1) {
 		utils::putSysError("poll");
@@ -86,7 +89,8 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			}
 			csmap.insert(
 				std::pair<int, ClientSocket *>(socketInfo.first, newCs));
-			rqmap.insert(std::pair<int, Request>(socketInfo.first, Request(newCs->getRemoteAddr())));
+			rqmap.insert(std::pair<int, Request>(
+				socketInfo.first, Request(newCs->getRemoteAddr())));
 		}
 		for (std::map<int, ClientSocket *>::iterator iter = csmap.begin();
 			 iter != csmap.end();) {
@@ -159,7 +163,10 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			 iter != rqmap.end(); ++iter) {
 			std::map<int, ClientSocket *>::iterator csiter =
 				csmap.find(iter->first);
-			if (csiter == csmap.end() || csiter->second->getPhase() == ClientSocket::CLOSE) { continue ; }
+			if (csiter == csmap.end() ||
+				csiter->second->getPhase() == ClientSocket::CLOSE) {
+				continue;
+			}
 			if ((utils::findCRLF(csiter->second->buffer) ||
 				 iter->second.getReqphase() == Request::RQBODY)) {
 				ClientSocket::csphase nextcsphase =
