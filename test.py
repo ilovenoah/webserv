@@ -28,6 +28,11 @@ def get_file_content(file_path):
 		raw_data = f.read().decode('ascii')
 	return raw_data
 
+def get_binary_file_content(file_path):
+	with open(file_path, 'rb') as f:
+		raw_data = f.read()
+	return raw_data
+
 def get_section_list(file_content):
 	sections = file_content.split(CRLF + CRLF + CRLF)
 	return sections
@@ -58,9 +63,13 @@ def get_body(sections):
 
 def send_raw_data(host, port, request_data, post_data_path):
 	response = ''
+	if (post_data_path is not None):
+		with open(post_data_path, 'rb') as f: request_data = request_data.encode() + f.read()
+	else: request_data = request_data.encode()
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 		s.connect((host, port))
-		s.sendall(request_data.encode())
+		# s.sendall(request_data.encode())
+		s.sendall(request_data)
 		while True:
 			part = s.recv(100000)
 			if not part: break
@@ -104,7 +113,7 @@ def assert_str(act, exp):
 		ok_count += 1
 		print(GREEN + '===== OK =====' + END)
 
-def assert_post(exp_status, sections, testdir):
+def assert_post(exp_status, sections, testdir, response_file_path):
 	global total_count
 	global ok_count
 	status = int(exp_status)
@@ -117,10 +126,18 @@ def assert_post(exp_status, sections, testdir):
 			print(GREEN + '===== OK =====' + END)
 
 	else:
-		paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
-		act = get_body(sections)
-		exp = get_file_content(paths[0])
-		assert_str(act, exp)
+		if (response_file_path == None):
+			paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
+			act = get_body(sections)
+			exp = get_file_content(paths[0])
+			assert_str(act, exp)
+		else:
+			paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
+			print(paths[0])
+			print(response_file_path)
+			act = get_binary_file_content(paths[0])
+			exp = get_binary_file_content(response_file_path)
+			assert_str(act, exp)
 	for file_path in paths:
 		if os.path.exists(file_path): os.remove(file_path)
 
@@ -170,7 +187,7 @@ def	 main():
 				print()
 				print('File name: \"%s\"' % (response_file_path))
 				assert_str(response_act, response_exp)
-				if (method == 'POST'): assert_post(exp_status, sections, testdir)
+				if (method == 'POST'): assert_post(exp_status, sections, testdir, post_data_path)
 				elif (method == 'DELETE'): assert_delete(exp_status, testdir)
 
 			process.terminate()
