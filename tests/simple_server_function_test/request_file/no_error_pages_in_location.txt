@@ -1,0 +1,7 @@
+host, localhost
+port, 8080
+
+
+GET /content/not_fount.html HTTP/1.1
+Host: test
+Connection: close
