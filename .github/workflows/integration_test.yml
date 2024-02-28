@@ -22,5 +22,8 @@ jobs:
       - name: Change privileges of CGI scripts
         run: chmod +x ./tests/simple_server_function_test/www/cgi-bin/*
 
+      - name: Create an empty directory for test
+        run: mkdir ./tests/simple_server_function_test/upload ./tests/simple_server_function_test/www/delete
+
       - name: Run test
         run: python3 test.py
