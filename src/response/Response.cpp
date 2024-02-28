@@ -668,7 +668,7 @@ void Response::setActPath(std::string const &path) {
 	if (posSlash != std::string::npos && posSlash + 1 == root.length()) {
 		root.erase(posSlash, 1);
 	}
-	this->_actPath = root + path;
+	this->_actPath = root + pathUnderRoot;
 }
 
 std::string const &Response::getActPath() const { return this->_actPath; }
