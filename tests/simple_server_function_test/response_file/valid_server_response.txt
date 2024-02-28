@@ -7,11 +7,11 @@ Content-Length: 311
 <body>
 <h1>Index of /</h1><hr><pre>
 <a href="../">../</a>
-<a href="error">error</a>
-<a href="delete">delete</a>
+<a href="cgi-bin">cgi-bin</a>
 <a href="content">content</a>
 <a href="content2">content2</a>
-<a href="cgi-bin">cgi-bin</a>
+<a href="delete">delete</a>
+<a href="error">error</a>
 <a href="index.html">index.html</a>
 </pre><hr></body>
 </html>
