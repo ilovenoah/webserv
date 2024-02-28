@@ -58,15 +58,16 @@ bool shouldIgnoreLine(std::string const &line) {
 	return false;
 }
 
-bool rmCR(std::string &line) {
-	if (line.empty() == true) {
-		return false;
+std::string rmCR(std::string const &line) {
+	std::string removedlline(line);
+	if (removedlline.empty() == true) {
+		return removedlline;
 	}
-	if (line[line.size() - 1] == '\r') {
-		line = line.substr(0, line.size() - 1);
-		return true;
+	if (removedlline[removedlline.size() - 1] == '\r') {
+		removedlline = removedlline.substr(0, removedlline.size() - 1);
+		return removedlline;
 	}
-	return false;
+	return removedlline;
 }
 
 bool isNumber(std::string const &str) {
@@ -112,4 +113,55 @@ std::string getRandomStr(const std::size_t len) {
 	}
 	return randomStr;
 }
+
+std::string replaceUri(std::string const &uri, std::string const &a, std::string const &b) {
+	std::string replacedUri(uri);
+
+	std::string::size_type pos;
+	while ((pos = replacedUri.find(a)) != std::string::npos) {
+		replacedUri.replace(pos, a.length(), b);
+	}
+	return replacedUri;
+}
+
+int x_close(int fd) {
+	if (close(fd) == -1) {
+		utils::putSysError("close");
+		return -1;
+	}
+	return 0;
+}
+
+int x_pipe(int pfd[2]) {
+	if (pipe(pfd) == -1) {
+		utils::putSysError("pipe");
+		return -1;
+	}
+	return 0;
+}
+
+int x_chdir(const char *dir) {
+	if (chdir(dir) == -1) {
+		utils::putSysError("chdir");
+		return -1;
+	}
+	return 0;
+}
+
+int x_dup2(int fd, int fd2) {
+	if (dup2(fd, fd2) == -1) {
+		utils::putSysError("dup2");
+		return -1;
+	}
+	return 0;
+}
+
+int x_kill(int pid, int sig) {
+	if (kill(pid, sig) == -1) {
+		utils::putSysError("kill");
+		return -1;
+	}
+	return 0;
+}
+
 }  // namespace utils

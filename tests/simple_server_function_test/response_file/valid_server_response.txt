@@ -1,0 +1,17 @@
+HTTP/1.1 200 Ok
+Connection: close
+Content-Length: 311
+
+<html>
+<head><title>Index of /</title></head>
+<body>
+<h1>Index of /</h1><hr><pre>
+<a href="../">../</a>
+<a href="cgi-bin">cgi-bin</a>
+<a href="content">content</a>
+<a href="content2">content2</a>
+<a href="delete">delete</a>
+<a href="error">error</a>
+<a href="index.html">index.html</a>
+</pre><hr></body>
+</html>

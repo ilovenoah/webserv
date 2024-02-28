@@ -22,7 +22,7 @@ std::map<std::string, bool (Location::*)(std::string const &, std::fstream &)>
 	Server::_setterMap = initSetterMap();
 
 Server::Server() : AConfigurable(), _ipAddr("0.0.0.0"), _port("8000") {
-	this->_root = "./";
+	this->_root = std::getenv("PWD");
 	this->_servernames.push_back("");
 }
 
@@ -110,7 +110,7 @@ bool Server::setLocations(std::string const &attribute, std::fstream &file) {
 		if (utils::shouldIgnoreLine(line)) {
 			continue;
 		}
-		utils::rmCR(line);
+		line = utils::rmCR(line);
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;

@@ -18,9 +18,11 @@
 #include "Result.hpp"
 #include "Server.hpp"
 #include "utils.hpp"
+#include "CGIHandler.hpp"
 
 class Response {
 	private:
+		CGIHandler _cgiHandler;
 		std::string _httpVersion;
 		std::string _status;
 		std::string _statusMsg;
@@ -44,10 +46,18 @@ class Response {
 		bool _shouldRedirect() const;
 		ClientSocket::csphase _setRedirectResponse(const Request &request,
 												   bool shouldKeepAlive);
+		ClientSocket::csphase _setCGIResponse(Request &request, bool shouldKeepAlive);
+		void _setCGIResponseHeader(const bool shouldKeepAlive);
+		void _setCGIResponseBody();
+		void _setCGIResponseStatus();
+		bool _isLocalRedirectResponse();
+		bool _isValidCGIResponse() const;
 		bool _shouldAutoIndexed() const;
+		bool _shouldExecCGIScript();
 		ClientSocket::csphase _setEntireDataWithBody(std::string const &status,
 													 std::string const &body,
 													 bool shouldKeepAlive);
+		void _clearResponse();
 
 	public:
 		Response();
@@ -60,8 +70,9 @@ class Response {
 		void setStatusMsg(std::string const &statusMsg);
 		void setBody(std::string const &body);
 		bool isKeepAlive() const;
+		bool isCGIActive() const;
 		void printConfigInfo() const;
-		ClientSocket::csphase load(Config &config, Request const &request);
+		ClientSocket::csphase load(Config &config, Request &request);
 		std::string getEntireData() const;
 		void setActPath(std::string const &path);
 		std::string const &getActPath() const;
@@ -70,5 +81,6 @@ class Response {
 													bool shouldKeepAlive);
 		ClientSocket::csphase setEntireData(std::string const &status,
 											bool shouldKeepAlive);
+		CGIHandler &getCgiHandler();
 };
 #endif

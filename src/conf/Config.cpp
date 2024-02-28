@@ -61,7 +61,7 @@ Server Config::_createServerInstance(std::fstream &file) {
 		if (utils::shouldIgnoreLine(line)) {
 			continue;
 		}
-		utils::rmCR(line);
+		line = utils::rmCR(line);
 		std::stringstream ss(line);
 		std::string elem;
 		ss >> elem;
@@ -101,7 +101,7 @@ bool Config::load() {
 			if (utils::shouldIgnoreLine(line)) {
 				continue;
 			}
-			utils::rmCR(line);
+			line = utils::rmCR(line);
 			std::stringstream ss(line);
 			std::string elem;
 			ss >> elem;
@@ -210,10 +210,10 @@ void Config::printServers() const {
 			std::clog << "Client max body size: "
 					  << iter2->second.getClientMaxBodySize() << std::endl;
 			std::clog << "Cgi extensions: ";
-			for (std::vector<std::string>::const_iterator iter3 =
+			for (std::map<std::string, std::string>::const_iterator iter3 =
 					 iter2->second.getCgiExtensions().begin();
 				 iter3 != iter2->second.getCgiExtensions().end(); ++iter3) {
-				std::clog << *iter3 << " ";
+				std::clog << iter3->first << "(" << iter3->second << ") ";
 			}
 			std::clog << std::endl;
 			std::clog << "Return: " << iter2->second.getReturn() << std::endl;
@@ -252,10 +252,10 @@ void Config::printServers() const {
 				std::clog << "	Client max body size: "
 						  << iter3->second.getClientMaxBodySize() << std::endl;
 				std::clog << "	Cgi extensions: ";
-				for (std::vector<std::string>::const_iterator iter4 =
+				for (std::map<std::string, std::string>::const_iterator iter4 =
 						 iter3->second.getCgiExtensions().begin();
 					 iter4 != iter3->second.getCgiExtensions().end(); ++iter4) {
-					std::clog << *iter4 << " ";
+					std::clog << iter4->first << "(" << iter4->second << ") ";
 				}
 				std::clog << std::endl;
 				std::clog << "	Return: " << iter3->second.getReturn()

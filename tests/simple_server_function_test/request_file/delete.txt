@@ -1,0 +1,7 @@
+host, localhost
+port, 8080
+
+
+DELETE /delete/test.html HTTP/1.1
+Host: test
+Connection: close

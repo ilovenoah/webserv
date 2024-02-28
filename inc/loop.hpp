@@ -11,6 +11,7 @@
 #include "ClientSocket.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
+#include "CGIHandler.hpp"
 #include "ServerSocket.hpp"
 #include "utils.hpp"
 

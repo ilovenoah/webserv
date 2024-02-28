@@ -1,0 +1,18 @@
+HTTP/1.1 200 Ok
+Connection: close
+Content-Length: 202
+Content-Type: text/html
+Status: 200 OK
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>CGI Environment Variables</title>
+</head>
+<body>
+<h1>Environment Variables</h1>
+<table border='1'>
+<tr><th>Variable</th><th>Value</th></tr>
+</table>
+</body>
+</html>

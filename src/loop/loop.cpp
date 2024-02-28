@@ -1,7 +1,8 @@
 #include "loop.hpp"
 
 static bool setRevents(std::map<int, ServerSocket> &ssmap,
-					   std::map<int, ClientSocket *> &csmap) {
+					   std::map<int, ClientSocket *> &csmap, std::map<int, Response> &rsmap) {
+	std::map<int, Response*> chmap;
 	std::vector<struct pollfd> pollfds;
 	for (std::map<int, ServerSocket>::iterator iter = ssmap.begin();
 		 iter != ssmap.end(); ++iter) {
@@ -19,6 +20,16 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 		pfd.events = POLLIN | POLLOUT | POLLHUP;
 		pollfds.push_back(pfd);
 	}
+	for (std::map<int, Response>::iterator iter = rsmap.begin();
+		 iter != rsmap.end(); ++iter) {
+		if (iter->second.isCGIActive() == false) { continue ; }
+		struct pollfd pfd;
+		std::memset(&pfd, 0, sizeof(struct pollfd));
+		pfd.fd = iter->second.getCgiHandler().getMonitoredFd();
+		pfd.events = POLLIN | POLLOUT | POLLHUP;
+		pollfds.push_back(pfd);
+		chmap.insert(std::pair<int, Response*>(pfd.fd, &(iter->second)));
+	}
 	if (poll(pollfds.data(), pollfds.size(), 0) == -1) {
 		utils::putSysError("poll");
 		return false;
@@ -29,6 +40,8 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 			ssmap[iter->fd].setRevents(iter->revents);
 		} else if (csmap.find(iter->fd) != csmap.end()) {
 			csmap[iter->fd]->setRevents(iter->revents);
+		} else if (chmap.find(iter->fd) != chmap.end()) {
+			chmap[iter->fd]->getCgiHandler().setRevents(iter->revents);
 		}
 	}
 	return true;
@@ -36,7 +49,7 @@ static bool setRevents(std::map<int, ServerSocket> &ssmap,
 
 static ClientSocket *createCsocket(std::pair<int, sockaddr_in> socketInfo,
 								   ServerSocket *serverSocket) {
-	return new (std::nothrow) ClientSocket(socketInfo.first, serverSocket);
+	return new (std::nothrow) ClientSocket(socketInfo, serverSocket);
 }
 
 static ClientSocket::csphase detectTimedOutClientSocket(ClientSocket &cs) {
@@ -55,7 +68,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 	std::map<int, Request> rqmap;
 	std::map<int, Response> rsmap;
 	while (true) {
-		if (setRevents(ssmap, csmap) == false) {
+		if (setRevents(ssmap, csmap, rsmap) == false) {
 			return false;
 		}
 		for (std::map<int, ServerSocket>::iterator iter = ssmap.begin();
@@ -73,7 +86,7 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			}
 			csmap.insert(
 				std::pair<int, ClientSocket *>(socketInfo.first, newCs));
-			rqmap.insert(std::pair<int, Request>(socketInfo.first, Request()));
+			rqmap.insert(std::pair<int, Request>(socketInfo.first, Request(newCs->getRemoteAddr())));
 		}
 		for (std::map<int, ClientSocket *>::iterator iter = csmap.begin();
 			 iter != csmap.end();) {
@@ -102,6 +115,9 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 							rsiter->second.getEntireData()));
 						if (rsiter->second.isKeepAlive() == false) {
 							iter->second->setPhase(ClientSocket::CLOSE);
+							rsmap.erase(rsiter);
+							++iter;
+							break;
 						}
 						rsmap.erase(rsiter);
 						rqiter->second.init();
@@ -143,8 +159,8 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			 iter != rqmap.end(); ++iter) {
 			std::map<int, ClientSocket *>::iterator csiter =
 				csmap.find(iter->first);
-			if (csiter != csmap.end() &&
-				(utils::findCRLF(csiter->second->buffer) ||
+			if (csiter == csmap.end() || csiter->second->getPhase() == ClientSocket::CLOSE) { continue ; }
+			if ((utils::findCRLF(csiter->second->buffer) ||
 				 iter->second.getReqphase() == Request::RQBODY)) {
 				ClientSocket::csphase nextcsphase =
 					iter->second.load(csiter->second->buffer);

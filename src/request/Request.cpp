@@ -1,6 +1,6 @@
 #include "Request.hpp"
 
-Request::Request() : _phase(Request::RQLINE), _chunksize(0) {}
+Request::Request(const std::string &remoteAddr) : _phase(Request::RQLINE), _chunksize(0), _remoteAddr(remoteAddr) {}
 
 void Request::init() {
 	this->_method.clear();
@@ -29,6 +29,10 @@ void Request::setHttpVersion(std::string const &httpVersion) {
 	this->_httpVersion = httpVersion;
 }
 
+void Request::addHeader(std::string const &key, std::string const &value) {
+	this->_header.insert(std::pair<std::string, std::string>(key, value));
+}
+
 std::string const &Request::getHttpVersion() const {
 	return this->_httpVersion;
 }
@@ -44,6 +48,8 @@ Result<std::string, bool> Request::getHeaderValue(
 }
 
 std::string const &Request::getBody() const { return this->_body; }
+
+std::string const &Request::getRemoteAddr() const { return this->_remoteAddr; }
 
 bool Request::shouldKeepAlive() const {
 	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator
@@ -79,6 +85,45 @@ bool Request::isValidRequest() const {
 	return true;
 }
 
+static std::string decodeURIComponentUTF8(std::string const &encoded) {
+	std::ostringstream oss;
+	for (size_t i = 0; i < encoded.size(); ++i) {
+		if (encoded[i] == '%' && i + 2 < encoded.size()) {
+			std::string hexStr = encoded.substr(i + 1, 2);
+			std::istringstream hexStream(hexStr);
+			int hexValue;
+			hexStream >> std::hex >> hexValue;
+			oss << (char)(hexValue);
+			i += 2;
+		} else if (encoded[i] == '+') {
+			oss << ' ';
+		} else {
+			oss << encoded[i];
+		}
+	}
+	return oss.str();
+}
+
+bool Request::_setHttpRequestLine(std::string const &line) {
+	size_t firstSpace = line.find(" ");
+	if (firstSpace == std::string::npos) {
+		return false;
+	}
+	size_t secondSpace = line.find(" ", firstSpace + 1);
+	if (secondSpace == std::string::npos) {
+		return false;
+	}
+	size_t thirdSpace = line.find(" ", secondSpace + 1);
+	if (thirdSpace != std::string::npos) {
+		return false;
+	}
+	this->_method = line.substr(0, firstSpace);
+	this->_path = line.substr(firstSpace + 1, secondSpace - firstSpace - 1);
+	this->_httpVersion = line.substr(secondSpace + 1);
+
+	return true;
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()) {
@@ -90,11 +135,14 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
-			utils::rmCR(line);
-			std::stringstream ss(line);
-			ss >> this->_method;
-			ss >> this->_path;
-			ss >> this->_httpVersion;
+			line = decodeURIComponentUTF8(line);
+			line = utils::replaceUri(line, "//", "/");
+			line = utils::rmCR(line);
+			if (this->_setHttpRequestLine(line) == false) {
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			if (this->isValidRequest() == false) {
 				this->_phase = Request::RQFIN;
 				nextcsphase = ClientSocket::RECV;
@@ -112,11 +160,10 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
-			utils::rmCR(line);
+			line = utils::rmCR(line);
 			std::stringstream ss(line);
 			std::string key;
 			std::string value;
-			std::stringstream spaceremover;
 			std::getline(ss, key, ':');
 			ss >> std::ws;
 			if (ss.peek() == EOF) {
