@@ -300,7 +300,7 @@ ClientSocket::csphase Response::_setPostResponse(const Request &request) {
 			(size_t)this->_location->getClientMaxBodySize()) {
 		this->_setErrorResponse("413", false);
 		return ClientSocket::SEND;
-	} else if (request.getBody().size() >
+	} else if (this->_location == NULL && request.getBody().size() >
 			   (size_t)this->_server->getClientMaxBodySize()) {
 		this->_setErrorResponse("413", false);
 		return ClientSocket::SEND;
@@ -353,7 +353,7 @@ bool Response::_shouldRedirect() const {
 	if (this->_location != NULL &&
 		this->_location->getReturn().empty() == false) {
 		return true;
-	} else if (this->_server->getReturn().empty() == false) {
+	} else if (this->_location == NULL && this->_server->getReturn().empty() == false) {
 		return true;
 	}
 	return false;
@@ -549,7 +549,7 @@ bool Response::_shouldAutoIndexed() const {
 	if (this->_location != NULL &&
 		this->_location->getAutoindex() == AConfigurable::TRUE) {
 		return true;
-	} else if (this->_server->getAutoindex() == AConfigurable::TRUE) {
+	} else if (this->_location == NULL && this->_server->getAutoindex() == AConfigurable::TRUE) {
 		return true;
 	}
 	return false;
