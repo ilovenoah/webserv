@@ -425,7 +425,7 @@ void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
 	std::string::size_type readByte= endPos - startPos;
 	this->_cgiHandler.eraseRbuffer(readByte);
 	std::map<std::string, std::string>::const_iterator iter = this->_headers.find("Location");
-	if (iter->second.find("/") == 0) {
+	if (iter != this->_headers.end() && iter->second.find("/") == 0) {
 		return ;
 	}
 	if (iter != this->_headers.end() && this->_headers.find("Content-Type") == this->_headers.end()) {
