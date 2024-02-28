@@ -224,6 +224,7 @@ bool Response::_setDirectoryListingPage(const std::string &path,
 	std::string aTagStart("<a href=\"");
 	std::string aTagEnd("</a>");
 	std::string data(title + head);
+	std::map<std::string, std::string> dirMap;
 
 	DIR *dirp;
 	struct dirent *dp;
@@ -239,13 +240,16 @@ bool Response::_setDirectoryListingPage(const std::string &path,
 			dp = readdir(dirp);
 			continue;
 		}
-		data.append(aTagStart + dp->d_name + "\">" + dp->d_name + aTagEnd +
-					"\n");
+		dirMap.insert(std::pair<std::string, std::string>(dp->d_name, aTagStart + dp->d_name + "\">" + dp->d_name + aTagEnd +
+					"\n"));
 		dp = readdir(dirp);
 	}
 	if (closedir(dirp) == -1) {
 		utils::putSysError("opendir");
 		return false;
+	}
+	for (std::map<std::string, std::string>::const_iterator iter = dirMap.begin(); iter != dirMap.end(); ++iter) {
+		data.append(iter->second);
 	}
 	data.append("</pre><hr></body>\n</html>");
 	this->_setEntireDataWithBody("200", data, shouldKeepAlive);
