@@ -1,19 +1,18 @@
 #ifndef CGIHANDLER_HPP
 #define CGIHANDLER_HPP
 
-#include <string>
-#include <map>
-
 #include <sys/types.h>
 #include <sys/wait.h>
+
+#include <map>
+#include <string>
 
 #include "Request.hpp"
 #include "Server.hpp"
 
 #define CGI_BUFFERSIZE 4096
 
-class CGIHandler
-{
+class CGIHandler {
 	public:
 		enum cgiphase { CGIWRITE, CGIRECV, CGISET, CGIFIN };
 
@@ -31,8 +30,12 @@ class CGIHandler
 		int _rpfd;
 		pid_t _pid;
 		cgiphase _phase;
-		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _initMetaVarSetterVec();
-		static std::vector<bool (CGIHandler::*)(const Request &, const std::string &)> _metaVarSetterVec;
+		static std::vector<bool (CGIHandler::*)(const Request &,
+												const std::string &)>
+		_initMetaVarSetterVec();
+		static std::vector<bool (CGIHandler::*)(const Request &,
+												const std::string &)>
+			_metaVarSetterVec;
 		bool _deleteEnv();
 
 	public:
@@ -49,20 +52,26 @@ class CGIHandler
 		int getMonitoredFd() const;
 		pid_t getPid() const;
 		bool setAuthType(const Request &request, const std::string &actPath);
-		bool setContentLength(const Request &request, const std::string &actPath);
+		bool setContentLength(const Request &request,
+							  const std::string &actPath);
 		bool setContentType(const Request &request, const std::string &actPath);
-		bool setGateInterface(const Request &request, const std::string &actPath);
+		bool setGateInterface(const Request &request,
+							  const std::string &actPath);
 		bool setPathInfo(const Request &request, const std::string &actPath);
-		bool setPathTranslated(const Request &request, const std::string &actPath);
+		bool setPathTranslated(const Request &request,
+							   const std::string &actPath);
 		bool setQueryString(const Request &request, const std::string &actPath);
 		bool setRemoteAddr(const Request &request, const std::string &actPath);
 		bool setRemoteHost(const Request &request, const std::string &actPath);
-		bool setRemoteMethod(const Request &request, const std::string &actPath);
+		bool setRemoteMethod(const Request &request,
+							 const std::string &actPath);
 		bool setScriptName(const Request &request, const std::string &actPath);
 		bool setServerName(const Request &request, const std::string &actPath);
 		bool setServerPort(const Request &request, const std::string &actPath);
-		bool setServerProtocol(const Request &request, const std::string &actPath);
-		bool setServerSoftware(const Request &request, const std::string &actPath);
+		bool setServerProtocol(const Request &request,
+							   const std::string &actPath);
+		bool setServerSoftware(const Request &request,
+							   const std::string &actPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 		void setCGIPhase(CGIHandler::cgiphase phase);
 		CGIHandler::cgiphase detectCGIPhase() const;

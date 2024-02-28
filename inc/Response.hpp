@@ -11,6 +11,7 @@
 #include <map>
 #include <string>
 
+#include "CGIHandler.hpp"
 #include "ClientSocket.hpp"
 #include "Config.hpp"
 #include "Location.hpp"
@@ -18,7 +19,6 @@
 #include "Result.hpp"
 #include "Server.hpp"
 #include "utils.hpp"
-#include "CGIHandler.hpp"
 
 class Response {
 	private:
@@ -46,7 +46,8 @@ class Response {
 		bool _shouldRedirect() const;
 		ClientSocket::csphase _setRedirectResponse(const Request &request,
 												   bool shouldKeepAlive);
-		ClientSocket::csphase _setCGIResponse(Request &request, bool shouldKeepAlive);
+		ClientSocket::csphase _setCGIResponse(Request &request,
+											  bool shouldKeepAlive);
 		void _setCGIResponseHeader(const bool shouldKeepAlive);
 		void _setCGIResponseBody();
 		void _setCGIResponseStatus();

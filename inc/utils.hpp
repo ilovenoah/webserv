@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <sys/errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -15,7 +16,6 @@
 #include "Ok.hpp"
 #include "Result.hpp"
 #include "env.hpp"
-#include <signal.h>
 
 namespace utils {
 void putSysError(char const *msg);
@@ -29,7 +29,8 @@ bool isNumber(std::string const &str);
 Result<bool, std::string> isDirectory(std::string const &path);
 bool isAccess(std::string const &path, int mode);
 std::string getRandomStr(const std::size_t len);
-std::string replaceUri(std::string const &uri, std::string const &a, std::string const &b);
+std::string replaceUri(std::string const &uri, std::string const &a,
+					   std::string const &b);
 int x_close(int fd);
 int x_pipe(int pfd[2]);
 int x_chdir(const char *dir);

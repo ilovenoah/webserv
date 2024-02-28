@@ -1,6 +1,7 @@
 #include "Request.hpp"
 
-Request::Request(const std::string &remoteAddr) : _phase(Request::RQLINE), _chunksize(0), _remoteAddr(remoteAddr) {}
+Request::Request(const std::string &remoteAddr)
+	: _phase(Request::RQLINE), _chunksize(0), _remoteAddr(remoteAddr) {}
 
 void Request::init() {
 	this->_method.clear();
