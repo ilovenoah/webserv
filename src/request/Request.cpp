@@ -104,6 +104,26 @@ static std::string decodeURIComponentUTF8(std::string const &encoded) {
 	return oss.str();
 }
 
+bool Request::_setHttpRequestLine(std::string const &line) {
+	size_t firstSpace = line.find(" ");
+	if (firstSpace == std::string::npos) {
+		return false;
+	}
+	size_t secondSpace = line.find(" ", firstSpace + 1);
+	if (secondSpace == std::string::npos) {
+		return false;
+	}
+	size_t thirdSpace = line.find(" ", secondSpace + 1);
+	if (thirdSpace != std::string::npos) {
+		return false;
+	}
+	this->_method = line.substr(0, firstSpace);
+	this->_path = line.substr(firstSpace + 1, secondSpace - firstSpace - 1);
+	this->_httpVersion = line.substr(secondSpace + 1);
+
+	return true;
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()) {
@@ -118,10 +138,11 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			line = decodeURIComponentUTF8(line);
 			line = utils::replaceUri(line, "//", "/");
 			line = utils::rmCR(line);
-			std::stringstream ss(line);
-			ss >> this->_method;
-			ss >> this->_path;
-			ss >> this->_httpVersion;
+			if (this->_setHttpRequestLine(line) == false) {
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			if (this->isValidRequest() == false) {
 				this->_phase = Request::RQFIN;
 				nextcsphase = ClientSocket::RECV;

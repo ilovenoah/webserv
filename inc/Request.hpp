@@ -26,6 +26,7 @@ class Request {
 		Request::rqphase _phase;
 		std::size_t _chunksize;
 		std::string _remoteAddr;
+		bool _setHttpRequestLine(std::string const &line);
 
 	public:
 		Request(const std::string &remoteAddr);
