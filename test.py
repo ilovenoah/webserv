@@ -20,6 +20,9 @@ RED = '\033[31m'
 GREEN = '\033[32m'
 END = '\033[0m'
 
+total_count = 0
+ok_count = 0
+
 def get_file_content(file_path):
 	with open(file_path, 'rb') as f:
 		raw_data = f.read().decode('ascii')
@@ -91,17 +94,27 @@ def get_post_data_path(sections):
 	return post_data_path_section[1]
 
 def assert_str(act, exp):
+	global total_count
+	global ok_count
+	total_count += 1
 	if (act != exp):
 		print(RED + '===== KO =====' + END)
 		print_diff(act, exp)
-	else: print(GREEN + '===== OK =====' + END)
+	else:
+		ok_count += 1
+		print(GREEN + '===== OK =====' + END)
 
 def assert_post(exp_status, sections, testdir):
+	global total_count
+	global ok_count
 	status = int(exp_status)
 	if (status >= 400 and status < 600):
+		total_count += 1
 		paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
 		if (len(paths) != 0): print(RED + '===== KO =====' + END)
-		else: print(GREEN + '===== OK =====' + END)
+		else:
+			ok_count += 1
+			print(GREEN + '===== OK =====' + END)
 
 	else:
 		paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
@@ -112,16 +125,25 @@ def assert_post(exp_status, sections, testdir):
 		if os.path.exists(file_path): os.remove(file_path)
 
 def assert_delete(exp_status, testdir):
+	global total_count
+	global ok_count
+	total_count += 1
 	status = int(exp_status)
 	
 	if (status >= 400 and status < 600):
 		path = os.path.join(testdir, DELETE_FILE_PATH)
-		if (os.path.exists(path) == True): print(GREEN + '===== OK =====' + END)
+		if (os.path.exists(path) == True):
+			ok_count += 1
+			print(GREEN + '===== OK =====' + END)
 		else: print(RED + '===== KO =====' + END)
 	else:
 		path = os.path.join(testdir, DELETE_FILE_PATH)
-		if (os.path.exists(path) == True): print(RED + '===== KO =====' + END)
-		else: print(GREEN + '===== OK =====' + END)
+		if (os.path.exists(path) == True):
+			ok_count += 1
+			print(RED + '===== KO =====' + END)
+		else:
+			ok_count += 1
+			print(GREEN + '===== OK =====' + END)
 	if os.path.exists(path): os.remove(path)
 
 def	 main():
@@ -157,6 +179,8 @@ def	 main():
 		print(e)
 		process.terminate()
 		process.wait()
+	fail_count = total_count - ok_count
+	print(f"\nSuccess: {ok_count}/{total_count}, Fail: {fail_count}/{total_count}")
 
 if __name__ == '__main__':
 	main()
