@@ -196,7 +196,7 @@ def	 main():
 		print(e)
 		process.terminate()
 		process.wait()
-		fail_count = 1
+		exit(1)
 	fail_count = total_count - ok_count
 	print(f"\nSuccess: {ok_count}/{total_count}, Fail: {fail_count}/{total_count}")
 	if fail_count > 0: exit(1)
