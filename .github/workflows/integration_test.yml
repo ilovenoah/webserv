@@ -19,5 +19,8 @@ jobs:
       - name: Build
         run: make
 
+      - name: Change privileges of CGI scripts
+        run: chmod +x ./tests/simple_server_function_test/www/cgi-bin/*
+
       - name: Run test
         run: python3 test.py
