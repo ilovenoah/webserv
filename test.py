@@ -151,8 +151,8 @@ def	 main():
 		for testdir in [os.path.join(TESTDIR_PATH, path) for path in os.listdir(TESTDIR_PATH)]:
 			config_path = os.path.join(testdir, CONFIG_FILEDIR_NAME, CONFIG_FILE_NAME)
 			process = subprocess.Popen([WEBSERV_FILE_PATH, config_path],
-										stdout=subprocess.PIPE,
-										stderr=subprocess.PIPE)
+										stdout=subprocess.DEVNULL,
+										stderr=subprocess.DEVNULL)
 			print('webserv is starting up...')
 			time.sleep(1)
 			for request_file_path, response_file_path in zip(os.listdir(os.path.join(testdir, REQUEST_FILEDIR_NAME)),
