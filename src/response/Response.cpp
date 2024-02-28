@@ -468,11 +468,14 @@ void Response::_setCGIResponseStatus() {
 }
 
 bool Response::_isValidCGIResponse() const {
-	if (this->_headers.find("Location") == this->_headers.end()) {
+	std::map<std::string, std::string>::const_iterator lriter = this->_headers.find("Location");
+	if (lriter == this->_headers.end()) {
 		if (this->_headers.find("Content-Type") == this->_headers.end()) {
 			return false;
 		}
 		return true;
+	} else if (lriter != this->_headers.end() && lriter->second.find("/") == 0 && this->_headers.size() != 1) {
+		return false;
 	}
 	if (this->_body.empty() == false) {
 		if (this->_headers.find("Content-Type") == this->_headers.end() || this->_headers.find("Status") == this->_headers.end()) {
