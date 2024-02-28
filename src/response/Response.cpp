@@ -518,15 +518,19 @@ ClientSocket::csphase Response::_setCGIResponse(Request &request ,bool shouldKee
 				this->setEntireData("500", false);
 			}	
 			if (this->_isLocalRedirectResponse() == true) {
-				Result<std::string, bool> res = request.getHeaderValue("Host");
+				Result<std::string, bool> hostres = request.getHeaderValue("Host");
+				Result<std::string, bool> connres = request.getHeaderValue("Connection");
 				request.init();
 				request.setMethod("GET");
 				std::map<std::string, std::string>::const_iterator lriter = this->_headers.find("Location");
 				std::string path(lriter->second);
 				request.setPath(path);
 				request.setHttpVersion("HTTP/1.1");
-				if (res.isOK() == true) {
-					request.addHeader("Host", res.getOk());
+				if (hostres.isOK() == true) {
+					request.addHeader("Host", hostres.getOk());
+				}
+				if (connres.isOK() == true) {
+					request.addHeader("Connection", connres.getOk());
 				}
 				request.setReqphase(Request::RQFIN);
 				Server *serverPointer(this->_server);
