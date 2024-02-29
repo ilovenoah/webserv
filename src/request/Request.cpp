@@ -189,6 +189,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				break;
 			}
 			std::getline(ss, value);
+			value = utils::trim(value, " \t");
 			this->_header.insert(
 				std::pair<std::string, std::string>(key, value));
 			this->_phase = Request::RQHEADER;
