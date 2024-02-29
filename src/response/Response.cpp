@@ -258,6 +258,17 @@ bool Response::_setDirectoryListingPage(const std::string &path,
 }
 
 ClientSocket::csphase Response::_setGetResponse(const Request &request) {
+	if (this->_location != NULL &&
+		request.getBody().size() >
+			(size_t)this->_location->getClientMaxBodySize()) {
+		this->_setErrorResponse("413", false);
+		return ClientSocket::SEND;
+	} else if (this->_location == NULL &&
+			   request.getBody().size() >
+				   (size_t)this->_server->getClientMaxBodySize()) {
+		this->_setErrorResponse("413", false);
+		return ClientSocket::SEND;
+	}
 	if (utils::isAccess(this->_actPath, R_OK) == false) {
 		this->_setErrorResponse("404", request.shouldKeepAlive());
 		return ClientSocket::SEND;
@@ -339,6 +350,17 @@ ClientSocket::csphase Response::_setPostResponse(const Request &request) {
 
 ClientSocket::csphase Response::_setDeleteResponse(const Request &request) {
 	(void)request;
+	if (this->_location != NULL &&
+		request.getBody().size() >
+			(size_t)this->_location->getClientMaxBodySize()) {
+		this->_setErrorResponse("413", false);
+		return ClientSocket::SEND;
+	} else if (this->_location == NULL &&
+			   request.getBody().size() >
+				   (size_t)this->_server->getClientMaxBodySize()) {
+		this->_setErrorResponse("413", false);
+		return ClientSocket::SEND;
+	}
 	if (utils::isAccess(this->_actPath, F_OK) == false) {
 		this->_setErrorResponse("404", request.shouldKeepAlive());
 		return ClientSocket::SEND;
