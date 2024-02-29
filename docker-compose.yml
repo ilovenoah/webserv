@@ -1,0 +1,15 @@
+version: '3'
+services:
+  webserv:
+    container_name: webserv
+    build: .
+    tty: true    
+    volumes:
+      - .:/code
+    ports:
+      - '9090:9090'
+    network_mode: "host"
+
+networks:
+  webserv_net:
+    driver: bridge
