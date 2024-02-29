@@ -190,8 +190,14 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			}
 			std::getline(ss, value);
 			value = utils::trim(value, " \t");
-			this->_header.insert(
-				std::pair<std::string, std::string>(key, value));
+			std::map<std::string, std::string>::iterator iter = this->_header.find(key);
+			if (iter != this->_header.end()) {
+				iter->second.append(", " + value);
+				std::clog << "iter->second: " << iter->second << std::endl;
+			} else {
+				this->_header.insert(
+					std::pair<std::string, std::string>(key, value));
+			}
 			this->_phase = Request::RQHEADER;
 			nextcsphase = ClientSocket::RECV;
 			break;
