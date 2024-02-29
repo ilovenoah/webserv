@@ -172,8 +172,8 @@ def	 main():
 										stderr=subprocess.DEVNULL)
 			print('webserv is starting up...')
 			time.sleep(1)
-			for request_file_path, response_file_path in zip(os.listdir(os.path.join(testdir, REQUEST_FILEDIR_NAME)),
-													os.listdir(os.path.join(testdir, RESPONSE_FILEDIR_NAME))):
+			for request_file_path, response_file_path in zip(sorted(os.listdir(os.path.join(testdir, REQUEST_FILEDIR_NAME))),
+													sorted(os.listdir(os.path.join(testdir, RESPONSE_FILEDIR_NAME)))):
 				sections = get_section_list(get_file_content(os.path.join(testdir, REQUEST_FILEDIR_NAME, request_file_path)))
 				host, port = get_socket(sections)
 				request_data = get_request_data(sections)
