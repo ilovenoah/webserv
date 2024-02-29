@@ -68,12 +68,17 @@ def send_raw_data(host, port, request_data, post_data_path):
 	else: request_data = request_data.encode()
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 		s.connect((host, port))
-		# s.sendall(request_data.encode())
 		s.sendall(request_data)
+		deadline = time.time() + 3.0
 		while True:
-			part = s.recv(100000)
-			if not part: break
-			response += part.decode()
+			if time.time() >= deadline: break
+			s.settimeout(deadline - time.time())
+			try:
+				s.setblocking(False)
+				part = s.recv(100000)
+				if not part: break
+				response += part.decode()
+			except: pass
 	return response
 
 def get_method(sections):
@@ -133,8 +138,6 @@ def assert_post(exp_status, sections, testdir, response_file_path):
 			assert_str(act, exp)
 		else:
 			paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
-			print(paths[0])
-			print(response_file_path)
 			act = get_binary_file_content(paths[0])
 			exp = get_binary_file_content(response_file_path)
 			assert_str(act, exp)
