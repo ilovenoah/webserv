@@ -32,6 +32,15 @@ std::string sizeTtoString(std::size_t num) {
 	return str;
 }
 
+bool findLF(std::stringstream &stream) {
+	std::streampos originalPos = stream.tellg();
+	std::string remainingContent((std::istreambuf_iterator<char>(stream)),
+								 std::istreambuf_iterator<char>());
+	bool foundCRLF = remainingContent.find("\n") != std::string::npos;
+	stream.seekg(originalPos);
+	return foundCRLF;
+}
+
 bool findCRLF(std::stringstream &stream) {
 	std::streampos originalPos = stream.tellg();
 	std::string remainingContent((std::istreambuf_iterator<char>(stream)),
