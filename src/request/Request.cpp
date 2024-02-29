@@ -136,6 +136,11 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
+			if (line.find('\r') == std::string::npos) {
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			line = decodeURIComponentUTF8(line);
 			line = utils::replaceUri(line, "//", "/");
 			line = utils::rmCR(line);
@@ -158,6 +163,14 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			std::getline(buffer, line);
 			if (line.compare("\r") == 0) {
 				this->_phase = Request::RQBODY;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
+			if (line.find('\r') == std::string::npos) {
+				this->_method.clear();
+				this->_path.clear();
+				this->_httpVersion.clear();
+				this->_phase = Request::RQFIN;
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
