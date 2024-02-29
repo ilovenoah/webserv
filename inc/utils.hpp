@@ -37,6 +37,7 @@ int x_pipe(int pfd[2]);
 int x_chdir(const char *dir);
 int x_dup2(int fd, int fd2);
 int x_kill(int pid, int sig);
+std::string trim(std::string const &line, std::string const &str);
 }  // namespace utils
 
 #endif

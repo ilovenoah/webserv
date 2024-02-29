@@ -174,4 +174,14 @@ int x_kill(int pid, int sig) {
 	return 0;
 }
 
+std::string trim(std::string const &line, std::string const &str) {
+	std::string::size_type posbig = line.find_first_not_of(str);
+	if (posbig == std::string::npos) {
+		return line;
+	}
+	std::string::size_type posend = line.find_last_not_of(str);
+	std::string::size_type strRange = posend - posbig + 1;
+	return line.substr(posbig, strRange);
+}
+
 }  // namespace utils
