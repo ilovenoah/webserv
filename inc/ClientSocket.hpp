@@ -34,7 +34,7 @@ class ClientSocket {
 		void setRevents(short revents);
 		short getRevents() const;
 		ClientSocket::csphase tryRecv();
-		ClientSocket::csphase trySend(std::string const &msg);
+		ssize_t trySend(std::string const &msg);
 		void close();
 		void setPhase(ClientSocket::csphase const phase);
 		ClientSocket::csphase getPhase() const;
