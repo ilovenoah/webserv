@@ -167,9 +167,9 @@ void Response::_setErrorResponse(const std::string &status,
 		fs.seekg(0, fs.end);
 		length = fs.tellg();
 		fs.seekg(0, fs.beg);
-		char buf[length];
-		std::memset(buf, 0, length);
-		fs.readsome(buf, length);
+		char buf[length + 1];
+		std::memset(buf, 0, length + 1);
+		fs.read(buf, length);
 		if (fs.fail()) {
 			this->_setEntireDataWithBody(
 				this->_statusMap.find("500")->first,
@@ -756,9 +756,9 @@ ClientSocket::csphase Response::setEntireDataWithFile(std::string const &path,
 	fs.seekg(0, fs.end);
 	length = fs.tellg();
 	fs.seekg(0, fs.beg);
-	char buf[length];
-	std::memset(buf, 0, length);
-	fs.readsome(buf, length);
+	char buf[length + 1];
+	std::memset(buf, 0, length + 1);
+	fs.read(buf, length);
 	if (fs.fail()) {
 		this->_setErrorResponse("500", shouldKeepAlive);
 		return ClientSocket::SEND;
