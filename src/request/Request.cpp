@@ -194,7 +194,6 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				this->_header.find(key);
 			if (iter != this->_header.end()) {
 				iter->second.append(", " + value);
-				std::clog << "iter->second: " << iter->second << std::endl;
 			} else {
 				this->_header.insert(
 					std::pair<std::string, std::string>(key, value));
@@ -206,7 +205,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 		case Request::RQBODY: {
 			std::size_t contentLength(0);
 			std::size_t expReadsize;
-			std::size_t actReadsize;
+			std::streamsize actReadsize;
 			std::map<std::string, std::string>::iterator cliter =
 				this->_header.find("Content-Length");
 			std::map<std::string, std::string>::iterator teiter =
@@ -247,8 +246,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				}
 				char buf[this->_chunksize + 1];
 				std::memset(buf, 0, this->_chunksize + 1);
-				buffer.read(buf, this->_chunksize);
-				actReadsize = std::strlen(buf);
+				actReadsize = buffer.readsome(buf, this->_chunksize);
 				if (buffer.fail()) {
 					utils::putSysError("read");
 					nextcsphase = ClientSocket::RECV;
@@ -277,8 +275,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			}
 			char buf[expReadsize + 1];
 			std::memset(buf, 0, expReadsize + 1);
-			buffer.read(buf, expReadsize);
-			actReadsize = std::strlen(buf);
+			actReadsize = buffer.readsome(buf, expReadsize);
 			if (buffer.fail()) {
 				utils::putSysError("read");
 				nextcsphase = ClientSocket::RECV;
