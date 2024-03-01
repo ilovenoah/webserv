@@ -133,7 +133,8 @@ static bool isValidFieldName(std::string const &field) {
 		return false;
 	}
 	for (size_t i = 1; i < field.size(); ++i) {
-		if (std::isalpha(field[i]) == false && std::isdigit(field[i]) == false && field[i] != '-') {
+		if (std::isalpha(field[i]) == false &&
+			std::isdigit(field[i]) == false && field[i] != '-') {
 			return false;
 		}
 	}
