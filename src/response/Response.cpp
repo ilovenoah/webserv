@@ -5,7 +5,7 @@ Response::_initstatusMap() {
 	std::map<std::string, std::pair<std::string, std::string> > statusMap;
 	statusMap.insert(
 		std::pair<std::string, std::pair<std::string, std::string> >(
-			"200", std::pair<std::string, std::string>("Ok", "Ok")));
+			"200", std::pair<std::string, std::string>("OK", "OK")));
 	statusMap.insert(
 		std::pair<std::string, std::pair<std::string, std::string> >(
 			"201", std::pair<std::string, std::string>("Created", "Created")));
