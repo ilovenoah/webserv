@@ -63,7 +63,7 @@ ClientSocket::csphase ClientSocket::tryRecv() {
 	return ClientSocket::RECV;
 }
 
-ClientSocket::csphase ClientSocket::trySend(std::string const &msg) {
+ssize_t ClientSocket::trySend(std::string const &msg) {
 #if defined(_LINUX)
 	const int flags = MSG_DONTWAIT | MSG_NOSIGNAL;
 #elif defined(_DARWIN)
@@ -73,14 +73,17 @@ ClientSocket::csphase ClientSocket::trySend(std::string const &msg) {
 #endif
 
 	if ((this->_revents & POLLOUT) != POLLOUT) {
-		return this->_phase;
+		return 0;
 	}
-
-	if (send(this->_fd, msg.c_str(), msg.size(), flags) == -1) {
+	ssize_t bytes(0);
+	bytes = send(this->_fd, msg.c_str(), msg.size(), flags);
+	if (bytes == -1) {
 		utils::putSysError("send");
-		return ClientSocket::CLOSE;
+		this->_phase = ClientSocket::CLOSE;
+		return -1;
 	}
-	return ClientSocket::RECV;
+	this->_phase = ClientSocket::RECV;
+	return bytes;
 }
 
 void ClientSocket::close() {

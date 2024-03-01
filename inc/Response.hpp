@@ -6,7 +6,6 @@
 #define HTTP_VERSION "HTTP/1.1"
 #define STATUS_OK "200"
 #define STATUS_CREATED "201"
-// #define STATUS_CREATED "201"
 
 #include <map>
 #include <string>
@@ -28,6 +27,7 @@ class Response {
 		std::string _statusMsg;
 		std::map<std::string, std::string, CaseInsensitiveCompare> _headers;
 		std::string _body;
+		std::string _rawData;
 		Server *_server;
 		Location *_location;
 		std::string _actPath;
@@ -70,11 +70,14 @@ class Response {
 		void setStatus(std::string const &status);
 		void setStatusMsg(std::string const &statusMsg);
 		void setBody(std::string const &body);
+		void setRawData();
+		void eraseRawData(ssize_t bytes);
 		bool isKeepAlive() const;
 		bool isCGIActive() const;
 		void printConfigInfo() const;
 		ClientSocket::csphase load(Config &config, Request &request);
 		std::string getEntireData() const;
+		const std::string &getRawData() const;
 		void setActPath(std::string const &path);
 		std::string const &getActPath() const;
 		ClientSocket::csphase setEntireDataWithFile(std::string const &path,
