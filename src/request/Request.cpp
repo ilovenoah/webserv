@@ -245,11 +245,12 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 						break;
 					}
 				}
-				char buf[this->_chunksize];
-				std::memset(buf, 0, this->_chunksize);
-				actReadsize = buffer.readsome(buf, this->_chunksize);
+				char buf[this->_chunksize + 1];
+				std::memset(buf, 0, this->_chunksize + 1);
+				buffer.read(buf, this->_chunksize);
+				actReadsize = std::strlen(buf);
 				if (buffer.fail()) {
-					utils::putSysError("readsome");
+					utils::putSysError("read");
 					nextcsphase = ClientSocket::RECV;
 					this->_phase = Request::RQFIN;
 					break;
@@ -274,11 +275,12 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				this->_phase = Request::RQFIN;
 				break;
 			}
-			char buf[expReadsize];
-			std::memset(buf, 0, expReadsize);
-			actReadsize = buffer.readsome(buf, expReadsize);
+			char buf[expReadsize + 1];
+			std::memset(buf, 0, expReadsize + 1);
+			buffer.read(buf, expReadsize);
+			actReadsize = std::strlen(buf);
 			if (buffer.fail()) {
-				utils::putSysError("readsome");
+				utils::putSysError("read");
 				nextcsphase = ClientSocket::RECV;
 				this->_phase = Request::RQFIN;
 				break;
