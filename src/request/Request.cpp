@@ -125,6 +125,21 @@ bool Request::_setHttpRequestLine(std::string const &line) {
 	return true;
 }
 
+static bool isValidFieldName(std::string const &field) {
+	if (field.empty()) {
+		return false;
+	}
+	if (!std::isalpha(field[0])) {
+		return false;
+	}
+	for (size_t i = 1; i < field.size(); ++i) {
+		if (std::isalpha(field[i]) == false && std::isdigit(field[i]) == false && field[i] != '-') {
+			return false;
+		}
+	}
+	return true;
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()) {
@@ -180,7 +195,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			std::string value;
 			std::getline(ss, key, ':');
 			ss >> std::ws;
-			if (ss.peek() == EOF) {
+			if (ss.peek() == EOF || isValidFieldName(key) == false) {
 				this->_method.clear();
 				this->_path.clear();
 				this->_httpVersion.clear();
