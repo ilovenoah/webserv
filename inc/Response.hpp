@@ -22,6 +22,7 @@
 class Response {
 	public:
 		enum accessResult { EXECUTABLE, UNAUTHORIZED, NOTMATCHED };
+
 	private:
 		CGIHandler _cgiHandler;
 		std::string _httpVersion;

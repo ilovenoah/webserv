@@ -644,7 +644,8 @@ Response::accessResult Response::_shouldExecCGIScript() {
 
 				if (isRuntimeExecutable == false && isRuntimeExisted == true) {
 					return Response::UNAUTHORIZED;
-				} else if (isRuntimeExecutable == false && isRuntimeExisted == false) {
+				} else if (isRuntimeExecutable == false &&
+						   isRuntimeExisted == false) {
 					return Response::NOTMATCHED;
 				}
 
@@ -705,8 +706,8 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 		}
 		return ClientSocket::RECV;
 	} else if (accessResultCGI == Response::UNAUTHORIZED) {
-			this->_setErrorResponse("403", false);
-			return ClientSocket::SEND;
+		this->_setErrorResponse("403", false);
+		return ClientSocket::SEND;
 	}
 	if (request.getMethod() == "GET") {
 		return this->_setGetResponse(request);
