@@ -576,7 +576,9 @@ void CGIHandler::setCGIPhase(CGIHandler::cgiphase phase) {
 
 CGIHandler::cgiphase CGIHandler::detectCGIPhase() const {
 	CGIHandler::cgiphase phase(this->_phase);
-	if (std::difftime(std::time(NULL), this->_startSec) > CGIHandler::_timeoutSec || this->_exeTime > CGI_LIMIT_LOCAL_REDIR) {
+	if (std::difftime(std::time(NULL), this->_startSec) >
+			CGIHandler::_timeoutSec ||
+		this->_exeTime > CGI_LIMIT_LOCAL_REDIR) {
 		utils::x_kill(this->_pid, SIGTERM);
 		if (this->_phase == CGIHandler::CGIFIN) {
 			return CGIHandler::CGIFIN;
