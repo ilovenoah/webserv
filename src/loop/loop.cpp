@@ -176,7 +176,6 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 				csiter->second->getPhase() == ClientSocket::CLOSE) {
 				continue;
 			}
-			// if ((utils::findCRLF(csiter->second->buffer) ||
 			if ((utils::findLF(csiter->second->buffer) ||
 				 iter->second.getReqphase() == Request::RQBODY)) {
 				ClientSocket::csphase nextcsphase =
@@ -216,6 +215,9 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 			std::map<int, Request>::iterator rqiter = rqmap.find(iter->first);
 			std::map<int, ClientSocket *>::iterator csiter =
 				csmap.find(iter->first);
+			if (csiter->second->getPhase() == ClientSocket::SEND) {
+				continue;
+			}
 			if (rqiter != rqmap.end() && csiter != csmap.end()) {
 				ClientSocket::csphase nextcsphase =
 					iter->second.load(config, rqiter->second);
