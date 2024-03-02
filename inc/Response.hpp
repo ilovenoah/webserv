@@ -20,6 +20,8 @@
 #include "utils.hpp"
 
 class Response {
+	public:
+		enum accessResult { EXECUTABLE, UNAUTHORIZED, NOTMATCHED };
 	private:
 		CGIHandler _cgiHandler;
 		std::string _httpVersion;
@@ -54,7 +56,7 @@ class Response {
 		bool _isLocalRedirectResponse();
 		bool _isValidCGIResponse() const;
 		bool _shouldAutoIndexed() const;
-		bool _shouldExecCGIScript();
+		Response::accessResult _shouldExecCGIScript();
 		ClientSocket::csphase _setEntireDataWithBody(std::string const &status,
 													 std::string const &body,
 													 bool shouldKeepAlive);

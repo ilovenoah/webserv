@@ -622,7 +622,7 @@ bool Response::_shouldAutoIndexed() const {
 	return false;
 }
 
-bool Response::_shouldExecCGIScript() {
+Response::accessResult Response::_shouldExecCGIScript() {
 	std::string scriptPath(this->_actPath);
 	std::map<std::string, std::string> cgiExtenstions;
 	if (this->_location != NULL) {
@@ -636,23 +636,37 @@ bool Response::_shouldExecCGIScript() {
 			 iter != cgiExtenstions.end(); ++iter) {
 			std::size_t posExtension(scriptPath.find_last_of('.'));
 			if (posExtension == std::string::npos) {
-				return false;
+				return Response::NOTMATCHED;
 			}
-			if (scriptPath.substr(posExtension).compare(iter->first) == 0 &&
-				utils::isAccess(scriptPath, X_OK) == true &&
-				utils::isAccess(iter->second, X_OK)) {
-				this->_cgiHandler.setRuntimePath(iter->second);
-				this->_cgiHandler.setScriptPath(scriptPath);
-				return true;
+			if (scriptPath.substr(posExtension).compare(iter->first) == 0) {
+				bool isRuntimeExecutable = utils::isAccess(iter->second, X_OK);
+				bool isRuntimeExisted = utils::isAccess(iter->second, F_OK);
+
+				if (isRuntimeExecutable == false && isRuntimeExisted == true) {
+					return Response::UNAUTHORIZED;
+				} else if (isRuntimeExecutable == false && isRuntimeExisted == false) {
+					return Response::NOTMATCHED;
+				}
+
+				bool isExecutable = utils::isAccess(scriptPath, X_OK);
+				bool isExisted = utils::isAccess(scriptPath, F_OK);
+
+				if (isExecutable == false && isExisted == true) {
+					return Response::UNAUTHORIZED;
+				} else if (isExecutable == true && isExisted == true) {
+					this->_cgiHandler.setRuntimePath(iter->second);
+					this->_cgiHandler.setScriptPath(scriptPath);
+					return Response::EXECUTABLE;
+				}
 			}
 		}
 		std::size_t posSlash(scriptPath.find_last_of('/'));
 		if (posSlash == std::string::npos) {
-			return false;
+			return Response::NOTMATCHED;
 		}
 		scriptPath.erase(posSlash);
 	}
-	return false;
+	return Response::NOTMATCHED;
 }
 
 ClientSocket::csphase Response::load(Config &config, Request &request) {
@@ -678,7 +692,8 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 	if (this->_shouldRedirect() == true) {
 		return this->_setRedirectResponse(request, request.shouldKeepAlive());
 	}
-	if (this->_shouldExecCGIScript() == true) {
+	Response::accessResult accessResultCGI = this->_shouldExecCGIScript();
+	if (accessResultCGI == Response::EXECUTABLE) {
 		if (this->_cgiHandler.init(request, *(this->_server), this->_actPath) ==
 			false) {
 			this->_setErrorResponse("500", false);
@@ -689,6 +704,9 @@ ClientSocket::csphase Response::load(Config &config, Request &request) {
 			return ClientSocket::SEND;
 		}
 		return ClientSocket::RECV;
+	} else if (accessResultCGI == Response::UNAUTHORIZED) {
+			this->_setErrorResponse("403", false);
+			return ClientSocket::SEND;
 	}
 	if (request.getMethod() == "GET") {
 		return this->_setGetResponse(request);
