@@ -458,6 +458,10 @@ void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
 		std::getline(hss, key, ':');
 		hss >> std::ws;
 		std::getline(hss, value);
+		if (this->_headers.size() > RESPONSE_HEADER_LIMITATION - 1) {
+			this->_headers.clear();
+			return ;
+		}
 		this->_headers.insert(std::pair<std::string, std::string>(key, value));
 	}
 	std::streampos endPos = ss.tellg();

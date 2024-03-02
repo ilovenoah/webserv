@@ -6,6 +6,7 @@
 #define HTTP_VERSION "HTTP/1.1"
 #define STATUS_OK "200"
 #define STATUS_CREATED "201"
+#define RESPONSE_HEADER_LIMITATION 1000
 
 #include <map>
 #include <string>
