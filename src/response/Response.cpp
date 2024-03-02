@@ -89,13 +89,9 @@ void Response::setStatusMsg(std::string const &statusMsg) {
 
 void Response::setBody(std::string const &body) { this->_body = body; }
 
-void Response::setRawData() {
-	this->_rawData = this->getEntireData();
-}
+void Response::setRawData() { this->_rawData = this->getEntireData(); }
 
-void Response::eraseRawData(ssize_t bytes) {
-	this->_rawData.erase(0, bytes);
-}
+void Response::eraseRawData(ssize_t bytes) { this->_rawData.erase(0, bytes); }
 
 bool Response::isKeepAlive() const {
 	std::map<std::string, std::string>::const_iterator iter =
@@ -420,7 +416,7 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request,
 		}
 		this->setRawData();
 		return ClientSocket::SEND;
-	} 
+	}
 	if (request.getMethod().compare("GET") == 0) {
 		this->_status = "302";
 		this->_statusMsg = this->_statusMap.find("302")->second.first;
@@ -433,8 +429,8 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request,
 	this->_headers.insert(std::pair<std::string, std::string>(
 		"Location", this->_server->getReturn()));
 	if (shouldKeepAlive == true) {
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Connection", "keep-alive"));
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Connection", "keep-alive"));
 	} else {
 		this->_headers.insert(
 			std::pair<std::string, std::string>("Connection", "close"));
@@ -710,9 +706,7 @@ std::string Response::getEntireData() const {
 	return entireData;
 }
 
-const std::string &Response::getRawData() const {
-	return this->_rawData;
-}
+const std::string &Response::getRawData() const { return this->_rawData; }
 
 static std::string const removeLocationFromString(std::string const &path,
 												  std::string const &location) {

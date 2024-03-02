@@ -115,11 +115,13 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 						std::clog << "========================================"
 								  << std::endl;
 #endif
-						ssize_t bytes = iter->second->trySend(rsiter->second.getRawData());
+						ssize_t bytes =
+							iter->second->trySend(rsiter->second.getRawData());
 						if (bytes > 0) {
 							rsiter->second.eraseRawData(bytes);
 						}
-						if (bytes >= 0 && rsiter->second.getRawData().size() > 0) {
+						if (bytes >= 0 &&
+							rsiter->second.getRawData().size() > 0) {
 							iter->second->setPhase(ClientSocket::SEND);
 						}
 						if (iter->second->getPhase() != ClientSocket::SEND) {
