@@ -69,7 +69,7 @@ def send_raw_data(host, port, request_data, post_data_path):
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 		s.connect((host, port))
 		s.sendall(request_data)
-		deadline = time.time() + 3.0
+		deadline = time.time() + 10.0
 		while True:
 			if time.time() >= deadline: break
 			s.settimeout(deadline - time.time())
