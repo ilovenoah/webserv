@@ -37,6 +37,8 @@ class CGIHandler {
 												const std::string &)>
 			_metaVarSetterVec;
 		bool _deleteEnv();
+		static const std::size_t _timeoutSec;
+		const std::time_t _startSec;
 
 	public:
 		CGIHandler();

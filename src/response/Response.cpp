@@ -595,10 +595,10 @@ ClientSocket::csphase Response::_setCGIResponse(Request &request,
 				break;
 			}
 			this->_cgiHandler.setCGIPhase(CGIHandler::CGIFIN);
+			this->setRawData();
 			break;
 		}
 		case CGIHandler::CGIFIN: {
-			this->setRawData();
 			phase = ClientSocket::SEND;
 			break;
 		}
