@@ -1,0 +1,7 @@
+host, localhost
+port, 8080
+
+
+GET /cgi-bin/invalid_local_redirect_infinity_pair_a.py HTTP/1.1
+Host: test
+Connection: close
