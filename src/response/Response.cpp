@@ -562,7 +562,10 @@ ClientSocket::csphase Response::_setCGIResponse(Request &request,
 			if (this->_isValidCGIResponse() == false) {
 				this->_headers.clear();
 				this->_body.clear();
-				this->setEntireData("500", false);
+				this->_setErrorResponse("500", false);
+				this->_cgiHandler.setCGIPhase(CGIHandler::CGIFIN);
+				this->setRawData();
+				break;
 			}
 			if (this->_isLocalRedirectResponse() == true) {
 				Result<std::string, bool> hostres =
