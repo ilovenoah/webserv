@@ -114,7 +114,7 @@ bool ClientSocket::isOverBytesSize(const std::stringstream::pos_type bytes) {
 	std::stringstream::pos_type posStart = this->buffer.tellg();
 	this->buffer.seekg(0, std::ios::end);
 	std::stringstream::pos_type posEnd = this->buffer.tellg();
-	if (posEnd - posEnd > bytes) {
+	if (posEnd - posStart > bytes) {
 		this->buffer.seekg(posStart);
 		return true;
 	}

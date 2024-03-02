@@ -147,6 +147,14 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 		case Request::RQLINE: {
 			std::string line;
 			std::getline(buffer, line);
+			if (line.size() > 1000) {
+				this->_method.clear();
+				this->_path.clear();
+				this->_httpVersion.clear();
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			if (line.compare("\r") == 0) {
 				this->_phase = Request::RQLINE;
 				nextcsphase = ClientSocket::RECV;
@@ -177,6 +185,14 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 		case Request::RQHEADER: {
 			std::string line;
 			std::getline(buffer, line);
+			if (line.size() > 1000) {
+				this->_method.clear();
+				this->_path.clear();
+				this->_httpVersion.clear();
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			if (line.compare("\r") == 0) {
 				this->_phase = Request::RQBODY;
 				nextcsphase = ClientSocket::RECV;
