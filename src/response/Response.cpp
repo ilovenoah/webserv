@@ -458,6 +458,10 @@ void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
 		std::getline(hss, key, ':');
 		hss >> std::ws;
 		std::getline(hss, value);
+		if (this->_headers.size() > RESPONSE_HEADER_LIMITATION - 1) {
+			this->_headers.clear();
+			return ;
+		}
 		this->_headers.insert(std::pair<std::string, std::string>(key, value));
 	}
 	std::streampos endPos = ss.tellg();
@@ -561,6 +565,14 @@ ClientSocket::csphase Response::_setCGIResponse(Request &request,
 			break;
 		}
 		case CGIHandler::CGISET: {
+			if (this->_cgiHandler.getRbuffer().size() > 1000) {
+				this->_headers.clear();
+				this->_body.clear();
+				this->_setErrorResponse("500", false);
+				this->_cgiHandler.setCGIPhase(CGIHandler::CGIFIN);
+				this->setRawData();
+				break;
+			}
 			this->_setCGIResponseHeader(shouldKeepAlive);
 			this->_setCGIResponseBody();
 			this->_setCGIResponseStatus();

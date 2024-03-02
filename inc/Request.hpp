@@ -1,6 +1,8 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
+#define REQUEST_HEADER_LIMITATION 1000
+
 #include <limits.h>
 
 #include <map>

@@ -1,0 +1,7 @@
+host, localhost
+port, 8080
+
+
+GET /cgi-bin/invalid_size_of_header.py HTTP/1.1
+Host: test
+Connection: close
