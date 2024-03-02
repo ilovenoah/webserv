@@ -176,7 +176,10 @@ bool loop(std::map<int, ServerSocket> &ssmap, Config &config) {
 				csiter->second->getPhase() == ClientSocket::CLOSE) {
 				continue;
 			}
-			if ((utils::findLF(csiter->second->buffer) ||
+			if (iter->second.getReqphase() != Request::RQBODY && csiter->second->isOverBytesSize(1000) == true) {
+				iter->second.init();
+				iter->second.setReqphase(Request::RQFIN);
+			} else if ((utils::findLF(csiter->second->buffer) ||
 				 iter->second.getReqphase() == Request::RQBODY)) {
 				ClientSocket::csphase nextcsphase =
 					iter->second.load(csiter->second->buffer);

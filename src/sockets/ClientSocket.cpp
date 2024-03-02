@@ -109,3 +109,15 @@ void ClientSocket::setLastSendTimestamp(std::time_t const lastSendTimestamp) {
 ServerSocket *ClientSocket::getServerSocket() const {
 	return this->_serverSocket;
 }
+
+bool ClientSocket::isOverBytesSize(const std::stringstream::pos_type bytes) {
+	std::stringstream::pos_type posStart = this->buffer.tellg();
+	this->buffer.seekg(0, std::ios::end);
+	std::stringstream::pos_type posEnd = this->buffer.tellg();
+	if (posEnd - posEnd > bytes) {
+		this->buffer.seekg(posStart);
+		return true;
+	}
+	this->buffer.seekg(posStart);
+	return false;
+}

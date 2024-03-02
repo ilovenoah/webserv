@@ -42,6 +42,7 @@ class ClientSocket {
 		void setLastSendTimestamp(std::time_t const lastSendTimestamp);
 		bool findCRLF();
 		ServerSocket *getServerSocket() const;
+		bool isOverBytesSize(const std::stringstream::pos_type bytes);
 };
 
 #endif
