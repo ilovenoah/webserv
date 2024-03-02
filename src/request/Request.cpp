@@ -190,6 +190,14 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				nextcsphase = ClientSocket::RECV;
 				break;
 			}
+			if (this->_header.size() > REQUEST_HEADER_LIMITATION - 1) {
+				this->_method.clear();
+				this->_path.clear();
+				this->_httpVersion.clear();
+				this->_phase = Request::RQFIN;
+				nextcsphase = ClientSocket::RECV;
+				break;
+			}
 			line = utils::rmCR(line);
 			std::stringstream ss(line);
 			std::string key;
