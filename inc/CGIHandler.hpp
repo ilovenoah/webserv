@@ -11,6 +11,7 @@
 #include "Server.hpp"
 
 #define CGI_BUFFERSIZE 4096
+#define CGI_LIMIT_LOCAL_REDIR 5
 
 class CGIHandler {
 	public:
@@ -37,6 +38,9 @@ class CGIHandler {
 												const std::string &)>
 			_metaVarSetterVec;
 		bool _deleteEnv();
+		static const std::size_t _timeoutSec;
+		const std::time_t _startSec;
+		std::size_t _exeTime;
 
 	public:
 		CGIHandler();
