@@ -141,6 +141,11 @@ void Response::_setErrorResponse(const std::string &status,
 			this->_location->getErrorPages().find(status);
 		if (iter != this->_location->getErrorPages().end()) {
 			errorPagePath = iter->second;
+		} else {
+			this->_setEntireDataWithBody(
+				status, this->_statusMap.find(status)->second.second,
+				shouldKeepAlive);
+			return;
 		}
 	} else {
 		std::map<std::string, std::string>::const_iterator iter =
