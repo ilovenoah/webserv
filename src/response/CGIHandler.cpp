@@ -36,7 +36,8 @@ CGIHandler::CGIHandler()
 	  _wpfd(0),
 	  _rpfd(0),
 	  _phase(CGIHandler::CGIWRITE),
-	  _startSec(std::time(NULL)) {}
+	  _startSec(std::time(NULL)),
+	  _exeTime(0) {}
 
 bool CGIHandler::_deleteEnv() {
 	for (std::vector<const char *>::iterator iter = this->_env.begin();
@@ -520,6 +521,7 @@ bool CGIHandler::activate() {
 	this->_rpfd = opfd[0];
 	this->_pid = pid;
 	this->_isActive = true;
+	this->_exeTime++;
 	return true;
 }
 
@@ -574,7 +576,7 @@ void CGIHandler::setCGIPhase(CGIHandler::cgiphase phase) {
 
 CGIHandler::cgiphase CGIHandler::detectCGIPhase() const {
 	CGIHandler::cgiphase phase(this->_phase);
-	if (std::difftime(std::time(NULL), this->_startSec) > CGIHandler::_timeoutSec) {
+	if (std::difftime(std::time(NULL), this->_startSec) > CGIHandler::_timeoutSec || this->_exeTime > CGI_LIMIT_LOCAL_REDIR) {
 		utils::x_kill(this->_pid, SIGTERM);
 		if (this->_phase == CGIHandler::CGIFIN) {
 			return CGIHandler::CGIFIN;
