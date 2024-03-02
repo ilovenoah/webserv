@@ -565,6 +565,14 @@ ClientSocket::csphase Response::_setCGIResponse(Request &request,
 			break;
 		}
 		case CGIHandler::CGISET: {
+			if (this->_cgiHandler.getRbuffer().size() > 1000) {
+				this->_headers.clear();
+				this->_body.clear();
+				this->_setErrorResponse("500", false);
+				this->_cgiHandler.setCGIPhase(CGIHandler::CGIFIN);
+				this->setRawData();
+				break;
+			}
 			this->_setCGIResponseHeader(shouldKeepAlive);
 			this->_setCGIResponseBody();
 			this->_setCGIResponseStatus();
