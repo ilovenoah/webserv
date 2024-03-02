@@ -5,7 +5,7 @@ Response::_initstatusMap() {
 	std::map<std::string, std::pair<std::string, std::string> > statusMap;
 	statusMap.insert(
 		std::pair<std::string, std::pair<std::string, std::string> >(
-			"200", std::pair<std::string, std::string>("Ok", "Ok")));
+			"200", std::pair<std::string, std::string>("OK", "OK")));
 	statusMap.insert(
 		std::pair<std::string, std::pair<std::string, std::string> >(
 			"201", std::pair<std::string, std::string>("Created", "Created")));
@@ -89,6 +89,10 @@ void Response::setStatusMsg(std::string const &statusMsg) {
 
 void Response::setBody(std::string const &body) { this->_body = body; }
 
+void Response::setRawData() { this->_rawData = this->getEntireData(); }
+
+void Response::eraseRawData(ssize_t bytes) { this->_rawData.erase(0, bytes); }
+
 bool Response::isKeepAlive() const {
 	std::map<std::string, std::string>::const_iterator iter =
 		this->_headers.find("Connection");
@@ -167,9 +171,9 @@ void Response::_setErrorResponse(const std::string &status,
 		fs.seekg(0, fs.end);
 		length = fs.tellg();
 		fs.seekg(0, fs.beg);
-		char buf[length];
-		std::memset(buf, 0, length);
-		fs.readsome(buf, length);
+		char buf[length + 1];
+		std::memset(buf, 0, length + 1);
+		fs.read(buf, length);
 		if (fs.fail()) {
 			this->_setEntireDataWithBody(
 				this->_statusMap.find("500")->first,
@@ -410,28 +414,28 @@ ClientSocket::csphase Response::_setRedirectResponse(Request const &request,
 			this->_headers.insert(
 				std::pair<std::string, std::string>("Connection", "close"));
 		}
-		return ClientSocket::SEND;
-	} else {
-		if (request.getMethod().compare("GET") == 0) {
-			this->_status = "302";
-			this->_statusMsg = this->_statusMap.find("302")->second.first;
-		} else {
-			this->_status = "307";
-			this->_statusMsg = this->_statusMap.find("307")->second.first;
-		}
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Content-Length", utils::sizeTtoString(this->_body.size())));
-		this->_headers.insert(std::pair<std::string, std::string>(
-			"Location", this->_server->getReturn()));
-		if (shouldKeepAlive == true) {
-			this->_headers.insert(std::pair<std::string, std::string>(
-				"Connection", "keep-alive"));
-		} else {
-			this->_headers.insert(
-				std::pair<std::string, std::string>("Connection", "close"));
-		}
+		this->setRawData();
 		return ClientSocket::SEND;
 	}
+	if (request.getMethod().compare("GET") == 0) {
+		this->_status = "302";
+		this->_statusMsg = this->_statusMap.find("302")->second.first;
+	} else {
+		this->_status = "307";
+		this->_statusMsg = this->_statusMap.find("307")->second.first;
+	}
+	this->_headers.insert(std::pair<std::string, std::string>(
+		"Content-Length", utils::sizeTtoString(this->_body.size())));
+	this->_headers.insert(std::pair<std::string, std::string>(
+		"Location", this->_server->getReturn()));
+	if (shouldKeepAlive == true) {
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Connection", "keep-alive"));
+	} else {
+		this->_headers.insert(
+			std::pair<std::string, std::string>("Connection", "close"));
+	}
+	this->setRawData();
 	return ClientSocket::SEND;
 }
 
@@ -591,6 +595,7 @@ ClientSocket::csphase Response::_setCGIResponse(Request &request,
 			break;
 		}
 		case CGIHandler::CGIFIN: {
+			this->setRawData();
 			phase = ClientSocket::SEND;
 			break;
 		}
@@ -701,6 +706,8 @@ std::string Response::getEntireData() const {
 	return entireData;
 }
 
+const std::string &Response::getRawData() const { return this->_rawData; }
+
 static std::string const removeLocationFromString(std::string const &path,
 												  std::string const &location) {
 	std::string result = path;
@@ -756,9 +763,9 @@ ClientSocket::csphase Response::setEntireDataWithFile(std::string const &path,
 	fs.seekg(0, fs.end);
 	length = fs.tellg();
 	fs.seekg(0, fs.beg);
-	char buf[length];
-	std::memset(buf, 0, length);
-	fs.readsome(buf, length);
+	char buf[length + 1];
+	std::memset(buf, 0, length + 1);
+	fs.read(buf, length);
 	if (fs.fail()) {
 		this->_setErrorResponse("500", shouldKeepAlive);
 		return ClientSocket::SEND;
@@ -782,6 +789,7 @@ ClientSocket::csphase Response::setEntireData(std::string const &status,
 		this->_headers.insert(
 			std::pair<std::string, std::string>("Connection", "close"));
 	}
+	this->setRawData();
 	return ClientSocket::SEND;
 }
 
@@ -800,6 +808,7 @@ ClientSocket::csphase Response::_setEntireDataWithBody(
 		this->_headers.insert(
 			std::pair<std::string, std::string>("Connection", "close"));
 	}
+	this->setRawData();
 	return ClientSocket::SEND;
 }
 

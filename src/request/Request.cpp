@@ -125,6 +125,22 @@ bool Request::_setHttpRequestLine(std::string const &line) {
 	return true;
 }
 
+static bool isValidFieldName(std::string const &field) {
+	if (field.empty()) {
+		return false;
+	}
+	if (!std::isalpha(field[0])) {
+		return false;
+	}
+	for (size_t i = 1; i < field.size(); ++i) {
+		if (std::isalpha(field[i]) == false &&
+			std::isdigit(field[i]) == false && field[i] != '-') {
+			return false;
+		}
+	}
+	return true;
+}
+
 ClientSocket::csphase Request::load(std::stringstream &buffer) {
 	ClientSocket::csphase nextcsphase(ClientSocket::CLOSE);
 	switch (this->getReqphase()) {
@@ -180,7 +196,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 			std::string value;
 			std::getline(ss, key, ':');
 			ss >> std::ws;
-			if (ss.peek() == EOF) {
+			if (ss.peek() == EOF || isValidFieldName(key) == false) {
 				this->_method.clear();
 				this->_path.clear();
 				this->_httpVersion.clear();
@@ -194,7 +210,6 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				this->_header.find(key);
 			if (iter != this->_header.end()) {
 				iter->second.append(", " + value);
-				std::clog << "iter->second: " << iter->second << std::endl;
 			} else {
 				this->_header.insert(
 					std::pair<std::string, std::string>(key, value));
@@ -206,7 +221,7 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 		case Request::RQBODY: {
 			std::size_t contentLength(0);
 			std::size_t expReadsize;
-			std::size_t actReadsize;
+			std::streamsize actReadsize;
 			std::map<std::string, std::string>::iterator cliter =
 				this->_header.find("Content-Length");
 			std::map<std::string, std::string>::iterator teiter =
@@ -245,11 +260,11 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 						break;
 					}
 				}
-				char buf[this->_chunksize];
-				std::memset(buf, 0, this->_chunksize);
+				char buf[this->_chunksize + 1];
+				std::memset(buf, 0, this->_chunksize + 1);
 				actReadsize = buffer.readsome(buf, this->_chunksize);
 				if (buffer.fail()) {
-					utils::putSysError("readsome");
+					utils::putSysError("read");
 					nextcsphase = ClientSocket::RECV;
 					this->_phase = Request::RQFIN;
 					break;
@@ -274,11 +289,11 @@ ClientSocket::csphase Request::load(std::stringstream &buffer) {
 				this->_phase = Request::RQFIN;
 				break;
 			}
-			char buf[expReadsize];
-			std::memset(buf, 0, expReadsize);
+			char buf[expReadsize + 1];
+			std::memset(buf, 0, expReadsize + 1);
 			actReadsize = buffer.readsome(buf, expReadsize);
 			if (buffer.fail()) {
-				utils::putSysError("readsome");
+				utils::putSysError("read");
 				nextcsphase = ClientSocket::RECV;
 				this->_phase = Request::RQFIN;
 				break;

@@ -8,7 +8,6 @@
 #include <utility>
 #include <vector>
 
-#include "CGIHandler.hpp"
 #include "ClientSocket.hpp"
 #include "Request.hpp"
 #include "Response.hpp"

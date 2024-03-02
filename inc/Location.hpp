@@ -13,7 +13,6 @@ class Server;
 class Location : public AConfigurable {
 	private:
 		std::string _path;
-		std::size_t _lineCount;
 		std::string _aliasDirective;
 
 	public:
