@@ -19,4 +19,12 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
+echo "${0}: remove object files."
+make fclean
+status=$?
+if [ $status -ne 0 ]; then
+  echo "Failed to remove object files: $status"
+  exit $status
+fi
+
 sleep infinity
