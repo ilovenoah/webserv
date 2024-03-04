@@ -118,6 +118,32 @@ def assert_str(act, exp):
 		ok_count += 1
 		print(GREEN + '===== OK =====' + END)
 
+def is_chunked_request(sections):
+	request = sections[1]
+	lines = request.splitlines()
+	for line in lines:
+		elems = line.split(':')
+		if (len(elems) == 2):
+			key = elems[0]
+			value = elems[1]
+			if (key == 'Transfer-Encoding' and 'chunked' in value): return True
+	return False
+
+def is_hex(s):
+    try:
+        int(s, 16)
+        return True
+    except ValueError:
+        return False
+
+def getChukedBody(sections):
+	unchunked_body = get_body(sections)
+	lines = unchunked_body.splitlines()
+	body = ''
+	for line in lines:
+		body += line if is_hex(line) is False else ''
+	return body
+
 def assert_post(exp_status, sections, testdir, response_file_path):
 	global total_count
 	global ok_count
@@ -131,13 +157,17 @@ def assert_post(exp_status, sections, testdir, response_file_path):
 			print(GREEN + '===== OK =====' + END)
 
 	else:
-		if (response_file_path == None):
-			paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
+		paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
+		if (is_chunked_request(sections) == True):
+			act = getChukedBody(sections)
+			print(act)
+			exp = get_file_content(paths[0])
+			assert_str(act, exp)
+		elif (response_file_path == None):
 			act = get_body(sections)
 			exp = get_file_content(paths[0])
 			assert_str(act, exp)
 		else:
-			paths = [os.path.join(testdir, UPLOAD_STORE_DIR_NAME, path) for path in os.listdir(os.path.join(testdir, UPLOAD_STORE_DIR_NAME))]
 			act = get_binary_file_content(paths[0])
 			exp = get_binary_file_content(response_file_path)
 			assert_str(act, exp)
