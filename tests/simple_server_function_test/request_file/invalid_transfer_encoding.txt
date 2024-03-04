@@ -1,6 +1,6 @@
 host, localhost
 port, 8080
-path, ./tests/simple_server_function_test/data/test.png
+path, ./simple_server_function_test/data/test.png
 
 
 POST / HTTP/1.1
