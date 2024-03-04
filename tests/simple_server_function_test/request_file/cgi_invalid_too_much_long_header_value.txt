@@ -1,7 +1,0 @@
-host, localhost
-port, 8080
-
-
-GET /cgi-bin/too_much_long_header_value.py HTTP/1.1
-Host: test
-Connection: close

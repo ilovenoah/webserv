@@ -1,7 +1,0 @@
-host, localhost
-port, 8080
-
-
-GET /cgi-bin/unauthorized_cgi_script.py HTTP/1.1
-Host: test
-Connection: close

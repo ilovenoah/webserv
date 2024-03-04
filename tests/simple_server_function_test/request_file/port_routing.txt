@@ -1,7 +1,0 @@
-host, localhost
-port, 8081
-
-
-GET /content2/ HTTP/1.1
-Host: test
-Connection: close
