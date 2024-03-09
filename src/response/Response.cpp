@@ -465,8 +465,14 @@ void Response::_setCGIResponseHeader(const bool shouldKeepAlive) {
 		if (utils::compCaseInsensitive(key, "Set-Cookie") == 0) {
 			this->_setCookies.push_back(value);
 		} else {
-			this->_headers.insert(
-				std::pair<std::string, std::string>(key, value));
+			std::map<std::string, std::string>::iterator iter =
+				this->_headers.find(key);
+			if (iter != this->_headers.end()) {
+				iter->second.append(", " + value);
+			} else {
+				this->_headers.insert(
+					std::pair<std::string, std::string>(key, value));
+			}
 		}
 	}
 	std::streampos endPos = ss.tellg();

@@ -1,0 +1,7 @@
+host, localhost
+port, 8080
+
+
+GET /cgi-bin/duplicate_cgi_response_header.py HTTP/1.1
+Host: test
+Connection: close
