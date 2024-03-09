@@ -76,6 +76,8 @@ class CGIHandler {
 							   const std::string &actPath);
 		bool setServerSoftware(const Request &request,
 							   const std::string &actPath);
+		bool setHttpCookie(const Request &request,
+							   const std::string &actPath);
 		CGIHandler::cgiphase getCGIPhase() const;
 		void setCGIPhase(CGIHandler::cgiphase phase);
 		CGIHandler::cgiphase detectCGIPhase() const;

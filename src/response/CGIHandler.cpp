@@ -20,6 +20,7 @@ CGIHandler::_initMetaVarSetterVec() {
 	metaVarSetterVec.push_back(&CGIHandler::setServerPort);
 	metaVarSetterVec.push_back(&CGIHandler::setServerProtocol);
 	metaVarSetterVec.push_back(&CGIHandler::setServerSoftware);
+	metaVarSetterVec.push_back(&CGIHandler::setHttpCookie);
 	return metaVarSetterVec;
 }
 
@@ -333,6 +334,25 @@ bool CGIHandler::setServerSoftware(const Request &request,
 		return false;
 	}
 	this->_env.push_back(serverSoftwarePtr);
+	return true;
+}
+
+bool CGIHandler::setHttpCookie(const Request &request, const std::string &actPath) {
+	(void)actPath;
+	std::string httpCookie;
+	Result<std::string, bool> res = request.getHeaderValue("Cookie");
+	if (res.isError() == true) {
+		return true;
+	}
+	if (res.isOK() == true) {
+		httpCookie = res.getOk();
+	}
+	httpCookie = "HTTP_COOKIE=" + httpCookie;
+	char *httpCookiePtr = strDupToCharPtr(httpCookie);
+	if (httpCookiePtr == NULL) {
+		return false;
+	}
+	this->_env.push_back(httpCookiePtr);
 	return true;
 }
 
