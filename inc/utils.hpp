@@ -38,6 +38,8 @@ int x_chdir(const char *dir);
 int x_dup2(int fd, int fd2);
 int x_kill(int pid, int sig);
 std::string trim(std::string const &line, std::string const &str);
+ssize_t compCaseInsensitive(const std::string &s1, const std::string &s2);
+
 }  // namespace utils
 
 #endif
