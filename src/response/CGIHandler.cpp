@@ -337,7 +337,8 @@ bool CGIHandler::setServerSoftware(const Request &request,
 	return true;
 }
 
-bool CGIHandler::setHttpCookie(const Request &request, const std::string &actPath) {
+bool CGIHandler::setHttpCookie(const Request &request,
+							   const std::string &actPath) {
 	(void)actPath;
 	std::string httpCookie;
 	Result<std::string, bool> res = request.getHeaderValue("Cookie");
