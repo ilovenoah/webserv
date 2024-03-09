@@ -184,4 +184,19 @@ std::string trim(std::string const &line, std::string const &str) {
 	return line.substr(posbig, strRange);
 }
 
+static unsigned char helper_tolower(unsigned char c) {
+	if ('A' <= c && c <= 'Z') {
+		return (c - 'A' + 'a');
+	}
+	return (c);
+}
+
+ssize_t compCaseInsensitive(const std::string &s1, const std::string &s2) {
+	std::string str1(s1.length(), ' ');
+	std::string str2(s2.length(), ' ');
+	std::transform(s1.begin(), s1.end(), str1.begin(), helper_tolower);
+	std::transform(s2.begin(), s2.end(), str2.begin(), helper_tolower);
+	return s1.compare(s2);
+}
+
 }  // namespace utils

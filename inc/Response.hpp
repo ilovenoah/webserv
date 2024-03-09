@@ -30,6 +30,7 @@ class Response {
 		std::string _status;
 		std::string _statusMsg;
 		std::map<std::string, std::string, CaseInsensitiveCompare> _headers;
+		std::vector<std::string> _setCookies;
 		std::string _body;
 		std::string _rawData;
 		Server *_server;
