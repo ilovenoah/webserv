@@ -1,7 +1,0 @@
-host, localhost
-port, 8080
-
-
-GET /cgi-bin/print_env.py HTTP/1.1
-Host: test4
-Connection: close

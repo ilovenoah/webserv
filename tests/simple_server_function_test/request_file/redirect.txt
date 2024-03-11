@@ -1,7 +1,0 @@
-host, localhost
-port, 8080
-
-
-GET /error HTTP/1.1
-Host: test2
-Connection: close
