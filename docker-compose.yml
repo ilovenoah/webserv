@@ -6,9 +6,24 @@ services:
     tty: true    
     volumes:
       - .:/code
+    networks:
+      - webserv_net
+
+  locust:
+    container_name: webserv_locust
+    image: python:latest
+    volumes:
+      - .:/code
+    working_dir: /code
+    command: >
+      /bin/sh -c "
+        pip install locust &&
+        locust
+      "
     ports:
-      - '9090:9090'
-    network_mode: "host"
+      - '8089:8089'
+    networks:
+      - webserv_net
 
 networks:
   webserv_net:
