@@ -216,7 +216,7 @@ bool Response::_setIndexPage(bool shouldKeepAlive) {
 	for (std::vector<std::string>::iterator iter = index.begin();
 		 iter != index.end(); ++iter) {
 		path = this->_actPath + *iter;
-				this->setEntireDataWithFile(path, "200", shouldKeepAlive);
+		this->setEntireDataWithFile(path, "200", shouldKeepAlive);
 		return true;
 	}
 	return false;
