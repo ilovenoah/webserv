@@ -216,7 +216,7 @@ bool Response::_setIndexPage(bool shouldKeepAlive) {
 	for (std::vector<std::string>::iterator iter = index.begin();
 		 iter != index.end(); ++iter) {
 		path = this->_actPath + *iter;
-		this->setEntireDataWithFile(path, "200", shouldKeepAlive);
+				this->setEntireDataWithFile(path, "200", shouldKeepAlive);
 		return true;
 	}
 	return false;
@@ -289,10 +289,10 @@ ClientSocket::csphase Response::_setGetResponse(const Request &request) {
 	}
 	if (res.getOk() == true &&
 		this->_actPath.find_last_of('/') != this->_actPath.length() - 1) {
-		this->setEntireData("301", request.shouldKeepAlive());
 		this->_headers.insert(std::pair<std::string, std::string>(
 			"Location",
 			"http://" + this->_server->getListen() + request.getPath() + "/"));
+		this->setEntireData("301", request.shouldKeepAlive());
 		return ClientSocket::SEND;
 	}
 	if (res.getOk() == true) {
