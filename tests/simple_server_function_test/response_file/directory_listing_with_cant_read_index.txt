@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 333
+
+<html>
+<head><title>Index of /error/</title></head>
+<body>
+<h1>Index of /error/</h1><hr><pre>
+<a href="../">../</a>
+<a href="400.html">400.html</a>
+<a href="403.html">403.html</a>
+<a href="404.html">404.html</a>
+<a href="405.html">405.html</a>
+<a href="413.html">413.html</a>
+<a href="500.html">500.html</a>
+</pre><hr></body>
+</html>
